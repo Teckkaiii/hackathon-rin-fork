@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIN — Revenue Intelligence Network (synthetic prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E1261B; --red-deep:#B81C13; --red-wash:#FDECEA;
+  --slate:#3F535E; --slate-hi:#33454E;
+  --canvas:#F5F1F1; --card:#FFFFFF; --sunk:#F7F5F5;
+  --line:#E8E2E2; --line-2:#D8D0D0;
+  --ink:#171717; --ink-2:#4A5560; --ink-3:#8A9096;
+  --green:#16775F; --green-wash:#E7F2EF;
+  --amber:#8A6210; --amber-wash:#FBF1DE;
+  --r-lg:20px; --r-md:14px; --r-sm:12px; --r-pill:999px;
+  --shadow:0 1px 2px rgba(23,23,23,.045), 0 4px 12px rgba(23,23,23,.04), 0 12px 30px rgba(23,23,23,.05);
+  --shadow-lift:0 2px 4px rgba(23,23,23,.05), 0 8px 20px rgba(23,23,23,.06), 0 22px 48px rgba(23,23,23,.10);
+  --grad-red:linear-gradient(135deg,#EE3A2E 0%,#E1261B 46%,#B81C13 100%);
+  --grad-slate:linear-gradient(135deg,#4A5F6B 0%,#3F535E 55%,#33454E 100%);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans); background:var(--canvas);
+  background-image:radial-gradient(1100px 620px at 78% -8%, rgba(225,38,27,.045), transparent 62%),
+    radial-gradient(900px 520px at 4% 2%, rgba(63,83,94,.05), transparent 60%);
+  background-attachment:fixed; color:var(--ink-2); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+select,input,textarea{font:inherit}
+a{color:var(--slate)}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:6px}
+
+.t-display{font-size:32px;line-height:1.15;font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+.t-h1{font-size:24px;line-height:1.22;font-weight:800;letter-spacing:-.026em;color:var(--ink)}
+.t-h2{font-size:19px;line-height:1.3;font-weight:700;letter-spacing:-.018em;color:var(--ink)}
+.t-h3{font-size:15px;line-height:1.4;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.t-lead{font-size:16px;line-height:1.55;color:var(--ink-2)}
+.t-body{font-size:15px;line-height:1.6;color:var(--ink-2)}
+.t-meta{font-size:13px;line-height:1.5;color:var(--ink-3)}
+.t-micro{font-size:13px;line-height:1.4;color:var(--ink-3);letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+.src{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.k{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.hidden{display:none !important}
+
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+
+/* ---- masthead / nav ---- */
+.redbar{height:4px;background:var(--grad-red)}
+.masthead{background:rgba(255,255,255,.86);backdrop-filter:saturate(150%) blur(12px);
+  border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.mast-row{display:flex;align-items:center;gap:12px 18px;padding:14px 0;flex-wrap:wrap}
+.mark{width:38px;height:38px;border-radius:11px;background:var(--grad-red);color:#fff;display:flex;
+  align-items:center;justify-content:center;font-weight:800;font-size:15px;letter-spacing:-.02em;flex:none;
+  box-shadow:0 4px 10px rgba(225,38,27,.28)}
+.mast-title{font-weight:800;font-size:16.5px;color:var(--ink);letter-spacing:-.01em}
+.mast-sub{font-size:12.5px;color:var(--ink-3)}
+.nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.navbtn{border:1px solid transparent;background:transparent;padding:9px 14px;border-radius:var(--r-pill);
+  font-size:14px;font-weight:600;color:var(--ink-2);transition:.15s var(--ease)}
+.navbtn:hover{background:var(--sunk)}
+.navbtn.on{background:var(--slate);color:#fff;box-shadow:var(--shadow)}
+.syn-tag{font-size:11.5px;font-weight:600;color:var(--red-deep);background:var(--red-wash);
+  padding:3px 9px;border-radius:var(--r-pill);letter-spacing:.02em;flex:none}
+
+main{padding:28px 0 80px}
+
+/* ---- card ---- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);
+  padding:20px 22px;margin-bottom:16px}
+.card.tight{padding:14px 18px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+
+/* ---- pills / badges ---- */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:var(--r-pill);
+  font-size:12.5px;font-weight:600;letter-spacing:.01em;white-space:nowrap}
+.pill.pass{background:var(--green-wash);color:var(--green)}
+.pill.block{background:var(--red-wash);color:var(--red-deep)}
+.pill.flag{background:var(--amber-wash);color:var(--amber)}
+.pill.neutral{background:var(--sunk);color:var(--ink-2);border:1px solid var(--line)}
+.pill.slate{background:var(--slate);color:#fff}
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
+.dot.pass{background:var(--green)} .dot.block{background:var(--red)} .dot.flag{background:var(--amber)}
+
+/* ---- buttons ---- */
+.btn{border-radius:var(--r-pill);padding:9px 16px;font-size:14px;font-weight:600;border:1px solid var(--line-2);
+  background:#fff;color:var(--ink-2);transition:.15s var(--ease)}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--grad-slate);color:#fff;border:none;box-shadow:var(--shadow)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.red{background:var(--grad-red);color:#fff;border:none;box-shadow:var(--shadow)}
+.btn.ghost{background:transparent;border:1px solid transparent;color:var(--ink-3)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* ---- filter bar ---- */
+.filterbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;background:var(--sunk);
+  border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:14px}
+.filterbar select{border:1px solid var(--line-2);background:#fff;border-radius:9px;padding:7px 9px;font-size:13.5px;color:var(--ink-2)}
+.filter-note{margin-left:auto;font-size:12.5px;color:var(--ink-3);font-weight:600}
+
+/* ---- opportunity card ---- */
+.opp{border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px;margin-bottom:12px;background:#fff;
+  position:relative}
+.opp.blocked{background:var(--sunk);border-style:dashed}
+.opp-top{display:flex;align-items:flex-start;gap:14px;justify-content:space-between;flex-wrap:wrap}
+.rank{width:30px;height:30px;border-radius:9px;background:var(--slate);color:#fff;font-weight:800;font-size:14px;
+  display:flex;align-items:center;justify-content:center;flex:none}
+.opp-name{font-weight:800;font-size:16.5px;color:var(--ink);letter-spacing:-.01em}
+.opp-meta{font-size:13px;color:var(--ink-3);margin-top:2px}
+.opp-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.why-box{background:var(--sunk);border-radius:10px;padding:10px 12px}
+.why-box .lbl{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);margin-bottom:4px}
+.why-box .val{font-size:13.5px;color:var(--ink-2);line-height:1.45}
+.opp-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.gate-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.gate-row{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:6px 0;border-top:1px solid var(--line)}
+.gate-row:first-child{border-top:none}
+.gate-name{font-weight:600;color:var(--ink-2);min-width:150px}
+.gate-reason{color:var(--ink-3);font-size:13px}
+
+@media (max-width:820px){.why-grid{grid-template-columns:1fr}}
+
+/* ---- stat strip ---- */
+.stat-strip{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border-top:1px solid var(--line);margin-top:12px}
+.stat{padding:10px 12px 9px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0}
+.stat-v{font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.stat-v.warn{color:var(--red)}
+.stat-l{font-size:12.5px;color:var(--ink-3);margin-top:3px}
+
+/* ---- client list / directory ---- */
+.clientrow{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid var(--line);
+  border-radius:var(--r-md);margin-bottom:8px;background:#fff}
+.clientrow:hover{border-color:var(--ink-3);cursor:pointer}
+.avatar{width:38px;height:38px;border-radius:10px;background:var(--slate);color:#fff;font-weight:700;font-size:13.5px;
+  display:flex;align-items:center;justify-content:center;flex:none}
+
+/* ---- binding constraint banner ---- */
+.bindbox{border:1px solid var(--red-wash);background:var(--red-wash);border-radius:var(--r-md);padding:14px 16px;margin-bottom:16px}
+.bindbox .t-micro{color:var(--red-deep)}
+.bindbox.doc{border-color:#F4D9A6;background:var(--amber-wash)}
+.bindbox.doc .t-micro{color:var(--amber)}
+
+/* ---- position dimension rows ---- */
+.dim{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px;background:#fff}
+.dim.top{border-color:var(--red);box-shadow:0 0 0 1px rgba(225,38,27,.15)}
+.dim-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.evidence{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-top:6px}
+
+/* ---- coach ---- */
+textarea{width:100%;border:1px solid var(--line-2);border-radius:var(--r-md);padding:12px 14px;font-family:var(--sans);
+  font-size:14.5px;line-height:1.6;color:var(--ink);resize:vertical;min-height:130px}
+.checkrow{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.checkrow:first-child{border-top:none}
+.checkrow .txt{font-size:13.5px;color:var(--ink-2)}
+.checkrow .rule{font-weight:700;color:var(--ink);font-size:13.5px}
+.rewrite-box{background:var(--sunk);border-radius:10px;padding:12px 14px;margin-top:10px;font-size:13.5px;
+  font-family:var(--mono);white-space:pre-wrap;line-height:1.6;color:var(--ink-2)}
+
+/* ---- table ---- */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);
+  padding:6px 10px;border-bottom:1px solid var(--line-2)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--ink-2)}
+tr:last-child td{border-bottom:none}
+
+/* ---- desk view grid ---- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media (max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+.bignum{font-size:30px;font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+
+.cluster-banner{border:1px solid #C9DDE2;background:#EFF6F7;border-radius:var(--r-md);padding:12px 16px;margin-bottom:14px;
+  display:flex;gap:10px;align-items:flex-start}
+
+.backlink{font-size:13.5px;font-weight:600;color:var(--slate);background:none;border:none;padding:0;margin-bottom:14px;
+  display:inline-flex;align-items:center;gap:4px}
+.footer-note{margin-top:30px;padding:14px 0;border-top:1px solid var(--line-2);font-size:12.5px;color:var(--ink-3);
+  text-align:center}
+.modal-veil{position:fixed;inset:0;background:rgba(23,23,23,.42);display:flex;align-items:center;justify-content:center;
+  z-index:100;padding:20px}
+.modal{background:#fff;border-radius:var(--r-lg);padding:22px 24px;max-width:440px;width:100%;box-shadow:var(--shadow-lift)}
+</style>
+</head>
+<body>
+<div class="redbar"></div>
+<header class="masthead">
+  <div class="wrap mast-row">
+    <div class="mark">RIN</div>
+    <div>
+      <div class="mast-title">Revenue Intelligence Network</div>
+      <div class="mast-sub">Premier &amp; Private Banking · daily decision layer</div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <span class="syn-tag">Synthetic prototype</span>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+<div class="footer-note wrap">Synthetic data throughout. RIN surfaces and explains; it does not price, advise, or send without RM approval.</div>
+<script>
+/* ============================== DATA ============================== */
+const TODAY = new Date('2026-09-14T09:00:00');
+
+const PRODUCTS = {
+  'sd-sgd':{name:'SGD Structured Deposit (rate lock)', entity:'OCBC Bank', family:'Structured'},
+  'bond-sgd':{name:'SGD Corporate Bond', entity:'Bank of Singapore', family:'Fixed Income'},
+  'dpm':{name:'Discretionary Portfolio Mandate (rebalance)', entity:'Bank of Singapore', family:'Discretionary'},
+  'fund-div':{name:'Dividend Income Fund', entity:'Lion Global', family:'Funds'},
+  'fd-sgd':{name:'SGD Fixed Deposit (renewal)', entity:'OCBC Bank', family:'Deposits'},
+  'ilp':{name:'Universal Life (Income Protection)', entity:'Great Eastern', family:'Insurance'},
+};
+
+const DRIVERS = {
+  'rate-cut':{label:'SGD rates expected to ease', detail:'Desk note (2026-09-13): 3M SORA expected to ease ~25bps by Q4 on softer core inflation. Renewing fixed-rate instruments at maturity risks resetting into a lower rate.'},
+  'sector-semis':{label:'Semiconductor sector correction', detail:'Foundry-segment guidance cut ~8% across peer set following a wafer-demand downgrade, published 2026-09-12.'},
+};
+
+const CLIENTS = {
+  chen:{ id:'chen', name:'Chen Wei Liang', segment:'Premier', tier:'Priority', rm:'Aisha Rahman',
+    mandate:'Advisory', risk:'Balanced',
+    kyc:{status:'Current', expiry:'2027-01-15'},
+    suitability:{lastReview:'2026-03-20'},
+    holdings:[{label:'SGD Fixed Deposit', value:380000, note:'matures 2026-09-26, rate 3.10% p.a.', source:'Core Banking · 2026-09-12'}],
+    concentration:null, idleCash:null, incomeObjective:null,
+  },
+  priya:{ id:'priya', name:'Priya Ravindran', segment:'Private', tier:'Signature', rm:'Aisha Rahman',
+    mandate:'Advisory', risk:'Growth',
+    kyc:{status:'Current', expiry:'2027-05-02'},
+    suitability:{lastReview:'2026-06-01'},
+    holdings:[{label:'Single-name equity position', value:1240000, note:'42% of portfolio in one foundry-segment name', source:'Portfolio Custody · 2026-09-13'}],
+    concentration:{pct:42, threshold:30, name:'a single foundry-segment holding'},
+    idleCash:null, incomeObjective:null,
+  },
+  tan:{ id:'tan', name:'Michael Tan', segment:'Premier', tier:'Priority', rm:'Daniel Goh',
+    mandate:'Advisory', risk:'Conservative',
+    kyc:{status:'Current', expiry:'2027-02-11'},
+    suitability:{lastReview:'2026-01-18'},
+    holdings:[{label:'SGD Corporate Bond', value:250000, note:'face value, matures 2026-10-01', source:'Fixed Income Custody · 2026-09-11'}],
+    concentration:null, idleCash:null, incomeObjective:null,
+  },
+  sarah:{ id:'sarah', name:'Sarah Lim', segment:'Private', tier:'Signature', rm:'Daniel Goh',
+    mandate:'Advisory', risk:'Balanced',
+    kyc:{status:'Renewing soon', expiry:'2026-10-02'},
+    suitability:{lastReview:'2026-02-10'},
+    holdings:[{label:'SGD idle cash balance', value:620000, note:'sitting uninvested since 2026-07-20 (56 days), following a property sale', source:'Core Banking · 2026-09-13'}],
+    concentration:null, idleCash:{days:56, threshold:45, source:'Core Banking · 2026-09-13'}, incomeObjective:null,
+  },
+  david:{ id:'david', name:'David Ong', segment:'Premier', tier:'Priority', rm:'Aisha Rahman',
+    mandate:'Advisory', risk:'Balanced',
+    kyc:{status:'Current', expiry:'2027-04-19'},
+    suitability:{lastReview:'2026-05-05'},
+    holdings:[{label:'Advisory portfolio', value:480000, note:'diversified income-oriented holdings', source:'Portfolio Custody · 2026-09-10'}],
+    concentration:null, idleCash:null,
+    incomeObjective:{target:30000, actual:21400, unit:'SGD/yr', source:'Portfolio Income Statement · 2026-09-01'},
+  },
+  grace:{ id:'grace', name:'Grace Koh', segment:'Private', tier:'Signature', rm:'Daniel Goh',
+    mandate:'Advisory', risk:'Growth',
+    kyc:{status:'Current', expiry:'2027-06-30'},
+    suitability:{lastReview:'2026-04-11'},
+    holdings:[{label:'Single-name equity position', value:890000, note:'holding in a company under a pending corporate action', source:'Portfolio Custody · 2026-09-13'}],
+    concentration:null, idleCash:null, incomeObjective:null,
+  },
+  robert:{ id:'robert', name:'Robert Teo', segment:'Premier', tier:'Priority', rm:'Aisha Rahman',
+    mandate:'Advisory', risk:'Balanced',
+    kyc:{status:'Current', expiry:'2027-01-30'},
+    suitability:{lastReview:'2025-05-02'},
+    holdings:[{label:'SGD Fixed Deposit', value:410000, note:'matures 2026-09-20, rate 2.95% p.a.', source:'Core Banking · 2026-09-12'}],
+    concentration:null, idleCash:null, incomeObjective:null,
+  },
+  michelle:{ id:'michelle', name:'Michelle Wong', segment:'Private', tier:'Signature', rm:'Daniel Goh',
+    mandate:'Advisory', risk:'Balanced',
+    kyc:{status:'Current', expiry:'2027-03-11'},
+    suitability:{lastReview:'2026-03-02'},
+    holdings:[{label:'Universal life policy', value:310000, note:'policy surrender value, held with Great Eastern', source:'Great Eastern policy record · 2026-09-12 (not yet permissioned to OCBC Bank)'}],
+    concentration:null, idleCash:null, incomeObjective:null,
+  },
+};
+
+const OPPS = [
+  { id:'op-chen', clientId:'chen', approach:'Notify', productId:'sd-sgd', driverId:'rate-cut',
+    signal:{recency:'Yesterday', headline:'SGD rates expected to ease before quarter end'},
+    amountAtStake:380000, daysToAct:12,
+    whyClient:'SGD 380,000 fixed deposit maturing in 12 days — currently his only rate-locked instrument.',
+    whyNow:'The desk expects SGD rates to ease before the renewal date. Left alone, the deposit rolls over automatically at whatever rate applies on 2026-09-26.',
+    whyInstrument:'A short-tenor structured deposit locks today\'s rate ahead of the move, without extending duration.',
+    gateOverride:null },
+  { id:'op-priya', clientId:'priya', approach:'Contextualise', productId:'dpm', driverId:'sector-semis',
+    signal:{recency:'Today', headline:'Foundry-segment guidance cut ~8% across peer set'},
+    amountAtStake:1240000, daysToAct:3,
+    whyClient:'42% of her portfolio sits in one foundry-segment name — well past the 30% concentration threshold for her mandate.',
+    whyNow:'A sector-wide guidance cut published this morning directly touches the held name; relevance to this conversation decays fast as the news ages.',
+    whyInstrument:'A discretionary-mandate rebalance conversation, not a sale recommendation — the point is to discuss the concentration, not to pitch a product.',
+    gateOverride:null },
+  { id:'op-tan', clientId:'tan', approach:'Notify', productId:'bond-sgd', driverId:'rate-cut',
+    signal:{recency:'Yesterday', headline:'SGD rates expected to ease before quarter end'},
+    amountAtStake:250000, daysToAct:17,
+    whyClient:'SGD 250,000 corporate bond maturing in 17 days.',
+    whyNow:'Same rate move as above: reinvesting after the move, rather than before, risks a lower running yield on the replacement instrument.',
+    whyInstrument:'A comparable-tenor bond, reinvested ahead of the rate move.',
+    gateOverride:null },
+  { id:'op-sarah', clientId:'sarah', approach:'Review', productId:'fund-div', driverId:null,
+    signal:{recency:'Internal', headline:'No external signal — internally triggered by an idle-cash threshold'},
+    amountAtStake:620000, daysToAct:30,
+    whyClient:'SGD 620,000 has sat uninvested for 56 days, past the 45-day idle-cash threshold for her segment.',
+    whyNow:'The cash arrived from a property sale in July and has not yet been reviewed against her stated objectives.',
+    whyInstrument:'An income-oriented fund conversation, sized to how much of the balance she actually wants deployed.',
+    gateOverride:null },
+  { id:'op-david', clientId:'david', approach:'Review', productId:'fund-div', driverId:null,
+    signal:{recency:'Internal', headline:'No external signal — internally triggered by an income-objective gap'},
+    amountAtStake:480000, daysToAct:21,
+    whyClient:'Trailing portfolio income of SGD 21,400/yr sits 29% below his stated objective of SGD 30,000/yr.',
+    whyNow:'The gap has held for a full quarterly review cycle without being raised.',
+    whyInstrument:'A higher-income reallocation, discussed against the objective he set — not a yield-chasing pitch.',
+    gateOverride:null },
+  { id:'op-grace', clientId:'grace', approach:'Contextualise', productId:'dpm', driverId:null,
+    signal:{recency:'Today', headline:'Pending corporate action on a held name'},
+    amountAtStake:890000, daysToAct:5,
+    whyClient:'SGD 890,000 held in a company that is the subject of a pending corporate action.',
+    whyNow:'The action was announced this morning.',
+    whyInstrument:'Would ordinarily be a portfolio conversation.',
+    gateOverride:{gate:'mnpi', reason:'Client\'s immediate family holds a board seat at the counterparty, and OCBC\'s advisory desk is engaged on this transaction. An information barrier is in effect (ref. IB-2026-0091) until the deal is announced publicly or terminated.'} },
+  { id:'op-robert', clientId:'robert', approach:'Notify', productId:'fd-sgd', driverId:null,
+    signal:{recency:'Internal', headline:'Contractual maturity date, no external signal'},
+    amountAtStake:410000, daysToAct:6,
+    whyClient:'SGD 410,000 fixed deposit maturing in 6 days.',
+    whyNow:'Renewal decision is due before 2026-09-20.',
+    whyInstrument:'Would ordinarily be a straightforward renewal conversation.',
+    gateOverride:{gate:'suitability', reason:'Suitability review lapsed 2026-05-02 — 4 months past the 12-month refresh policy. No product conversation may proceed until the review is refreshed.'} },
+  { id:'op-michelle', clientId:'michelle', approach:'Contextualise', productId:'ilp', driverId:null,
+    signal:{recency:'Today', headline:'Policy bonus declaration affecting surrender value'},
+    amountAtStake:310000, daysToAct:10,
+    whyClient:'A bonus declaration on her Great Eastern policy affects its surrender value.',
+    whyNow:'The declaration was booked to the policy record this morning.',
+    whyInstrument:'Would ordinarily be a policy-review conversation.',
+    gateOverride:{gate:'permission', reason:'This detail originates from a Great Eastern policy record. Cross-entity data-sharing consent for this client is not on file with OCBC Bank, so the specific figure may not cross the One Group perimeter to this RM until consent is obtained.'} },
+];
+
+/* ============================== STATE ============================== */
+const S = {
+  tab:'queue', selectedClient:null,
+  filters:{segment:'all', family:'all', tier:'all', minAmount:0, recency:'all'},
+  parked:new Set(), dismissed:new Map(),
+  ledger:[], // {ts, clientId, kind, detail, ref}
+  draftByClient:{}, // clientId -> current draft text
+  coachResult:{}, // clientId -> last check result
+};
+
+const SEED_DRAFT_CHEN = "Hi Mr Chen,\n\nJust a heads up that your SGD 500,000 fixed deposit is coming due soon. Rates are looking great right now so I'd recommend locking in a new structured deposit today — don't miss this window!\n\nBest,\nAisha";
+S.draftByClient['chen'] = SEED_DRAFT_CHEN;
+
+/* ============================== HELPERS ============================== */
+function fmt(n){ return 'SGD ' + Math.round(n).toLocaleString('en-SG'); }
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+function fmtDate(s){ const d=new Date(s+'T00:00:00'); return d.toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'numeric'}); }
+function monthsBetween(a,b){ return (b.getFullYear()-a.getFullYear())*12 + (b.getMonth()-a.getMonth()); }
+function esc(s){ return String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join(''); }
+
+function evalGates(opp){
+  const c = CLIENTS[opp.clientId];
+  const rows = [
+    {gate:'eligibility', label:'Product eligibility', status:'pass', reason:'On the One Group approved shelf for this segment.'},
+    {gate:'suitability', label:'Suitability & mandate fit', status:'pass', reason:'Matches stated risk profile and mandate; review current.'},
+    {gate:'permission', label:'Cross-entity permission', status:'pass', reason:'Signal and client data sit within one permissioned entity.'},
+    {gate:'mnpi', label:'MNPI / secrecy firewall', status:'pass', reason:'No information barrier applies.'},
+  ];
+  if(opp.gateOverride){
+    const row = rows.find(r=>r.gate===opp.gateOverride.gate);
+    row.status='block'; row.reason=opp.gateOverride.reason;
+  }
+  const blocked = rows.some(r=>r.status==='block');
+  return {rows, blocked, blockingGate: blocked ? rows.find(r=>r.status==='block').gate : null};
+}
+
+function allOppsWithGates(){ return OPPS.map(o=>({opp:o, gates:evalGates(o)})); }
+
+function passedOpps(){ return allOppsWithGates().filter(x=>!x.gates.blocked).map(x=>x.opp); }
+function blockedOpps(){ return allOppsWithGates().filter(x=>x.gates.blocked); }
+
+function activeOpps(){
+  // passed gates, not parked, not dismissed
+  return passedOpps().filter(o=>!S.parked.has(o.id) && !S.dismissed.has(o.id));
+}
+function filteredOpps(){
+  const f = S.filters;
+  return activeOpps().filter(o=>{
+    const c = CLIENTS[o.clientId];
+    if(f.segment!=='all' && c.segment!==f.segment) return false;
+    if(f.tier!=='all' && c.tier!==f.tier) return false;
+    if(f.family!=='all' && PRODUCTS[o.productId].family!==f.family) return false;
+    if(o.amountAtStake < f.minAmount) return false;
+    if(f.recency!=='all'){
+      if(f.recency==='fresh' && !(o.signal.recency==='Today'||o.signal.recency==='Yesterday')) return false;
+      if(f.recency==='internal' && o.signal.recency!=='Internal') return false;
+    }
+    return true;
+  }).sort((a,b)=>a.daysToAct-b.daysToAct);
+}
+
+function clusters(){
+  const byDriver = {};
+  activeOpps().forEach(o=>{
+    if(!o.driverId) return;
+    (byDriver[o.driverId] = byDriver[o.driverId]||[]).push(o);
+  });
+  return Object.entries(byDriver).filter(([,list])=>list.length>1)
+    .map(([driverId,list])=>({driverId, opps:list}));
+}
+
+function businessDaysAdd(date, n){
+  const d = new Date(date);
+  let added=0;
+  while(added<n){ d.setDate(d.getDate()+1); if(d.getDay()!==0 && d.getDay()!==6) added++; }
+  return d;
+}
+
+/* ============================== GATES/POSITION LOGIC ============================== */
+function bindingConstraint(client){
+  // fixed-order, rule-based — not a weighted score
+  const monthsSinceReview = monthsBetween(new Date(client.suitability.lastReview+'T00:00:00'), TODAY);
+  if(monthsSinceReview > 12){
+    return {kind:'doc', label:'Documentation currency', detail:`Suitability review lapsed ${monthsSinceReview} months ago (last reviewed ${fmtDate(client.suitability.lastReview)}; policy requires refresh within 12 months). No product conversation may proceed until this is refreshed.`};
+  }
+  if(client.concentration && client.concentration.pct > client.concentration.threshold){
+    return {kind:'concentration', label:'Exposure concentration', detail:`${client.concentration.pct}% of the portfolio sits in ${client.concentration.name}, above the ${client.concentration.threshold}% guideline.`};
+  }
+  if(client.idleCash && client.idleCash.days > client.idleCash.threshold){
+    return {kind:'idle', label:'Idle-cash duration', detail:`${fmt(client.holdings[0].value)} has sat uninvested for ${client.idleCash.days} days, past the ${client.idleCash.threshold}-day threshold.`};
+  }
+  if(client.incomeObjective && client.incomeObjective.actual < client.incomeObjective.target*0.85){
+    const gap = Math.round((1-client.incomeObjective.actual/client.incomeObjective.target)*100);
+    return {kind:'income', label:'Portfolio income vs objective', detail:`Trailing income is ${gap}% below the client's stated objective of ${client.incomeObjective.target.toLocaleString()} ${client.incomeObjective.unit}.`};
+  }
+  return {kind:'maturity', label:'Maturity ladder', detail:'Nearest scheduled maturity is the most time-bound item on this relationship today.'};
+}
+
+/* ============================== COACH CHECKS ============================== */
+function runCoachChecks(clientId, text){
+  const c = CLIENTS[clientId];
+  const trueAmount = c.holdings[0].value;
+  const trueSrc = c.holdings[0].source;
+  const results = [];
+
+  // 1. Fact trace — any SGD figure in the draft must match a known record figure
+  const amounts = [...text.matchAll(/SGD\s?([\d,]{4,})/gi)].map(m=>parseInt(m[1].replace(/,/g,''),10));
+  const badAmount = amounts.find(a=>a!==trueAmount);
+  results.push({
+    rule:'Fact trace', status: badAmount ? 'fail' : 'pass',
+    detail: badAmount
+      ? `Draft states SGD ${badAmount.toLocaleString()}. The client record shows ${fmt(trueAmount)} for ${c.holdings[0].label} (source: ${trueSrc}). Figures in an RM message must trace to a record.`
+      : `Every SGD figure in the draft matches a record the RM is licensed to see (source: ${trueSrc}).`
+  });
+
+  // 2. Circumstance vs. feature framing
+  const featureFirst = /great rate|don't miss|limited time|act now|best deal/i.test(text);
+  results.push({
+    rule:'States circumstance, not a feature', status: featureFirst ? 'flag' : 'pass',
+    detail: featureFirst
+      ? 'Phrasing reads as a product pitch ("great rates", "don\'t miss") rather than the client\'s own circumstance. Lead with what is happening on their account, not the offer.'
+      : 'Message is framed around the client\'s own position rather than a generic offer.'
+  });
+
+  // 3. Advice boundary
+  const advises = /i('| )?d? recommend|you should (invest|buy|move|switch)|the best option for you/i.test(text);
+  results.push({
+    rule:'Stays within the RM\'s licence to inform', status: advises ? 'fail' : 'pass',
+    detail: advises
+      ? 'Contains language that reads as personal advice ("recommend", "you should"). The RM is licensed to inform, not to advise — leave the recommendation to the specialist conversation.'
+      : 'No advice-shaped language detected; the message informs rather than recommends.'
+  });
+
+  // 4. Required disclosure present
+  const hasDisclosure = /not (financial|investment) advice|indicative only|subject to (suitability|change)/i.test(text);
+  results.push({
+    rule:'Required disclosure present', status: hasDisclosure ? 'pass' : 'flag',
+    detail: hasDisclosure
+      ? 'A disclosure line is present.'
+      : 'No disclosure line detected. Add a line making clear this is not financial advice and rates/terms are indicative and subject to change.'
+  });
+
+  // 5. Register matches tier
+  const casual = /\bhey\b|!{2,}|lol/i.test(text);
+  results.push({
+    rule:'Register matches relationship tier', status: (casual && c.tier==='Signature') ? 'flag' : 'pass',
+    detail: (casual && c.tier==='Signature')
+      ? `Tone reads as casual for a ${c.tier} relationship. Match the formality the client is used to.`
+      : 'Tone is consistent with this client\'s relationship tier.'
+  });
+
+  return results;
+}
+
+function suggestRewrite(clientId, text){
+  const c = CLIENTS[clientId];
+  const trueAmount = c.holdings[0].value;
+  let out = text.replace(/SGD\s?[\d,]{4,}/gi, fmt(trueAmount));
+  out = out.replace(/great rate[s]?/gi, 'a rate that may not hold').replace(/don'?t miss (this|it)/gi,'worth reviewing before the renewal date').replace(/act now!?/gi,'').replace(/limited time/gi,'');
+  out = out.replace(/i('| )?d? recommend/gi, 'wanted to flag').replace(/you should (invest|buy|move|switch)/gi,'you may want to discuss whether to $1');
+  if(!/not (financial|investment) advice|indicative only/i.test(out)){
+    out = out.trim() + "\n\nThis message is for information only and is not financial advice. Rates and terms are indicative and subject to change and to suitability review.";
+  }
+  return out;
+}
+
+/* ============================== RENDER: SHELL ============================== */
+const TABS = [
+  ['queue','Queue'], ['clients','Clients'], ['coach','Coach'], ['outreach','Outreach'], ['desk','Desk View']
+];
+function renderNav(){
+  document.getElementById('nav').innerHTML = TABS.map(([id,label])=>
+    `<button class="navbtn ${S.tab===id?'on':''}" data-tab="${id}">${label}</button>`).join('');
+  document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>{ S.tab=b.dataset.tab; if(S.tab!=='clients') S.selectedClient=null; render(); });
+}
+
+function render(){
+  renderNav();
+  const app = document.getElementById('app');
+  if(S.tab==='queue') app.innerHTML = viewQueue();
+  else if(S.tab==='clients') app.innerHTML = S.selectedClient ? viewClientDetail(S.selectedClient) : viewClientList();
+  else if(S.tab==='coach') app.innerHTML = viewCoach();
+  else if(S.tab==='outreach') app.innerHTML = viewOutreach();
+  else if(S.tab==='desk') app.innerHTML = viewDesk();
+  wireEvents();
+}
+
+/* ============================== VIEW: QUEUE ============================== */
+function oppCard(o, rank){
+  const c = CLIENTS[o.clientId];
+  const prod = PRODUCTS[o.productId];
+  const parked = S.parked.has(o.id);
+  return `
+  <div class="opp" data-oppid="${o.id}">
+    <div class="opp-top">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        ${rank?`<div class="rank">${rank}</div>`:''}
+        <div>
+          <div class="opp-name">${c.name}</div>
+          <div class="opp-meta">${c.segment} · ${c.tier} · RM ${c.rm}</div>
+          <div class="opp-badges">
+            <span class="pill neutral">${o.approach}</span>
+            <span class="pill neutral">${prod.name}</span>
+            <span class="pill neutral">Signal: ${o.signal.recency}</span>
+            ${o.driverId?`<span class="pill flag">Driver: ${DRIVERS[o.driverId].label}</span>`:''}
+          </div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="t-micro">Amount at stake</div>
+        <div class="t-h2">${fmt(o.amountAtStake)}</div>
+        <div class="t-meta">Window to act: ${o.daysToAct} days</div>
+      </div>
+    </div>
+    <div class="why-grid">
+      <div class="why-box"><div class="lbl">Why this client</div><div class="val">${o.whyClient}</div></div>
+      <div class="why-box"><div class="lbl">Why now</div><div class="val">${o.whyNow}</div></div>
+      <div class="why-box"><div class="lbl">Why this instrument</div><div class="val">${o.whyInstrument}</div></div>
+    </div>
+    <div class="opp-actions">
+      <button class="btn primary sm" data-act="open-client" data-id="${c.id}">Open client position</button>
+      <button class="btn sm" data-act="open-coach" data-id="${c.id}">Draft in Coach</button>
+      ${parked
+        ? `<span class="pill flag">Parked — resurfaces ${fmtParkDate(o.id)}</span>`
+        : `<button class="btn ghost sm" data-act="park" data-id="${o.id}">Park</button>`}
+      <button class="btn ghost sm" data-act="dismiss" data-id="${o.id}">Dismiss</button>
+    </div>
+  </div>`;
+}
+
+function fmtParkDate(oppId){
+  const rec = S.parked.get ? null : null;
+  const info = S._parkDates && S._parkDates[oppId];
+  return info ? info.toLocaleDateString('en-SG',{day:'numeric',month:'short'}) : '';
+}
+
+function blockedCard(x){
+  const o=x.opp, c=CLIENTS[o.clientId];
+  const blockedRow = x.gates.rows.find(r=>r.status==='block');
+  return `
+  <div class="opp blocked">
+    <div class="opp-top">
+      <div>
+        <div class="opp-name">${c.name}</div>
+        <div class="opp-meta">${c.segment} · ${c.tier} · RM ${c.rm}</div>
+      </div>
+      <div style="text-align:right">
+        <span class="pill block"><span class="dot block"></span>Withheld from queue</span>
+      </div>
+    </div>
+    <div class="gate-list">
+      ${x.gates.rows.map(r=>`<div class="gate-row"><span class="dot ${r.status}"></span><span class="gate-name">${r.label}</span><span class="gate-reason">${r.reason}</span></div>`).join('')}
+    </div>
+    <div class="t-meta" style="margin-top:8px">Would otherwise rank on ${fmt(o.amountAtStake)} at stake, ${o.daysToAct}-day window. Blocked at: <b>${blockedRow.label}</b>. No filter setting can surface this — gates run before any ranking.</div>
+  </div>`;
+}
+
+function viewQueue(){
+  const f = S.filters;
+  const list = filteredOpps();
+  const blocked = blockedOpps();
+  const parkedList = OPPS.filter(o=>S.parked.has(o.id));
+  const dismissedList = OPPS.filter(o=>S.dismissed.has(o.id));
+  const cls = clusters();
+  const families = [...new Set(Object.values(PRODUCTS).map(p=>p.family))];
+
+  return `
+  <div class="t-h1">Today's queue</div>
+  <div class="t-lead" style="margin-bottom:16px">Overnight signals resolved against client exposures, after compliance gates, ranked by window to act.</div>
+
+  ${cls.map(cl=>`
+    <div class="cluster-banner">
+      <span class="pill flag">Cluster</span>
+      <div class="t-body"><b>Correlated conviction cluster</b> — ${cl.opps.length} opportunities rest on the same driver: <b>${DRIVERS[cl.driverId].label}</b> (${cl.opps.map(o=>CLIENTS[o.clientId].name).join(', ')}). Read as one conviction, not ${cl.opps.length} independent ones.</div>
+    </div>`).join('')}
+
+  <div class="filterbar">
+    <select data-filter="segment"><option value="all">All segments</option><option value="Premier" ${f.segment==='Premier'?'selected':''}>Premier</option><option value="Private" ${f.segment==='Private'?'selected':''}>Private</option></select>
+    <select data-filter="tier"><option value="all">All tiers</option><option value="Priority" ${f.tier==='Priority'?'selected':''}>Priority</option><option value="Signature" ${f.tier==='Signature'?'selected':''}>Signature</option></select>
+    <select data-filter="family"><option value="all">All product families</option>${families.map(fam=>`<option value="${fam}" ${f.family===fam?'selected':''}>${fam}</option>`).join('')}</select>
+    <select data-filter="minAmount"><option value="0">Any amount at stake</option><option value="250000" ${f.minAmount==250000?'selected':''}>≥ SGD 250,000</option><option value="500000" ${f.minAmount==500000?'selected':''}>≥ SGD 500,000</option><option value="1000000" ${f.minAmount==1000000?'selected':''}>≥ SGD 1,000,000</option></select>
+    <select data-filter="recency"><option value="all">Any signal recency</option><option value="fresh" ${f.recency==='fresh'?'selected':''}>Fresh (today/yesterday)</option><option value="internal" ${f.recency==='internal'?'selected':''}>Internal only</option></select>
+    <span class="filter-note">${blocked.length} withheld by gates — unaffected by these filters</span>
+  </div>
+
+  <div class="t-h3" style="margin-bottom:10px">${list.length} surfaced</div>
+  ${list.map((o,i)=>oppCard(o,i+1)).join('') || '<div class="card t-meta">No opportunities match these filters.</div>'}
+
+  <div class="t-h2" style="margin-top:26px">What we blocked</div>
+  <div class="t-meta" style="margin-bottom:12px">Passed the rank ordering would have applied, but withheld from the queue entirely by a hard gate. Same production quality as a surfaced opportunity — a refusal is a credibility scene, not an edge case.</div>
+  ${blocked.map(blockedCard).join('')}
+
+  ${parkedList.length ? `
+  <div class="t-h2" style="margin-top:26px">Parked</div>
+  <div class="t-meta" style="margin-bottom:12px">Parking is itself recorded as a signal. A parked item resurfaces on a governed cadence rather than vanishing or reappearing daily. Rule: review-type opportunities resurface after 5 business days, or immediately if a new signal names the same client.</div>
+  ${parkedList.map(o=>{
+    const c=CLIENTS[o.clientId];
+    return `<div class="opp"><div class="opp-top"><div><div class="opp-name">${c.name}</div><div class="opp-meta">${c.segment} · ${c.tier}</div></div>
+    <span class="pill flag">Resurfaces ${fmtParkDate(o.id)}</span></div></div>`;
+  }).join('')}` : ''}
+
+  ${dismissedList.length ? `
+  <div class="t-h2" style="margin-top:26px">Dismissed</div>
+  ${dismissedList.map(o=>{
+    const c=CLIENTS[o.clientId];
+    return `<div class="opp"><div class="opp-top"><div><div class="opp-name">${c.name}</div><div class="opp-meta">${c.segment} · ${c.tier}</div></div>
+    <span class="pill neutral">Reason: ${esc(S.dismissed.get(o.id))}</span></div></div>`;
+  }).join('')}` : ''}
+  `;
+}
+
+/* ============================== VIEW: CLIENTS ============================== */
+function viewClientList(){
+  return `
+  <div class="t-h1">Clients</div>
+  <div class="t-lead" style="margin-bottom:16px">One reviewable position page per Premier or Private client.</div>
+  ${Object.values(CLIENTS).map(c=>`
+    <div class="clientrow" data-act="open-client" data-id="${c.id}">
+      <div class="avatar">${initials(c.name)}</div>
+      <div style="flex:1">
+        <div class="t-h3">${c.name}</div>
+        <div class="t-meta">${c.segment} · ${c.tier} · RM ${c.rm}</div>
+      </div>
+      <span class="pill ${c.suitability && monthsBetween(new Date(c.suitability.lastReview+'T00:00:00'),TODAY)>12 ? 'block':'pass'}">
+        ${monthsBetween(new Date(c.suitability.lastReview+'T00:00:00'),TODAY)>12 ? 'Review lapsed' : 'Docs current'}
+      </span>
+    </div>`).join('')}
+  `;
+}
+
+function viewClientDetail(clientId){
+  const c = CLIENTS[clientId];
+  const bind = bindingConstraint(c);
+  const monthsSince = monthsBetween(new Date(c.suitability.lastReview+'T00:00:00'), TODAY);
+  const opp = OPPS.find(o=>o.clientId===clientId);
+
+  const dims = [];
+  dims.push({key:'doc', title:'Documentation currency', body:`Suitability last reviewed ${fmtDate(c.suitability.lastReview)} (${monthsSince} months ago). KYC status: ${c.kyc.status}, expiry ${fmtDate(c.kyc.expiry)}.`, source:'Compliance Records System'});
+  if(c.concentration) dims.push({key:'concentration', title:'Exposure concentration', body:`${c.concentration.pct}% of the portfolio in ${c.concentration.name} (guideline: ${c.concentration.threshold}%).`, source:c.holdings[0].source});
+  if(c.idleCash) dims.push({key:'idle', title:'Idle-cash duration', body:`${fmt(c.holdings[0].value)} idle for ${c.idleCash.days} days (threshold: ${c.idleCash.threshold} days).`, source:c.idleCash.source});
+  dims.push({key:'maturity', title:'Maturity ladder', body:c.holdings.map(h=>`${h.label}: ${fmt(h.value)} — ${h.note}`).join('<br>'), source:c.holdings[0].source});
+  if(c.incomeObjective) dims.push({key:'income', title:'Portfolio income vs objective', body:`Trailing income ${c.incomeObjective.actual.toLocaleString()} ${c.incomeObjective.unit} against a stated objective of ${c.incomeObjective.target.toLocaleString()} ${c.incomeObjective.unit}.`, source:c.incomeObjective.source});
+  dims.push({key:'mandate', title:'Mandate drift', body:`Mandate: ${c.mandate}. Risk profile: ${c.risk}. Holdings reviewed against mandate — no drift detected.`, source:'Mandate Records'});
+
+  // reorder: binding constraint dimension first
+  dims.sort((a,b)=> (a.key===bind.kind?-1:0) - (b.key===bind.kind?-1:0));
+
+  return `
+  <button class="backlink" data-act="back-clients">&larr; All clients</button>
+  <div class="t-h1">${c.name}</div>
+  <div class="t-meta" style="margin-bottom:16px">${c.segment} · ${c.tier} · RM ${c.rm} · Mandate: ${c.mandate} · Risk profile: ${c.risk}</div>
+
+  <div class="bindbox ${bind.kind==='doc'?'doc':''}">
+    <div class="t-micro">Binding constraint — shown first because it is the most limiting condition on this relationship today</div>
+    <div class="t-h3" style="margin-top:4px">${bind.label}</div>
+    <div class="t-body">${bind.detail}</div>
+  </div>
+
+  ${dims.map(d=>`
+    <div class="dim ${d.key===bind.kind?'top':''}">
+      <div class="dim-head"><div class="t-h3">${d.title}</div>${d.key===bind.kind?'<span class="pill block">Binding</span>':''}</div>
+      <div class="t-body">${d.body}</div>
+      <div class="evidence">Source: ${d.source}</div>
+    </div>`).join('')}
+
+  ${opp ? `<div class="card" style="margin-top:6px"><div class="t-h3">Related opportunity</div>
+    <div class="t-body">${fmt(opp.amountAtStake)} at stake · ${opp.approach} · ${PRODUCTS[opp.productId].name}</div>
+    <div class="opp-actions"><button class="btn primary sm" data-act="open-coach" data-id="${c.id}">Draft in Coach</button></div></div>` : ''}
+  `;
+}
+
+/* ============================== VIEW: COACH ============================== */
+function viewCoach(){
+  const clientId = S.coachClient || 'chen';
+  const c = CLIENTS[clientId];
+  const text = S.draftByClient[clientId] !== undefined ? S.draftByClient[clientId] : '';
+  const results = S.coachResult[clientId];
+
+  return `
+  <div class="t-h1">Conversation Coach</div>
+  <div class="t-lead" style="margin-bottom:16px">Draft a client message. RIN checks it against the client's own record before it goes — the RM's edit is always the final text.</div>
+
+  <div class="card">
+    <div class="section-head"><div class="t-h3">Client</div></div>
+    <select id="coach-client-select" style="border:1px solid var(--line-2);border-radius:9px;padding:8px 10px;font-size:14px;margin-bottom:12px">
+      ${Object.values(CLIENTS).map(cc=>`<option value="${cc.id}" ${cc.id===clientId?'selected':''}>${cc.name}</option>`).join('')}
+    </select>
+    <textarea id="coach-text">${esc(text)}</textarea>
+    <div class="opp-actions">
+      <button class="btn primary sm" data-act="coach-review">Review draft</button>
+      <button class="btn ghost sm" data-act="coach-clear">Clear</button>
+    </div>
+  </div>
+
+  ${results ? `
+  <div class="card">
+    <div class="t-h3" style="margin-bottom:8px">Checks</div>
+    ${results.map(r=>`
+      <div class="checkrow">
+        <span class="pill ${r.status}"><span class="dot ${r.status}"></span>${r.status==='pass'?'Pass':r.status==='flag'?'Flag':'Fail'}</span>
+        <div><div class="rule">${r.rule}</div><div class="txt">${esc(r.detail)}</div></div>
+      </div>`).join('')}
+    ${results.some(r=>r.status!=='pass') ? `
+    <div class="t-h3" style="margin-top:14px">Suggested rewrite</div>
+    <div class="rewrite-box">${esc(suggestRewrite(clientId, text))}</div>
+    <div class="opp-actions">
+      <button class="btn primary sm" data-act="coach-accept">Accept rewrite</button>
+      <button class="btn ghost sm" data-act="coach-reject">Reject — keep my draft</button>
+    </div>` : '<div class="t-meta" style="margin-top:10px">No suggested rewrite — every check passed.</div>'}
+  </div>` : ''}
+  `;
+}
+
+/* ============================== VIEW: OUTREACH ============================== */
+function viewOutreach(){
+  const clientId = S.outreachClient || 'chen';
+  const c = CLIENTS[clientId];
+  const opp = OPPS.find(o=>o.clientId===clientId);
+  const ledgerForClient = S.ledger.filter(l=>l.clientId===clientId);
+
+  return `
+  <div class="t-h1">Client Outreach</div>
+  <div class="t-lead" style="margin-bottom:16px">Grounded in the client's position and the signal that surfaced them. Nothing sends without explicit RM approval, and every send writes to the approved, archived channel.</div>
+
+  <div class="card">
+    <select id="outreach-client-select" style="border:1px solid var(--line-2);border-radius:9px;padding:8px 10px;font-size:14px;margin-bottom:12px">
+      ${Object.values(CLIENTS).map(cc=>`<option value="${cc.id}" ${cc.id===clientId?'selected':''}>${cc.name}</option>`).join('')}
+    </select>
+    ${opp ? `
+    <div class="t-h3" style="margin-bottom:8px">Approach</div>
+    <div class="opp-badges" style="margin-bottom:12px">
+      ${['Notify','Contextualise','Review'].map(a=>`<button class="btn sm ${a===(S.outreachApproach||opp.approach)?'primary':''}" data-act="set-approach" data-approach="${a}">${a}</button>`).join('')}
+    </div>
+    <textarea id="outreach-text">${esc(outreachDraft(clientId, S.outreachApproach||opp.approach))}</textarea>
+    <div class="opp-actions">
+      <button class="btn sm" data-act="outreach-check">Check before sending</button>
+      <button class="btn red sm" data-act="outreach-send">Send</button>
+      <button class="btn ghost sm" data-act="outreach-nosend">Log a non-send</button>
+    </div>
+    ${S.outreachCheck ? `<div class="rewrite-box" style="margin-top:10px">${S.outreachCheck.map(r=>`${r.status.toUpperCase()} · ${r.rule}: ${esc(r.detail)}`).join('\n')}</div>`:''}
+    ` : '<div class="t-meta">No active opportunity for this client today.</div>'}
+  </div>
+
+  <div class="card">
+    <div class="t-h3" style="margin-bottom:8px">Outcome ledger — ${c.name}</div>
+    ${ledgerForClient.length ? `
+    <table><thead><tr><th>When</th><th>Kind</th><th>Detail</th><th>Reference</th></tr></thead><tbody>
+    ${ledgerForClient.map(l=>`<tr><td>${l.ts}</td><td>${l.kind}</td><td>${esc(l.detail)}</td><td class="src">${l.ref||'—'}</td></tr>`).join('')}
+    </tbody></table>` : '<div class="t-meta">No entries yet.</div>'}
+  </div>
+  `;
+}
+
+function outreachDraft(clientId, approach){
+  const c = CLIENTS[clientId];
+  const opp = OPPS.find(o=>o.clientId===clientId);
+  if(!opp) return '';
+  const h = c.holdings[0];
+  if(approach==='Notify') return `Hi ${c.name.split(' ')[0]},\n\nYour ${h.label.toLowerCase()} of ${fmt(h.value)} is ${h.note}. Worth a short call before the renewal date to walk through the options.\n\nThis message is for information only and is not financial advice.`;
+  if(approach==='Contextualise') return `Hi ${c.name.split(' ')[0]},\n\nA market event today touches a position you hold (${h.label.toLowerCase()}, ${fmt(h.value)}). Happy to walk through what it means for you when convenient.\n\nThis message is for information only and is not financial advice.`;
+  return `Hi ${c.name.split(' ')[0]},\n\nWhen we last reviewed your portfolio, we set an objective together. It looks like it's drifted — worth a short review call to see whether anything should change.\n\nThis message is for information only and is not financial advice.`;
+}
+
+/* ============================== VIEW: DESK ============================== */
+function viewDesk(){
+  const blocked = blockedOpps();
+  const byGate = {};
+  blocked.forEach(x=>{ const g=x.gates.blockingGate; byGate[g]=(byGate[g]||0)+1; });
+  const gateLabels = {suitability:'Suitability & mandate fit', permission:'Cross-entity permission', mnpi:'MNPI / secrecy firewall', eligibility:'Product eligibility'};
+
+  const surfaced = filteredOppsAllFilters();
+  const actioned = S.ledger.length + S.dismissed.size;
+  const pending = surfaced.length - [...new Set(S.ledger.map(l=>l.clientId))].length - [...S.dismissed.keys()].length;
+
+  const cls = clusters();
+
+  const docTable = Object.values(CLIENTS).map(c=>{
+    const months = monthsBetween(new Date(c.suitability.lastReview+'T00:00:00'), TODAY);
+    return {c, months, status: months>12 ? 'Lapsed' : months>=10 ? 'Due soon' : 'Current', kyc:c.kyc.status};
+  });
+
+  return `
+  <div class="t-h1">Desk View</div>
+  <div class="t-lead" style="margin-bottom:16px">Team-lead surface. Coverage, refusals and concentration across the book — no ranking or prediction of individual RM performance.</div>
+
+  <div class="grid3">
+    <div class="card"><div class="t-micro">Surfaced today</div><div class="bignum">${activeOpps().length}</div><div class="t-meta">passed all 4 gates</div></div>
+    <div class="card"><div class="t-micro">Withheld by gates</div><div class="bignum">${blocked.length}</div><div class="t-meta">would otherwise rank</div></div>
+    <div class="card"><div class="t-micro">Actioned this session</div><div class="bignum">${S.ledger.length + S.dismissed.size + S.parked.size}</div><div class="t-meta">sent, dismissed or parked</div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="t-h3" style="margin-bottom:8px">Refusal-case volume, by reason</div>
+      ${Object.entries(byGate).map(([g,n])=>`<div class="checkrow"><span class="pill block">${n}</span><div class="txt">${gateLabels[g]}</div></div>`).join('') || '<div class="t-meta">No refusals.</div>'}
+    </div>
+    <div class="card">
+      <div class="t-h3" style="margin-bottom:8px">Unactioned, with recorded reason</div>
+      ${OPPS.filter(o=>passedOpps().includes(o) && !S.ledger.some(l=>l.clientId===o.clientId)).map(o=>{
+        const c=CLIENTS[o.clientId];
+        const reason = S.dismissed.has(o.id) ? 'Dismissed: '+S.dismissed.get(o.id) : S.parked.has(o.id) ? 'Parked' : 'Not yet actioned';
+        return `<div class="checkrow"><span class="pill neutral">${c.name}</span><div class="txt">${reason}</div></div>`;
+      }).join('') || '<div class="t-meta">Everything surfaced has been actioned.</div>'}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="t-h3" style="margin-bottom:8px">Correlated-conviction clusters, spanning multiple RMs</div>
+    ${cls.length ? cls.map(cl=>`
+      <div class="checkrow"><span class="pill flag">${cl.opps.length}</span>
+      <div class="txt"><b>${DRIVERS[cl.driverId].label}</b> — ${cl.opps.map(o=>`${CLIENTS[o.clientId].name} (RM ${CLIENTS[o.clientId].rm})`).join(', ')}</div></div>`).join('')
+      : '<div class="t-meta">No active clusters.</div>'}
+  </div>
+
+  <div class="card">
+    <div class="t-h3" style="margin-bottom:8px">Documentation currency across the book</div>
+    <table><thead><tr><th>Client</th><th>RM</th><th>Suitability review</th><th>Status</th><th>KYC</th></tr></thead><tbody>
+    ${docTable.map(r=>`<tr><td>${r.c.name}</td><td>${r.c.rm}</td><td>${fmtDate(r.c.suitability.lastReview)}</td><td><span class="pill ${r.status==='Lapsed'?'block':r.status==='Due soon'?'flag':'pass'}">${r.status}</span></td><td>${r.kyc}</td></tr>`).join('')}
+    </tbody></table>
+  </div>
+  `;
+}
+function filteredOppsAllFilters(){ return activeOpps(); }
+
+/* ============================== EVENTS ============================== */
+function wireEvents(){
+  document.querySelectorAll('[data-filter]').forEach(sel=>{
+    sel.onchange = ()=>{ const k=sel.dataset.filter; S.filters[k] = (k==='minAmount') ? parseInt(sel.value,10) : sel.value; render(); };
+  });
+  document.querySelectorAll('[data-act]').forEach(el=>{
+    el.onclick = ()=>{
+      const act = el.dataset.act, id = el.dataset.id;
+      if(act==='open-client'){ S.tab='clients'; S.selectedClient=id; render(); }
+      if(act==='back-clients'){ S.selectedClient=null; render(); }
+      if(act==='open-coach'){ S.tab='coach'; S.coachClient=id; render(); }
+      if(act==='park'){
+        S.parked.add(id);
+        S._parkDates = S._parkDates||{}; S._parkDates[id]=businessDaysAdd(TODAY,5);
+        render();
+      }
+      if(act==='dismiss'){
+        const reason = prompt('Reason for dismissing this opportunity:','Client not reachable this week');
+        if(reason!==null) S.dismissed.set(id, reason || 'No reason given');
+        render();
+      }
+      if(act==='coach-review'){
+        const clientId = document.getElementById('coach-client-select').value;
+        const text = document.getElementById('coach-text').value;
+        S.draftByClient[clientId]=text;
+        S.coachResult[clientId]=runCoachChecks(clientId,text);
+        S.coachClient=clientId;
+        render();
+      }
+      if(act==='coach-clear'){
+        const clientId = document.getElementById('coach-client-select').value;
+        S.draftByClient[clientId]=''; delete S.coachResult[clientId]; S.coachClient=clientId; render();
+      }
+      if(act==='coach-accept'){
+        const clientId = S.coachClient;
+        S.draftByClient[clientId] = suggestRewrite(clientId, S.draftByClient[clientId]);
+        S.coachResult[clientId]=runCoachChecks(clientId, S.draftByClient[clientId]);
+        render();
+      }
+      if(act==='coach-reject'){ delete S.coachResult[S.coachClient]; render(); }
+      if(act==='set-approach'){ S.outreachApproach = el.dataset.approach; render(); }
+      if(act==='outreach-check'){
+        const clientId = document.getElementById('outreach-client-select').value;
+        const text = document.getElementById('outreach-text').value;
+        S.outreachCheck = runCoachChecks(clientId, text);
+        render();
+      }
+      if(act==='outreach-send'){
+        const clientId = document.getElementById('outreach-client-select').value;
+        const ref = 'ARC-' + Math.random().toString(36).slice(2,8).toUpperCase();
+        S.ledger.push({ts:'14 Sep, 09:14', clientId, kind:'Sent', detail:`${S.outreachApproach||OPPS.find(o=>o.clientId===clientId).approach} message sent`, ref:'Archived Client Comms · '+ref});
+        render();
+      }
+      if(act==='outreach-nosend'){
+        const clientId = document.getElementById('outreach-client-select').value;
+        const reason = prompt('Reason for not sending:','Client travelling this week');
+        if(reason!==null) S.ledger.push({ts:'14 Sep, 09:14', clientId, kind:'Non-send', detail:reason, ref:null});
+        render();
+      }
+    };
+  });
+  const csel = document.getElementById('coach-client-select');
+  if(csel) csel.onchange = ()=>{ S.coachClient = csel.value; render(); };
+  const osel = document.getElementById('outreach-client-select');
+  if(osel) osel.onchange = ()=>{ S.outreachClient = osel.value; S.outreachApproach=null; S.outreachCheck=null; render(); };
+}
+
+render();
+</script>
+</body>
+</html>
