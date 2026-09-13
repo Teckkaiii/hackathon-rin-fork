@@ -1,0 +1,8 @@
+{
+  "sd-sgd": { "id": "sd-sgd", "name": "SGD Structured Deposit (rate lock)", "entity": "OCBC Bank", "family": "Structured" },
+  "bond-sgd": { "id": "bond-sgd", "name": "SGD Corporate Bond", "entity": "Bank of Singapore", "family": "Fixed Income" },
+  "dpm": { "id": "dpm", "name": "Discretionary Portfolio Mandate (rebalance)", "entity": "Bank of Singapore", "family": "Discretionary" },
+  "fund-div": { "id": "fund-div", "name": "Dividend Income Fund", "entity": "Lion Global", "family": "Funds" },
+  "fd-sgd": { "id": "fd-sgd", "name": "SGD Fixed Deposit (renewal)", "entity": "OCBC Bank", "family": "Deposits" },
+  "ilp": { "id": "ilp", "name": "Universal Life (Income Protection)", "entity": "Great Eastern", "family": "Insurance" }
+}

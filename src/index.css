@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+
+body {
+  @apply bg-canvas text-ink-2 antialiased;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-image:
+    radial-gradient(1200px 640px at 82% -10%, rgba(225,38,27,.04), transparent 60%),
+    radial-gradient(900px 520px at 2% 0%, rgba(63,83,94,.045), transparent 58%);
+  background-attachment: fixed;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+::selection { background: rgba(225,38,27,.16); }
+
+:focus-visible { outline: 2px solid theme('colors.red.DEFAULT'); outline-offset: 2px; border-radius: 6px; }
+
+@layer components {
+  /* editorial display type — the Instrument Serif borrow */
+  .t-display { @apply font-serif text-[40px] leading-[1.08] tracking-[-0.01em] text-ink; }
+  .t-h1 { @apply font-serif text-[30px] leading-[1.15] tracking-[-0.005em] text-ink; }
+  .t-h2 { @apply font-sans text-[19px] font-bold leading-tight tracking-tight text-ink; }
+  .t-h3 { @apply font-sans text-[15px] font-bold leading-snug text-ink; }
+  .t-lead { @apply font-sans text-[16px] text-ink-2; }
+  .t-body { @apply font-sans text-[15px] text-ink-2; }
+  .t-meta { @apply font-sans text-[13px] text-ink-3; }
+  .t-micro { @apply font-sans text-[11px] font-semibold uppercase tracking-[0.09em] text-ink-3; }
+  .src { @apply font-mono text-[12px] text-ink-3; font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+
+  /* glass surface — hairline border, soft translucency, generous radius */
+  .glass {
+    @apply bg-white/85 backdrop-blur-glass border border-hairline rounded-xl2 shadow-glass;
+  }
+  .glass-tight { @apply bg-white/85 backdrop-blur-glass border border-hairline rounded-2xl; }
+
+  /* orb avatar — circular ring, serif initials */
+  .orb {
+    @apply flex items-center justify-center rounded-full border border-hairline-2 bg-slate/[.06] text-slate-hi font-serif;
+  }
+
+  .pill { @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12.5px] font-semibold max-w-full; }
+  .pill-pass { @apply bg-green-wash text-green; }
+  .pill-block { @apply bg-red-wash text-red-deep; }
+  .pill-flag { @apply bg-gold-wash text-gold; }
+  .pill-neutral { @apply bg-sunk text-ink-2 border border-hairline; }
+  .pill-slate { @apply bg-slate text-white; }
+
+  .dot { @apply w-[7px] h-[7px] rounded-full inline-block flex-none; }
+  .dot-pass { @apply bg-green; }
+  .dot-block { @apply bg-red; }
+  .dot-flag { @apply bg-gold; }
+
+  .btn { @apply inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-[14px] font-semibold border border-hairline-2 bg-white text-ink-2 transition-colors; }
+  .btn:hover { @apply border-ink-3; }
+  .btn-primary { @apply bg-gradient-to-br from-[#4A5F6B] via-slate to-slate-hi text-white border-none shadow-glass; }
+  .btn-red { @apply bg-gradient-to-br from-[#EE3A2E] via-red to-red-deep text-white border-none shadow-glass; }
+  .btn-ghost { @apply border-transparent bg-transparent text-ink-3; }
+  .btn-sm { @apply px-3 py-1.5 text-[13px]; }
+  .btn:disabled { @apply opacity-40 cursor-not-allowed; }
+}
