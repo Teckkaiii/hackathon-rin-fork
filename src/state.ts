@@ -7,6 +7,13 @@ export const CLIENTS = clientsData as Record<string, Client>;
 export const DRIVERS = driversData as Record<string, Driver>;
 export const CLIENT_LIST = Object.values(CLIENTS);
 
+// RIN is a per-RM working surface: every RM-facing view (Queue, Clients, Coach,
+// Outreach) is scoped to the signed-in RM's own book. Desk View is the
+// exception — it's the team-lead surface and intentionally spans the whole book.
+export const CURRENT_RM = 'Aisha Rahman';
+export const MY_CLIENTS = CLIENT_LIST.filter(c => c.rm === CURRENT_RM);
+export const MY_CLIENT_IDS = new Set(MY_CLIENTS.map(c => c.id));
+
 export type Tab = 'queue' | 'clients' | 'coach' | 'outreach' | 'desk';
 
 export interface AppState {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Action, AppState } from '../state';
-import { CLIENT_LIST, CLIENTS } from '../state';
+import { MY_CLIENTS, CLIENTS } from '../state';
 import { OPPS } from '../lib/queue';
 import { runCoachChecks } from '../lib/coach';
 import { fmt } from '../lib/format';
@@ -55,7 +55,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
           value={clientId}
           onChange={e => switchClient(e.target.value)}
         >
-          {CLIENT_LIST.map(cc => <option key={cc.id} value={cc.id}>{cc.name}</option>)}
+          {MY_CLIENTS.map(cc => <option key={cc.id} value={cc.id}>{cc.name}</option>)}
         </select>
 
         {opp ? (

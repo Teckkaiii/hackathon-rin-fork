@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { CLIENT_LIST, CLIENTS } from '../state';
+import { MY_CLIENTS, CLIENTS } from '../state';
 import { TODAY, monthsBetween } from '../lib/format';
 import { bindingConstraint } from '../lib/binding';
 import { OPPS, PRODUCTS } from '../lib/queue';
@@ -13,7 +13,7 @@ export function ClientsView({ onOpenClient }: { onOpenClient: (id: string) => vo
     <div>
       <div className="t-display mb-1">Clients</div>
       <div className="t-lead mb-5">One reviewable position page per Premier or Private client.</div>
-      {CLIENT_LIST.map(c => {
+      {MY_CLIENTS.map(c => {
         const months = monthsBetween(new Date(c.suitability.lastReview + 'T00:00:00'), TODAY);
         const lapsed = months > 12;
         return (

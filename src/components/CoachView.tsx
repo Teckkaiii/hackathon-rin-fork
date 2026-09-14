@@ -1,5 +1,5 @@
 import type { Action, AppState } from '../state';
-import { CLIENT_LIST, CLIENTS } from '../state';
+import { MY_CLIENTS, CLIENTS } from '../state';
 import { runCoachChecks, suggestRewrite } from '../lib/coach';
 import { Pill } from './ui/Pill';
 import { Button } from './ui/Button';
@@ -25,7 +25,7 @@ export function CoachView({ state, dispatch }: { state: AppState; dispatch: (a: 
           value={clientId}
           onChange={e => dispatch({ type: 'SET_COACH_CLIENT', id: e.target.value })}
         >
-          {CLIENT_LIST.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          {MY_CLIENTS.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
         <textarea
           id="coach-text"
@@ -56,7 +56,9 @@ export function CoachView({ state, dispatch }: { state: AppState; dispatch: (a: 
             </div>
           ))}
 
-          {results.some(r => r.status !== 'pass') ? (
+          {results.some(r => r.rule === 'Draft is real, sendable content' && r.status === 'fail') ? (
+            <div className="t-meta mt-2.5">No rewrite to suggest — write the actual message you intend to send, then review it again.</div>
+          ) : results.some(r => r.status !== 'pass') ? (
             <>
               <div className="t-h3 mt-3.5 mb-2">Suggested rewrite</div>
               <div className="bg-sunk rounded-xl p-3.5 text-[13.5px] whitespace-pre-wrap leading-relaxed">

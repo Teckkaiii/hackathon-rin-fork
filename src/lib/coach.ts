@@ -1,10 +1,62 @@
 import type { Client, CoachCheck } from '../types';
 import { fmt } from './format';
 
+// Common English function words — articles, pronouns, prepositions,
+// conjunctions. Virtually every grammatical English sentence contains at
+// least one; keyboard-mashed gibberish essentially never does by chance,
+// which makes this a much sharper gibberish signal than "contains a vowel".
+const COMMON_WORDS = new Set([
+  'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+  'to', 'of', 'in', 'on', 'at', 'for', 'and', 'or', 'but', 'with', 'as',
+  'by', 'from', 'about', 'up', 'down', 'out', 'if', 'so', 'not', 'no', 'yes',
+  'i', 'you', 'your', 'we', 'our', 'us', 'my', 'me', 'he', 'she', 'him',
+  'her', 'his', 'they', 'them', 'their', 'it', 'its', 'this', 'that',
+  'have', 'has', 'had', 'will', 'would', 'can', 'could', 'should', 'do',
+  'does', 'did', 'just', 'hi', 'hello', 'dear', 'please', 'thanks', 'thank',
+]);
+
+// A "word" is word-shaped if it's short (articles/pronouns), or has at
+// least one vowel without an implausible run of consonants or vowels —
+// English words essentially never have 5+ consonants or 4+ vowels in a row.
+function looksLikeWord(w: string): boolean {
+  const lw = w.toLowerCase();
+  if (lw.length <= 2) return true;
+  if (!/[aeiou]/.test(lw)) return false;
+  if (/[^aeiou]{5,}/.test(lw)) return false;
+  if (/[aeiou]{4,}/.test(lw)) return false;
+  return true;
+}
+
+// Rejects text that isn't real, sendable prose: empty/too-short drafts, or
+// strings of characters that don't resemble actual English sentences
+// (keyboard mashes, random gibberish).
+function isGibberish(text: string): boolean {
+  const trimmed = text.trim();
+  if (trimmed.length < 10) return true;
+  const words = trimmed.match(/[A-Za-z']+/g) || [];
+  if (words.length < 3) return true;
+  if (!words.some(w => COMMON_WORDS.has(w.toLowerCase()))) return true;
+  const wordShaped = words.filter(looksLikeWord);
+  return wordShaped.length / words.length < 0.7;
+}
+
 export function runCoachChecks(client: Client, text: string): CoachCheck[] {
   const trueAmount = client.holdings[0].value;
   const trueSrc = client.holdings[0].source;
   const results: CoachCheck[] = [];
+
+  const gibberish = isGibberish(text);
+  results.push({
+    rule: 'Draft is real, sendable content',
+    status: gibberish ? 'fail' : 'pass',
+    detail: gibberish
+      ? "This doesn't read as an actual client message (too short, or not recognisable words). Write the message you intend to send before it can be checked."
+      : 'Draft reads as real prose addressed to the client.',
+  });
+
+  if (gibberish) {
+    return results;
+  }
 
   const amounts = [...text.matchAll(/SGD\s?([\d,]{4,})/gi)].map(m => parseInt(m[1].replace(/,/g, ''), 10));
   const badAmount = amounts.find(a => a !== trueAmount);

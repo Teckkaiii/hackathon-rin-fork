@@ -22,25 +22,33 @@ export function allOppsWithGates() {
   return OPPS.map(opp => ({ opp, gates: evalGates(opp) }));
 }
 
-export function passedOpps(): Opportunity[] {
-  return allOppsWithGates().filter(x => !x.gates.blocked).map(x => x.opp);
+// clientIds, when passed, scopes results to a single RM's book. Omit it for
+// book-wide views (Desk View).
+export function passedOpps(clientIds?: Set<string>): Opportunity[] {
+  return allOppsWithGates()
+    .filter(x => !x.gates.blocked)
+    .filter(x => !clientIds || clientIds.has(x.opp.clientId))
+    .map(x => x.opp);
 }
 
-export function blockedOpps() {
-  return allOppsWithGates().filter(x => x.gates.blocked);
+export function blockedOpps(clientIds?: Set<string>) {
+  return allOppsWithGates()
+    .filter(x => x.gates.blocked)
+    .filter(x => !clientIds || clientIds.has(x.opp.clientId));
 }
 
-export function activeOpps(parked: Set<string>, dismissed: Record<string, string>): Opportunity[] {
-  return passedOpps().filter(o => !parked.has(o.id) && !(o.id in dismissed));
+export function activeOpps(parked: Set<string>, dismissed: Record<string, string>, clientIds?: Set<string>): Opportunity[] {
+  return passedOpps(clientIds).filter(o => !parked.has(o.id) && !(o.id in dismissed));
 }
 
 export function filteredOpps(
   parked: Set<string>,
   dismissed: Record<string, string>,
   filters: Filters,
-  clientsById: Record<string, { segment: string; tier: string }>
+  clientsById: Record<string, { segment: string; tier: string }>,
+  clientIds?: Set<string>
 ): Opportunity[] {
-  return activeOpps(parked, dismissed)
+  return activeOpps(parked, dismissed, clientIds)
     .filter(o => {
       const c = clientsById[o.clientId];
       if (filters.segment !== 'all' && c.segment !== filters.segment) return false;
@@ -54,9 +62,9 @@ export function filteredOpps(
     .sort((a, b) => a.daysToAct - b.daysToAct);
 }
 
-export function clusters(parked: Set<string>, dismissed: Record<string, string>, driversById: Record<string, Driver>) {
+export function clusters(parked: Set<string>, dismissed: Record<string, string>, driversById: Record<string, Driver>, clientIds?: Set<string>) {
   const byDriver: Record<string, Opportunity[]> = {};
-  activeOpps(parked, dismissed).forEach(o => {
+  activeOpps(parked, dismissed, clientIds).forEach(o => {
     if (!o.driverId) return;
     (byDriver[o.driverId] ||= []).push(o);
   });

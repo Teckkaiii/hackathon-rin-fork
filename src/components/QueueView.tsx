@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { Action, AppState } from '../state';
-import { CLIENTS, DRIVERS } from '../state';
+import { CLIENTS, DRIVERS, MY_CLIENT_IDS } from '../state';
 import { PRODUCTS, OPPS, blockedOpps, filteredOpps, clusters } from '../lib/queue';
 import { businessDaysAdd, TODAY } from '../lib/format';
 import { OpportunityCard } from './OpportunityCard';
@@ -11,14 +11,14 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
   const { filters, parked, dismissed, parkDates } = state;
 
   const surfaced = useMemo(
-    () => filteredOpps(parked, dismissed, filters, CLIENTS),
+    () => filteredOpps(parked, dismissed, filters, CLIENTS, MY_CLIENT_IDS),
     [parked, dismissed, filters]
   );
-  const blocked = useMemo(() => blockedOpps(), []);
-  const cls = useMemo(() => clusters(parked, dismissed, DRIVERS), [parked, dismissed]);
+  const blocked = useMemo(() => blockedOpps(MY_CLIENT_IDS), []);
+  const cls = useMemo(() => clusters(parked, dismissed, DRIVERS, MY_CLIENT_IDS), [parked, dismissed]);
   const families = useMemo(() => [...new Set(Object.values(PRODUCTS).map(p => p.family))], []);
-  const parkedList = OPPS.filter(o => parked.has(o.id));
-  const dismissedList = OPPS.filter(o => o.id in dismissed);
+  const parkedList = OPPS.filter(o => parked.has(o.id) && MY_CLIENT_IDS.has(o.clientId));
+  const dismissedList = OPPS.filter(o => o.id in dismissed && MY_CLIENT_IDS.has(o.clientId));
 
   function setFilter(key: keyof typeof filters, value: string | number) {
     dispatch({ type: 'SET_FILTER', key, value });
