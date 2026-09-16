@@ -11,7 +11,7 @@ const URL = 'http://localhost:4310';
   await page.goto(URL);
   await page.waitForSelector('[data-testid="opportunity-card"]');
 
-  const tabs = [['Queue', 'queue'], ['Clients', 'clients'], ['Coach', 'coach'], ['Outreach', 'outreach'], ['Desk View', 'desk']];
+  const tabs = [['Queue', 'queue'], ['Clients', 'clients'], ['Blocked', 'blocked'], ['Outreach', 'outreach'], ['News', 'news'], ['Past Week', 'pastweek']];
   for (const [label, id] of tabs) {
     await page.click(`nav >> text=${label}`);
     await page.waitForTimeout(150);
@@ -19,8 +19,8 @@ const URL = 'http://localhost:4310';
   }
 
   await page.click('nav >> text=Clients');
-  await page.locator('[data-client-id="robert"]').click();
-  await page.screenshot({ path: path.resolve(__dirname, 'shot-client-robert.png'), fullPage: true });
+  await page.locator('[data-client-id="chen"]').click();
+  await page.screenshot({ path: path.resolve(__dirname, 'shot-client-chen.png'), fullPage: true });
 
   await page.setViewportSize({ width: 400, height: 900 });
   await page.click('nav >> text=Queue');

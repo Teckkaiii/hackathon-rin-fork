@@ -4,7 +4,6 @@ import { CLIENTS, DRIVERS, MY_CLIENT_IDS } from '../state';
 import { PRODUCTS, OPPS, blockedOpps, filteredOpps, clusters } from '../lib/queue';
 import { businessDaysAdd, TODAY } from '../lib/format';
 import { OpportunityCard } from './OpportunityCard';
-import { BlockedCard } from './BlockedCard';
 import { Pill } from './ui/Pill';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
@@ -28,7 +27,8 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
     <div>
       <div className="t-display mb-1">Today's queue</div>
       <div className="t-lead mb-5">
-        Overnight signals resolved against client exposures, after compliance gates, ranked by window to act.
+        Overnight signals resolved against client exposures, after compliance gates, ranked by signal score —
+        momentum, news relevancy, urgency and conviction combined.
       </div>
 
       {cls.map(cl => (
@@ -67,7 +67,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
           <option value="fresh">Fresh (today/yesterday)</option>
           <option value="internal">Internal only</option>
         </select>
-        <span className="ml-auto t-meta font-semibold">{blocked.length} withheld by gates — unaffected by these filters</span>
+        <span className="ml-auto t-meta font-semibold">{blocked.length} withheld by gates — see the Blocked tab</span>
       </div>
 
       <div className="t-h3 mb-2.5">{surfaced.length} surfaced</div>
@@ -79,7 +79,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
               rank={i + 1}
               parkedResurfaceDate={parkDates[o.id] ? new Date(parkDates[o.id]).toLocaleDateString('en-SG', { day: 'numeric', month: 'short' }) : undefined}
               onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })}
-              onOpenCoach={id => { dispatch({ type: 'SET_COACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'coach' }); }}
+              onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
               onPark={id => dispatch({ type: 'PARK', id, resurface: businessDaysAdd(TODAY, 5).toISOString() })}
               onDismiss={id => {
                 const reason = prompt('Reason for dismissing this opportunity:', 'Client not reachable this week');
@@ -88,12 +88,6 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
             />
           ))
         : <div className="glass-tight p-4 t-meta">No opportunities match these filters.</div>}
-
-      <div className="t-h1 mt-8 mb-1">What we blocked</div>
-      <div className="t-meta mb-3">
-        Passed the rank ordering would have applied, but withheld from the queue entirely by a hard gate. Same production quality as a surfaced opportunity — a refusal is a credibility scene, not an edge case.
-      </div>
-      {blocked.map(x => <BlockedCard key={x.opp.id} opp={x.opp} gates={x.gates} />)}
 
       {parkedList.length > 0 && (
         <>

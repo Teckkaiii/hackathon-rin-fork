@@ -1,29 +1,17 @@
-import opportunitiesData from '../data/opportunities.json';
-import productsData from '../data/products.json';
-import type { Opportunity, Product, Driver } from '../types';
+import type { Driver, Opportunity } from '../types';
 import { evalGates } from './gates';
+import { signalScore } from './signal';
+import type { Filters } from './filters';
+import { OPPS, PRODUCTS } from './data';
 
-export const OPPS = opportunitiesData as Opportunity[];
-export const PRODUCTS = productsData as Record<string, Product>;
-
-export interface Filters {
-  segment: string;
-  tier: string;
-  family: string;
-  minAmount: number;
-  recency: string;
-}
-
-export const DEFAULT_FILTERS: Filters = {
-  segment: 'all', tier: 'all', family: 'all', minAmount: 0, recency: 'all',
-};
+export { OPPS, PRODUCTS };
 
 export function allOppsWithGates() {
   return OPPS.map(opp => ({ opp, gates: evalGates(opp) }));
 }
 
 // clientIds, when passed, scopes results to a single RM's book. Omit it for
-// book-wide views (Desk View).
+// book-wide views.
 export function passedOpps(clientIds?: Set<string>): Opportunity[] {
   return allOppsWithGates()
     .filter(x => !x.gates.blocked)
@@ -59,7 +47,11 @@ export function filteredOpps(
       if (filters.recency === 'internal' && o.signal.recency !== 'Internal') return false;
       return true;
     })
-    .sort((a, b) => a.daysToAct - b.daysToAct);
+    .sort((a, b) => signalScore(b) - signalScore(a) || a.daysToAct - b.daysToAct);
+}
+
+export function blockedClientIds(clientIds?: Set<string>): Set<string> {
+  return new Set(blockedOpps(clientIds).map(x => x.opp.clientId));
 }
 
 export function clusters(parked: Set<string>, dismissed: Record<string, string>, driversById: Record<string, Driver>, clientIds?: Set<string>) {

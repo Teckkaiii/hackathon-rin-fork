@@ -16,6 +16,8 @@ export interface Driver {
   id: string;
   label: string;
   detail: string;
+  date: string;
+  recency: SignalRecency;
 }
 
 export interface Holding {
@@ -23,6 +25,14 @@ export interface Holding {
   value: number;
   note: string;
   source: string;
+}
+
+export interface CrossBorderProfile {
+  operatingCountries: string[];
+  investmentLocations: string[];
+  transactionCorridors: string[];
+  treasuryExposures: string[];
+  relationshipFootprint: string[];
 }
 
 export interface Client {
@@ -39,6 +49,7 @@ export interface Client {
   concentration: { pct: number; threshold: number; name: string } | null;
   idleCash: { days: number; threshold: number; source: string } | null;
   incomeObjective: { target: number; actual: number; unit: string; source: string } | null;
+  crossBorder: CrossBorderProfile | null;
 }
 
 export interface GateOverride {
@@ -94,3 +105,44 @@ export interface BindingConstraint {
   label: string;
   detail: string;
 }
+
+export type ImpactSeverity = 'high' | 'medium' | 'low';
+export type ImpactBasis = 'confirmed' | 'inferred';
+
+export interface NewsImpact {
+  clientId: string;
+  severity: ImpactSeverity;
+  basis: ImpactBasis;
+  reason: string;
+}
+
+export type NewsFlag = 'priority' | 'elevated' | 'standard';
+
+export interface NewsItem {
+  id: string;
+  headline: string;
+  detail: string;
+  date: string;
+  recency: SignalRecency;
+  impacts: NewsImpact[];
+  flag: NewsFlag;
+}
+
+export type MomentumImpact = 'favorable' | 'adverse';
+export type MomentumLevel = 'high' | 'low';
+
+export interface MomentumDay {
+  date: string;
+  impact: MomentumImpact;
+  note: string;
+}
+
+export interface MomentumTheme {
+  id: string;
+  label: string;
+  detail: string;
+  driverId: string | null;
+  clientIds: string[];
+  days: MomentumDay[];
+}
+

@@ -1,20 +1,19 @@
 import clientsData from './data/clients.json';
 import driversData from './data/drivers.json';
 import type { Client, Driver, Approach, CoachCheck, LedgerEntry } from './types';
-import { DEFAULT_FILTERS, type Filters } from './lib/queue';
+import { DEFAULT_FILTERS, type Filters } from './lib/filters';
 
 export const CLIENTS = clientsData as Record<string, Client>;
 export const DRIVERS = driversData as Record<string, Driver>;
 export const CLIENT_LIST = Object.values(CLIENTS);
 
-// RIN is a per-RM working surface: every RM-facing view (Queue, Clients, Coach,
-// Outreach) is scoped to the signed-in RM's own book. Desk View is the
-// exception — it's the team-lead surface and intentionally spans the whole book.
+// RIN is a per-RM working surface: every view (Queue, Clients, Blocked,
+// Outreach, News, Past Week) is scoped to the signed-in RM's own book.
 export const CURRENT_RM = 'Aisha Rahman';
 export const MY_CLIENTS = CLIENT_LIST.filter(c => c.rm === CURRENT_RM);
 export const MY_CLIENT_IDS = new Set(MY_CLIENTS.map(c => c.id));
 
-export type Tab = 'queue' | 'clients' | 'coach' | 'outreach' | 'desk';
+export type Tab = 'queue' | 'clients' | 'blocked' | 'outreach' | 'news' | 'pastweek';
 
 export interface AppState {
   tab: Tab;
@@ -25,11 +24,9 @@ export interface AppState {
   dismissed: Record<string, string>;
   ledger: LedgerEntry[];
   draftByClient: Record<string, string>;
-  coachResultByClient: Record<string, CoachCheck[] | undefined>;
-  coachClientId: string;
+  draftResultByClient: Record<string, CoachCheck[] | undefined>;
   outreachClientId: string;
   outreachApproach: Approach | null;
-  outreachCheck: CoachCheck[] | null;
 }
 
 const SEED_DRAFT_CHEN =
@@ -45,11 +42,9 @@ export function initialState(): AppState {
     dismissed: {},
     ledger: [],
     draftByClient: { chen: SEED_DRAFT_CHEN },
-    coachResultByClient: {},
-    coachClientId: 'chen',
+    draftResultByClient: {},
     outreachClientId: 'chen',
     outreachApproach: null,
-    outreachCheck: null,
   };
 }
 
@@ -60,15 +55,13 @@ export type Action =
   | { type: 'SET_FILTER'; key: keyof Filters; value: string | number }
   | { type: 'PARK'; id: string; resurface: string }
   | { type: 'DISMISS'; id: string; reason: string }
-  | { type: 'SET_COACH_CLIENT'; id: string }
-  | { type: 'COACH_SET_DRAFT'; clientId: string; text: string }
-  | { type: 'COACH_REVIEW'; clientId: string; checks: CoachCheck[] }
-  | { type: 'COACH_CLEAR'; clientId: string }
-  | { type: 'COACH_ACCEPT'; clientId: string; text: string; checks: CoachCheck[] }
-  | { type: 'COACH_REJECT'; clientId: string }
+  | { type: 'DRAFT_SET_TEXT'; clientId: string; text: string }
+  | { type: 'DRAFT_REVIEW'; clientId: string; checks: CoachCheck[] }
+  | { type: 'DRAFT_CLEAR'; clientId: string }
+  | { type: 'DRAFT_ACCEPT'; clientId: string; text: string; checks: CoachCheck[] }
+  | { type: 'DRAFT_REJECT'; clientId: string }
   | { type: 'SET_OUTREACH_CLIENT'; id: string }
   | { type: 'SET_APPROACH'; approach: Approach }
-  | { type: 'OUTREACH_CHECK'; checks: CoachCheck[] }
   | { type: 'OUTREACH_SEND'; entry: LedgerEntry }
   | { type: 'OUTREACH_NOSEND'; entry: LedgerEntry };
 
@@ -89,34 +82,30 @@ export function reducer(state: AppState, action: Action): AppState {
     }
     case 'DISMISS':
       return { ...state, dismissed: { ...state.dismissed, [action.id]: action.reason } };
-    case 'SET_COACH_CLIENT':
-      return { ...state, coachClientId: action.id };
-    case 'COACH_SET_DRAFT':
+    case 'DRAFT_SET_TEXT':
       return { ...state, draftByClient: { ...state.draftByClient, [action.clientId]: action.text } };
-    case 'COACH_REVIEW':
-      return { ...state, coachResultByClient: { ...state.coachResultByClient, [action.clientId]: action.checks } };
-    case 'COACH_CLEAR': {
-      const coachResultByClient = { ...state.coachResultByClient };
-      delete coachResultByClient[action.clientId];
-      return { ...state, draftByClient: { ...state.draftByClient, [action.clientId]: '' }, coachResultByClient };
+    case 'DRAFT_REVIEW':
+      return { ...state, draftResultByClient: { ...state.draftResultByClient, [action.clientId]: action.checks } };
+    case 'DRAFT_CLEAR': {
+      const draftResultByClient = { ...state.draftResultByClient };
+      delete draftResultByClient[action.clientId];
+      return { ...state, draftByClient: { ...state.draftByClient, [action.clientId]: '' }, draftResultByClient };
     }
-    case 'COACH_ACCEPT':
+    case 'DRAFT_ACCEPT':
       return {
         ...state,
         draftByClient: { ...state.draftByClient, [action.clientId]: action.text },
-        coachResultByClient: { ...state.coachResultByClient, [action.clientId]: action.checks },
+        draftResultByClient: { ...state.draftResultByClient, [action.clientId]: action.checks },
       };
-    case 'COACH_REJECT': {
-      const coachResultByClient = { ...state.coachResultByClient };
-      delete coachResultByClient[action.clientId];
-      return { ...state, coachResultByClient };
+    case 'DRAFT_REJECT': {
+      const draftResultByClient = { ...state.draftResultByClient };
+      delete draftResultByClient[action.clientId];
+      return { ...state, draftResultByClient };
     }
     case 'SET_OUTREACH_CLIENT':
-      return { ...state, outreachClientId: action.id, outreachApproach: null, outreachCheck: null };
+      return { ...state, outreachClientId: action.id, outreachApproach: null };
     case 'SET_APPROACH':
       return { ...state, outreachApproach: action.approach };
-    case 'OUTREACH_CHECK':
-      return { ...state, outreachCheck: action.checks };
     case 'OUTREACH_SEND':
     case 'OUTREACH_NOSEND':
       return { ...state, ledger: [...state.ledger, action.entry] };

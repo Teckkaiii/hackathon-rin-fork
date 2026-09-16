@@ -1,19 +1,24 @@
 import type { ReactNode } from 'react';
-import { MY_CLIENTS, CLIENTS } from '../state';
+import { MY_CLIENTS, MY_CLIENT_IDS, CLIENTS } from '../state';
 import { TODAY, monthsBetween } from '../lib/format';
 import { bindingConstraint } from '../lib/binding';
-import { OPPS, PRODUCTS } from '../lib/queue';
+import { OPPS, PRODUCTS, blockedClientIds } from '../lib/queue';
 import { fmt, fmtDate } from '../lib/format';
 import { Pill } from './ui/Pill';
 import { Orb } from './ui/Orb';
 import { Button } from './ui/Button';
 
 export function ClientsView({ onOpenClient }: { onOpenClient: (id: string) => void }) {
+  const blocked = blockedClientIds(MY_CLIENT_IDS);
+  const clients = MY_CLIENTS.filter(c => !blocked.has(c.id));
   return (
     <div>
       <div className="t-display mb-1">Clients</div>
-      <div className="t-lead mb-5">One reviewable position page per Premier or Private client.</div>
-      {MY_CLIENTS.map(c => {
+      <div className="t-lead mb-5">
+        One reviewable position page per Premier or Private client. Clients withheld by a compliance gate live in
+        the Blocked tab instead.
+      </div>
+      {clients.map(c => {
         const months = monthsBetween(new Date(c.suitability.lastReview + 'T00:00:00'), TODAY);
         const lapsed = months > 12;
         return (
@@ -37,7 +42,7 @@ export function ClientsView({ onOpenClient }: { onOpenClient: (id: string) => vo
   );
 }
 
-export function ClientDetail({ clientId, onBack, onOpenCoach }: { clientId: string; onBack: () => void; onOpenCoach: (id: string) => void }) {
+export function ClientDetail({ clientId, onBack, onOpenOutreach }: { clientId: string; onBack: () => void; onOpenOutreach: (id: string) => void }) {
   const c = CLIENTS[clientId];
   const bind = bindingConstraint(c);
   const monthsSince = monthsBetween(new Date(c.suitability.lastReview + 'T00:00:00'), TODAY);
@@ -82,6 +87,22 @@ export function ClientDetail({ clientId, onBack, onOpenCoach }: { clientId: stri
     body: `Mandate: ${c.mandate}. Risk profile: ${c.risk}. Holdings reviewed against mandate — no drift detected.`,
     source: 'Mandate Records',
   });
+  if (c.crossBorder) {
+    const cb = c.crossBorder;
+    dims.push({
+      key: 'crossBorder', title: 'Cross-border footprint',
+      body: (
+        <>
+          <div><b>Operating countries:</b> {cb.operatingCountries.join(', ')}</div>
+          <div><b>Investment locations:</b> {cb.investmentLocations.join(', ')}</div>
+          <div><b>Transaction corridors:</b> {cb.transactionCorridors.join('; ')}</div>
+          <div><b>Treasury exposures:</b> {cb.treasuryExposures.join('; ')}</div>
+          <div><b>Relationship footprint:</b> {cb.relationshipFootprint.join('; ')}</div>
+        </>
+      ),
+      source: 'RM discussion notes & KYC record',
+    });
+  }
 
   dims.sort((a, b) => (a.key === bind.kind ? -1 : 0) - (b.key === bind.kind ? -1 : 0));
 
@@ -117,7 +138,9 @@ export function ClientDetail({ clientId, onBack, onOpenCoach }: { clientId: stri
         <div className="glass-tight p-4 mt-1">
           <div className="t-h3 mb-1.5">Related opportunity</div>
           <div className="t-body mb-3">{fmt(opp.amountAtStake)} at stake · {opp.approach} · {PRODUCTS[opp.productId].name}</div>
-          <Button variant="primary" size="sm" onClick={() => onOpenCoach(c.id)}>Draft in Coach</Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="primary" size="sm" onClick={() => onOpenOutreach(c.id)}>Draft outreach</Button>
+          </div>
         </div>
       )}
     </div>

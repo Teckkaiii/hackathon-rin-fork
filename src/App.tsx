@@ -3,9 +3,10 @@ import { reducer, initialState, CURRENT_RM } from './state';
 import { Nav } from './components/Nav';
 import { QueueView } from './components/QueueView';
 import { ClientsView, ClientDetail } from './components/ClientsView';
-import { CoachView } from './components/CoachView';
+import { BlockedView } from './components/BlockedView';
 import { OutreachView } from './components/OutreachView';
-import { DeskView } from './components/DeskView';
+import { NewsView } from './components/NewsView';
+import { PastWeekView } from './components/PastWeekView';
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, undefined, initialState);
@@ -39,13 +40,14 @@ export default function App() {
             ? <ClientDetail
                 clientId={state.selectedClientId}
                 onBack={() => dispatch({ type: 'BACK_CLIENTS' })}
-                onOpenCoach={id => { dispatch({ type: 'SET_COACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'coach' }); }}
+                onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
               />
             : <ClientsView onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })} />
         )}
-        {state.tab === 'coach' && <CoachView state={state} dispatch={dispatch} />}
+        {state.tab === 'blocked' && <BlockedView />}
         {state.tab === 'outreach' && <OutreachView state={state} dispatch={dispatch} />}
-        {state.tab === 'desk' && <DeskView state={state} />}
+        {state.tab === 'news' && <NewsView />}
+        {state.tab === 'pastweek' && <PastWeekView />}
       </main>
 
       <div className="max-w-[1160px] mx-auto px-5 py-4 border-t border-hairline-2 text-center t-meta">
