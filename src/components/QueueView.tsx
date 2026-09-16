@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Action, AppState } from '../state';
 import { CLIENTS, DRIVERS, MY_CLIENT_IDS } from '../state';
 import { PRODUCTS, OPPS, blockedOpps, filteredOpps, clusters } from '../lib/queue';
 import { OpportunityCard } from './OpportunityCard';
 import { Pill } from './ui/Pill';
+import { Modal } from './ui/Modal';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
   const { filters, dismissed } = state;
@@ -16,6 +17,21 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
   const cls = useMemo(() => clusters(dismissed, DRIVERS, MY_CLIENT_IDS), [dismissed]);
   const families = useMemo(() => [...new Set(Object.values(PRODUCTS).map(p => p.family))], []);
   const dismissedList = OPPS.filter(o => o.id in dismissed && MY_CLIENT_IDS.has(o.clientId));
+
+  const [dismissTarget, setDismissTarget] = useState<string | null>(null);
+  const [dismissReason, setDismissReason] = useState('Client not reachable this week');
+
+  function openDismiss(id: string) {
+    setDismissReason('Client not reachable this week');
+    setDismissTarget(id);
+  }
+
+  function confirmDismiss() {
+    if (dismissTarget) {
+      dispatch({ type: 'DISMISS', id: dismissTarget, reason: dismissReason.trim() || 'No reason given' });
+    }
+    setDismissTarget(null);
+  }
 
   function setFilter(key: keyof typeof filters, value: string | number) {
     dispatch({ type: 'SET_FILTER', key, value });
@@ -76,10 +92,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
               opp={o}
               onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })}
               onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
-              onDismiss={id => {
-                const reason = prompt('Reason for dismissing this opportunity:', 'Client not reachable this week');
-                if (reason !== null) dispatch({ type: 'DISMISS', id, reason: reason || 'No reason given' });
-              }}
+              onDismiss={openDismiss}
             />
           ))
         : <div className="glass-tight p-4 t-meta">No opportunities match these filters.</div>}
@@ -101,6 +114,21 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
           })}
         </>
       )}
+
+      <Modal
+        open={dismissTarget !== null}
+        title="Dismiss this opportunity"
+        confirmLabel="Dismiss"
+        onConfirm={confirmDismiss}
+        onClose={() => setDismissTarget(null)}
+      >
+        <div className="t-meta mb-2">The reason is recorded against this opportunity.</div>
+        <textarea
+          className="w-full border border-hairline-2 rounded-xl p-3 text-[14px] leading-relaxed min-h-[80px] font-sans"
+          value={dismissReason}
+          onChange={e => setDismissReason(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 }

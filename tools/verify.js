@@ -85,10 +85,16 @@ function startServer() {
   check('No Parked section in the queue', !txt.includes('Parked') && !txt.includes('Resurfaces'));
   check('No parking cadence copy in the queue', !txt.includes('5 business days'));
 
-  // Dismiss with reason
-  page.once('dialog', d => d.accept('Client travelling, follow up next week'));
+  // Dismiss with reason, via the in-app modal (not a browser prompt)
+  let sawNativeDialog = false;
+  page.on('dialog', d => { sawNativeDialog = true; d.dismiss(); });
   const priyaCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'Priya Ravindran' });
   await priyaCard.locator('button:has-text("Dismiss")').click();
+  check('Dismiss opens an in-app modal', await page.locator('[data-testid="modal"]').count() === 1);
+  check('Dismiss did not use a native browser prompt', !sawNativeDialog);
+  await page.fill('[data-testid="modal"] textarea', 'Client travelling, follow up next week');
+  await page.click('[data-act="modal-confirm"]');
+  check('Modal closes after confirming', await page.locator('[data-testid="modal"]').count() === 0);
   txt = await page.locator('main').innerText();
   check('Priya dismissed with reason recorded', txt.includes('Dismissed') && txt.includes('Client travelling'));
 
