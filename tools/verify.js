@@ -79,13 +79,11 @@ function startServer() {
   txt = await page.locator('main').innerText();
   check('Withheld count still 1 after resetting filters', txt.includes('1 withheld by gates') && /3 surfaced/.test(txt));
 
-  // Park David Ong (button click must not also trigger the card's own open-client navigation)
-  const davidCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'David Ong' });
-  await davidCard.locator('button:has-text("Park")').click();
+  // Park is gone.
   txt = await page.locator('main').innerText();
-  check('David Ong moved to Parked with resurface date', txt.includes('Parked') && txt.includes('Resurfaces'));
-  check('Cadence rule text shown', txt.includes('5 business days'));
-  check('Parking a card kept us on the Queue tab (button click did not bubble to open-client)', txt.includes('Today\'s queue'));
+  check('No Park button anywhere in the queue', await page.locator('button:has-text("Park")').count() === 0);
+  check('No Parked section in the queue', !txt.includes('Parked') && !txt.includes('Resurfaces'));
+  check('No parking cadence copy in the queue', !txt.includes('5 business days'));
 
   // Dismiss with reason
   page.once('dialog', d => d.accept('Client travelling, follow up next week'));

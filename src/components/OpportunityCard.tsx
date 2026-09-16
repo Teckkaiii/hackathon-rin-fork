@@ -11,13 +11,11 @@ const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
 const LEVEL_LABEL: Record<SignalLevel, string> = { high: 'High', medium: 'Medium', low: 'Low' };
 
 export function OpportunityCard({
-  opp, parkedResurfaceDate, onOpenClient, onOpenOutreach, onPark, onDismiss,
+  opp, onOpenClient, onOpenOutreach, onDismiss,
 }: {
   opp: Opportunity;
-  parkedResurfaceDate?: string;
   onOpenClient: (id: string) => void;
   onOpenOutreach: (id: string) => void;
-  onPark?: (id: string) => void;
   onDismiss?: (id: string) => void;
 }) {
   const c = CLIENTS[opp.clientId];
@@ -63,11 +61,6 @@ export function OpportunityCard({
 
       <div className="flex gap-2 flex-wrap mt-4">
         <Button size="sm" onClick={() => onOpenOutreach(c.id)}>Draft outreach</Button>
-        {parkedResurfaceDate ? (
-          <Pill variant="flag">Parked — resurfaces {parkedResurfaceDate}</Pill>
-        ) : (
-          onPark && <Button variant="ghost" size="sm" onClick={() => onPark(opp.id)}>Park</Button>
-        )}
         {onDismiss && <Button variant="ghost" size="sm" onClick={() => onDismiss(opp.id)}>Dismiss</Button>}
       </div>
     </div>

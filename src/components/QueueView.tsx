@@ -2,21 +2,19 @@ import { useMemo } from 'react';
 import type { Action, AppState } from '../state';
 import { CLIENTS, DRIVERS, MY_CLIENT_IDS } from '../state';
 import { PRODUCTS, OPPS, blockedOpps, filteredOpps, clusters } from '../lib/queue';
-import { businessDaysAdd, TODAY } from '../lib/format';
 import { OpportunityCard } from './OpportunityCard';
 import { Pill } from './ui/Pill';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
-  const { filters, parked, dismissed, parkDates } = state;
+  const { filters, dismissed } = state;
 
   const surfaced = useMemo(
-    () => filteredOpps(parked, dismissed, filters, CLIENTS, MY_CLIENT_IDS),
-    [parked, dismissed, filters]
+    () => filteredOpps(dismissed, filters, CLIENTS, MY_CLIENT_IDS),
+    [dismissed, filters]
   );
   const blocked = useMemo(() => blockedOpps(MY_CLIENT_IDS), []);
-  const cls = useMemo(() => clusters(parked, dismissed, DRIVERS, MY_CLIENT_IDS), [parked, dismissed]);
+  const cls = useMemo(() => clusters(dismissed, DRIVERS, MY_CLIENT_IDS), [dismissed]);
   const families = useMemo(() => [...new Set(Object.values(PRODUCTS).map(p => p.family))], []);
-  const parkedList = OPPS.filter(o => parked.has(o.id) && MY_CLIENT_IDS.has(o.clientId));
   const dismissedList = OPPS.filter(o => o.id in dismissed && MY_CLIENT_IDS.has(o.clientId));
 
   function setFilter(key: keyof typeof filters, value: string | number) {
@@ -76,10 +74,8 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
             <OpportunityCard
               key={o.id}
               opp={o}
-              parkedResurfaceDate={parkDates[o.id] ? new Date(parkDates[o.id]).toLocaleDateString('en-SG', { day: 'numeric', month: 'short' }) : undefined}
               onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })}
               onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
-              onPark={id => dispatch({ type: 'PARK', id, resurface: businessDaysAdd(TODAY, 5).toISOString() })}
               onDismiss={id => {
                 const reason = prompt('Reason for dismissing this opportunity:', 'Client not reachable this week');
                 if (reason !== null) dispatch({ type: 'DISMISS', id, reason: reason || 'No reason given' });
@@ -87,27 +83,6 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
             />
           ))
         : <div className="glass-tight p-4 t-meta">No opportunities match these filters.</div>}
-
-      {parkedList.length > 0 && (
-        <>
-          <div className="t-h1 mt-8 mb-1">Parked</div>
-          <div className="t-meta mb-3">
-            Parking is itself recorded as a signal. A parked item resurfaces on a governed cadence rather than vanishing or reappearing daily. Rule: review-type opportunities resurface after 5 business days, or immediately if a new signal names the same client.
-          </div>
-          {parkedList.map(o => {
-            const c = CLIENTS[o.clientId];
-            return (
-              <div key={o.id} className="glass-tight p-4 mb-2 flex items-center justify-between">
-                <div>
-                  <div className="t-h3">{c.name}</div>
-                  <div className="t-meta">{c.segment} · {c.tier}</div>
-                </div>
-                <Pill variant="flag">Resurfaces {new Date(parkDates[o.id]).toLocaleDateString('en-SG', { day: 'numeric', month: 'short' })}</Pill>
-              </div>
-            );
-          })}
-        </>
-      )}
 
       {dismissedList.length > 0 && (
         <>

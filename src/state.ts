@@ -19,8 +19,6 @@ export interface AppState {
   tab: Tab;
   selectedClientId: string | null;
   filters: Filters;
-  parked: Set<string>;
-  parkDates: Record<string, string>;
   dismissed: Record<string, string>;
   ledger: LedgerEntry[];
   draftByClient: Record<string, string>;
@@ -37,8 +35,6 @@ export function initialState(): AppState {
     tab: 'queue',
     selectedClientId: null,
     filters: { ...DEFAULT_FILTERS },
-    parked: new Set(),
-    parkDates: {},
     dismissed: {},
     ledger: [],
     draftByClient: { chen: SEED_DRAFT_CHEN },
@@ -53,7 +49,6 @@ export type Action =
   | { type: 'OPEN_CLIENT'; id: string }
   | { type: 'BACK_CLIENTS' }
   | { type: 'SET_FILTER'; key: keyof Filters; value: string | number }
-  | { type: 'PARK'; id: string; resurface: string }
   | { type: 'DISMISS'; id: string; reason: string }
   | { type: 'DRAFT_SET_TEXT'; clientId: string; text: string }
   | { type: 'DRAFT_REVIEW'; clientId: string; checks: CoachCheck[] }
@@ -75,11 +70,6 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, selectedClientId: null };
     case 'SET_FILTER':
       return { ...state, filters: { ...state.filters, [action.key]: action.value } };
-    case 'PARK': {
-      const parked = new Set(state.parked);
-      parked.add(action.id);
-      return { ...state, parked, parkDates: { ...state.parkDates, [action.id]: action.resurface } };
-    }
     case 'DISMISS':
       return { ...state, dismissed: { ...state.dismissed, [action.id]: action.reason } };
     case 'DRAFT_SET_TEXT':
