@@ -2,6 +2,7 @@ import clientsData from './data/clients.json';
 import driversData from './data/drivers.json';
 import type { Client, Driver, Approach, CoachCheck, LedgerEntry } from './types';
 import { DEFAULT_FILTERS, type Filters } from './lib/filters';
+import type { RouteId, RoutedMap } from './lib/routing';
 
 export const CLIENTS = clientsData as Record<string, Client>;
 export const DRIVERS = driversData as Record<string, Driver>;
@@ -20,6 +21,7 @@ export interface AppState {
   selectedClientId: string | null;
   filters: Filters;
   dismissed: Record<string, string>;
+  routed: RoutedMap;
   ledger: LedgerEntry[];
   draftByClient: Record<string, string>;
   draftResultByClient: Record<string, CoachCheck[] | undefined>;
@@ -36,6 +38,7 @@ export function initialState(): AppState {
     selectedClientId: null,
     filters: { ...DEFAULT_FILTERS },
     dismissed: {},
+    routed: {},
     ledger: [],
     draftByClient: { chen: SEED_DRAFT_CHEN },
     draftResultByClient: {},
@@ -50,6 +53,7 @@ export type Action =
   | { type: 'BACK_CLIENTS' }
   | { type: 'SET_FILTER'; key: keyof Filters; value: string | number }
   | { type: 'DISMISS'; id: string; reason: string }
+  | { type: 'ROUTE_OPPORTUNITY'; id: string; route: RouteId; note: string }
   | { type: 'DRAFT_SET_TEXT'; clientId: string; text: string }
   | { type: 'DRAFT_REVIEW'; clientId: string; checks: CoachCheck[] }
   | { type: 'DRAFT_CLEAR'; clientId: string }
@@ -72,6 +76,8 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, filters: { ...state.filters, [action.key]: action.value } };
     case 'DISMISS':
       return { ...state, dismissed: { ...state.dismissed, [action.id]: action.reason } };
+    case 'ROUTE_OPPORTUNITY':
+      return { ...state, routed: { ...state.routed, [action.id]: { route: action.route, note: action.note } } };
     case 'DRAFT_SET_TEXT':
       return { ...state, draftByClient: { ...state.draftByClient, [action.clientId]: action.text } };
     case 'DRAFT_REVIEW':

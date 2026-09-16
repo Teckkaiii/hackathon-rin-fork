@@ -4,6 +4,7 @@ import { signalBreakdown, type SignalLevel } from '../lib/signal';
 import { fmt } from '../lib/format';
 import { Pill } from './ui/Pill';
 import { Button } from './ui/Button';
+import { routeFor, type RouteId } from '../lib/routing';
 
 const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
   high: 'pass', medium: 'flag', low: 'neutral',
@@ -11,15 +12,22 @@ const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
 const LEVEL_LABEL: Record<SignalLevel, string> = { high: 'High', medium: 'Medium', low: 'Low' };
 
 export function OpportunityCard({
-  opp, onOpenClient, onOpenOutreach, onDismiss,
+  opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff,
 }: {
   opp: Opportunity;
   onOpenClient: (id: string) => void;
   onOpenOutreach: (id: string) => void;
   onDismiss?: (id: string) => void;
+  onHandoff: (oppId: string, route: RouteId) => void;
 }) {
   const c = CLIENTS[opp.clientId];
   const signal = signalBreakdown(opp);
+  const route = routeFor(opp, c);
+
+  function runRoute(id: RouteId) {
+    if (id === 'draft') onOpenOutreach(c.id);
+    else onHandoff(opp.id, id);
+  }
 
   return (
     <div
@@ -59,9 +67,14 @@ export function OpportunityCard({
         <WhyBox label="Why this instrument" value={opp.whyInstrument} />
       </div>
 
-      <div className="flex gap-2 flex-wrap mt-4">
-        <Button size="sm" onClick={() => onOpenOutreach(c.id)}>Draft outreach</Button>
-        {onDismiss && <Button variant="ghost" size="sm" onClick={() => onDismiss(opp.id)}>Dismiss</Button>}
+      <div className="mt-4">
+        <div className="flex gap-2 flex-wrap items-center">
+          <Button data-testid="route-primary" variant="primary" size="sm" onClick={() => runRoute(route.id)}>
+            {route.label}
+          </Button>
+          {onDismiss && <Button variant="ghost" size="sm" onClick={() => onDismiss(opp.id)}>Dismiss</Button>}
+        </div>
+        <div data-testid="route-rationale" className="t-meta mt-2">{route.rationale}</div>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { evalGates } from './gates';
 import { signalScore } from './signal';
 import type { Filters } from './filters';
 import { OPPS, PRODUCTS } from './data';
+import type { RoutedMap } from './routing';
 
 export { OPPS, PRODUCTS };
 
@@ -25,17 +26,18 @@ export function blockedOpps(clientIds?: Set<string>) {
     .filter(x => !clientIds || clientIds.has(x.opp.clientId));
 }
 
-export function activeOpps(dismissed: Record<string, string>, clientIds?: Set<string>): Opportunity[] {
-  return passedOpps(clientIds).filter(o => !(o.id in dismissed));
+export function activeOpps(dismissed: Record<string, string>, routed: RoutedMap, clientIds?: Set<string>): Opportunity[] {
+  return passedOpps(clientIds).filter(o => !(o.id in dismissed) && !(o.id in routed));
 }
 
 export function filteredOpps(
   dismissed: Record<string, string>,
+  routed: RoutedMap,
   filters: Filters,
   clientsById: Record<string, { segment: string; tier: string }>,
   clientIds?: Set<string>
 ): Opportunity[] {
-  return activeOpps(dismissed, clientIds)
+  return activeOpps(dismissed, routed, clientIds)
     .filter(o => {
       const c = clientsById[o.clientId];
       if (filters.segment !== 'all' && c.segment !== filters.segment) return false;
@@ -53,9 +55,9 @@ export function blockedClientIds(clientIds?: Set<string>): Set<string> {
   return new Set(blockedOpps(clientIds).map(x => x.opp.clientId));
 }
 
-export function clusters(dismissed: Record<string, string>, driversById: Record<string, Driver>, clientIds?: Set<string>) {
+export function clusters(dismissed: Record<string, string>, routed: RoutedMap, driversById: Record<string, Driver>, clientIds?: Set<string>) {
   const byDriver: Record<string, Opportunity[]> = {};
-  activeOpps(dismissed, clientIds).forEach(o => {
+  activeOpps(dismissed, routed, clientIds).forEach(o => {
     if (!o.driverId) return;
     (byDriver[o.driverId] ||= []).push(o);
   });

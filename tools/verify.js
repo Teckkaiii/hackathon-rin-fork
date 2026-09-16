@@ -85,6 +85,33 @@ function startServer() {
   check('No Parked section in the queue', !txt.includes('Parked') && !txt.includes('Resurfaces'));
   check('No parking cadence copy in the queue', !txt.includes('5 business days'));
 
+  // ---- Task 5: the agent picks a different next step per opportunity ----
+  const chenRoute = await page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' }).locator('[data-testid="route-primary"]').innerText();
+  const priyaRoute = await page.locator('[data-testid="opportunity-card"]', { hasText: 'Priya Ravindran' }).locator('[data-testid="route-primary"]').innerText();
+  const davidRoute = await page.locator('[data-testid="opportunity-card"]', { hasText: 'David Ong' }).locator('[data-testid="route-primary"]').innerText();
+  check('Chen routed to a direct draft', chenRoute.includes('Draft outreach'));
+  check('Priya routed to a specialist', priyaRoute.includes('Refer to specialist'));
+  check('David routed to a clarifying call', davidRoute.includes('Call to clarify'));
+  check('The three routes differ', new Set([chenRoute, priyaRoute, davidRoute]).size === 3);
+
+  const davidCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'David Ong' });
+  check('Route shows a rationale', (await davidCard.locator('[data-testid="route-rationale"]').innerText()).length > 20);
+  check('Priya rationale cites the concentration breach', (await page.locator('[data-testid="opportunity-card"]', { hasText: 'Priya Ravindran' }).locator('[data-testid="route-rationale"]').innerText()).includes('42%'));
+
+  // Executing a non-draft route hands the item off and drops it from the queue
+  await davidCard.locator('[data-testid="route-primary"]').click();
+  txt = await page.locator('main').innerText();
+  check('Handed-off item leaves the surfaced list', /2 surfaced/.test(txt));
+  check('Handed-off section names the route taken', txt.includes('Handed off') && txt.includes('Call to clarify'));
+  check('Handing off kept us on the Queue tab', txt.includes("Today's queue"));
+
+  // The draft route still goes to Outreach
+  await page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' }).locator('[data-testid="route-primary"]').click();
+  txt = await page.locator('main').innerText();
+  check('Draft route opens the Outreach tab', txt.includes('Outreach') && await page.locator('#outreach-text').count() === 1);
+  await page.click('nav >> text=Queue');
+  await page.waitForTimeout(150);
+
   // Dismiss with reason, via the in-app modal (not a browser prompt)
   let sawNativeDialog = false;
   page.on('dialog', d => { sawNativeDialog = true; d.dismiss(); });

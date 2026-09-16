@@ -5,18 +5,20 @@ import { PRODUCTS, OPPS, blockedOpps, filteredOpps, clusters } from '../lib/queu
 import { OpportunityCard } from './OpportunityCard';
 import { Pill } from './ui/Pill';
 import { Modal } from './ui/Modal';
+import { ROUTE_LABELS, type RouteId } from '../lib/routing';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
-  const { filters, dismissed } = state;
+  const { filters, dismissed, routed } = state;
 
   const surfaced = useMemo(
-    () => filteredOpps(dismissed, filters, CLIENTS, MY_CLIENT_IDS),
-    [dismissed, filters]
+    () => filteredOpps(dismissed, routed, filters, CLIENTS, MY_CLIENT_IDS),
+    [dismissed, routed, filters]
   );
   const blocked = useMemo(() => blockedOpps(MY_CLIENT_IDS), []);
-  const cls = useMemo(() => clusters(dismissed, DRIVERS, MY_CLIENT_IDS), [dismissed]);
+  const cls = useMemo(() => clusters(dismissed, routed, DRIVERS, MY_CLIENT_IDS), [dismissed, routed]);
   const families = useMemo(() => [...new Set(Object.values(PRODUCTS).map(p => p.family))], []);
   const dismissedList = OPPS.filter(o => o.id in dismissed && MY_CLIENT_IDS.has(o.clientId));
+  const handedOffList = OPPS.filter(o => o.id in routed && MY_CLIENT_IDS.has(o.clientId));
 
   const [dismissTarget, setDismissTarget] = useState<string | null>(null);
   const [dismissReason, setDismissReason] = useState('Client not reachable this week');
@@ -31,6 +33,10 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
       dispatch({ type: 'DISMISS', id: dismissTarget, reason: dismissReason.trim() || 'No reason given' });
     }
     setDismissTarget(null);
+  }
+
+  function handoff(oppId: string, route: RouteId) {
+    dispatch({ type: 'ROUTE_OPPORTUNITY', id: oppId, route, note: '' });
   }
 
   function setFilter(key: keyof typeof filters, value: string | number) {
@@ -93,9 +99,33 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
               onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })}
               onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
               onDismiss={openDismiss}
+              onHandoff={handoff}
             />
           ))
         : <div className="glass-tight p-4 t-meta">No opportunities match these filters.</div>}
+
+      {handedOffList.length > 0 && (
+        <>
+          <div className="t-h1 mt-8 mb-1">Handed off</div>
+          <div className="t-meta mb-3">
+            These opportunities were routed somewhere other than a direct message. They stay out of the queue until the
+            desk or the client comes back.
+          </div>
+          {handedOffList.map(o => {
+            const c = CLIENTS[o.clientId];
+            const r = routed[o.id];
+            return (
+              <div key={o.id} className="glass-tight p-4 mb-2 flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <div className="t-h3">{c.name}</div>
+                  <div className="t-meta">{c.segment}</div>
+                </div>
+                <Pill variant="flag">{ROUTE_LABELS[r.route]}{r.note ? ` — ${r.note}` : ''}</Pill>
+              </div>
+            );
+          })}
+        </>
+      )}
 
       {dismissedList.length > 0 && (
         <>
