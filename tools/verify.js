@@ -57,7 +57,7 @@ function startServer() {
   check('Card keeps the segment', chenTxt0.includes('Premier'));
   check('Card keeps all four scoring pills', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => chenTxt0.includes(s)));
   check('Card keeps the amount at stake', chenTxt0.includes('380,000'));
-  check('Card keeps the three why-boxes', chenTxt0.includes('Why this client') && chenTxt0.includes('Why now') && chenTxt0.includes('Why this instrument'));
+  check('Card keeps the three why-boxes', /why this client/i.test(chenTxt0) && /why now/i.test(chenTxt0) && /why this instrument/i.test(chenTxt0));
 
   // Clicking a card (not a button) opens the client's position page
   const chenCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
