@@ -59,11 +59,14 @@ function startServer() {
   check('Card keeps the amount at stake', chenTxt0.includes('380,000'));
   check('Card keeps the three why-boxes', /why this client/i.test(chenTxt0) && /why now/i.test(chenTxt0) && /why this instrument/i.test(chenTxt0));
 
-  // Clicking a card (not a button) opens the client's position page
+  // Only the name block navigates; the card body does not.
   const chenCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
-  await chenCard.click({ position: { x: 20, y: 20 } });
+  await chenCard.locator('.t-micro', { hasText: 'Amount at stake' }).click();
   txt = await page.locator('main').innerText();
-  check('Clicking a Queue card opens that client\'s position page', txt.includes('Chen Wei Liang') && /binding constraint/i.test(txt));
+  check('Clicking the card body does NOT navigate away from the queue', txt.includes("Today's queue"));
+  await chenCard.locator('[data-testid="client-open"]').click();
+  txt = await page.locator('main').innerText();
+  check('Clicking the client name opens that client\'s position page', txt.includes('Chen Wei Liang') && /binding constraint/i.test(txt));
   await page.click('nav >> text=Queue');
   await page.waitForTimeout(150);
 

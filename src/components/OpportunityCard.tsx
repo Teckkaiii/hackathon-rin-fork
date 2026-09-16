@@ -28,13 +28,17 @@ export function OpportunityCard({
       className="glass-tight border p-5 mb-3"
       data-oppid={opp.id}
       data-testid="opportunity-card"
-      onClick={() => onOpenClient(c.id)}
     >
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="min-w-0 flex-1">
-          <div className="t-h2 break-words">{c.name}</div>
+        <button
+          type="button"
+          data-testid="client-open"
+          className="min-w-0 flex-1 text-left group"
+          onClick={() => onOpenClient(c.id)}
+        >
+          <div className="t-h2 break-words group-hover:underline">{c.name}</div>
           <div className="t-meta">{c.segment}</div>
-        </div>
+        </button>
         <div className="text-right">
           <div className="t-micro">Amount at stake</div>
           <div className="t-h2 font-serif text-[24px]">{fmt(opp.amountAtStake)}</div>
@@ -57,7 +61,7 @@ export function OpportunityCard({
         <WhyBox label="Why this instrument" value={opp.whyInstrument} />
       </div>
 
-      <div className="flex gap-2 flex-wrap mt-4" onClick={e => e.stopPropagation()}>
+      <div className="flex gap-2 flex-wrap mt-4">
         <Button size="sm" onClick={() => onOpenOutreach(c.id)}>Draft outreach</Button>
         {parkedResurfaceDate ? (
           <Pill variant="flag">Parked — resurfaces {parkedResurfaceDate}</Pill>
