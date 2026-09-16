@@ -41,8 +41,8 @@ The left column of `OpportunityCard` collapses to a single clickable block:
 ```
 BEFORE                                    AFTER
 ┌────────────────────────────────┐        ┌────────────────────────────────┐
-│ ①  (●)  Chen Wei Ming          │        │ Chen Wei Ming        ← button  │
-│         Premier · Signature ·  │        │ Premier              ← button  │
+│ ①  (●)  Chen Wei Liang         │        │ Chen Wei Liang       ← button  │
+│         Premier · Priority ·   │        │ Premier              ← button  │
 │         RM Aisha Rahman        │        │                                │
 │         [Notify][SGD Struct…]  │        │ ●Urgency:High ●Relevancy:High  │
 │         [Signal: Yesterday]    │        │ ●Momentum:High ●Conviction:2   │
@@ -199,18 +199,30 @@ It is also the modal used by the `specialist` and `clarify` routes.
 
 ## Testing
 
-The project has no test runner configured. Verification is:
+The project has no unit-test runner, but it has an end-to-end harness:
+`tools/verify.js` drives a real Chromium via Playwright against a built `dist/`
+served by `tools/serve.js`, asserting behaviour with a list of `check(label,
+bool)` calls and exiting non-zero on any failure or any console error.
 
-1. `npx tsc --noEmit` passes.
-2. `npm run build` passes.
-3. `npm run dev`, then in the browser confirm: three cards render with no rank
-   badge, no orb, no RM name and no tier; each shows exactly four pills;
-   clicking a card's body does nothing while clicking the name opens the client;
-   the three cards show three different primary route buttons; `Other actions`
-   reveals two alternates; confirming a specialist referral moves that card to
-   Handed off and adds a row to that client's ledger in Outreach; Dismiss opens
-   the styled modal rather than a browser prompt; no Park button or Parked
-   section exists anywhere.
+That harness is the test bed for this work. The cycle for every task is:
 
-If a test runner is added later, `routeFor` is the piece worth covering — it is
-pure and its three-way split on the current data is a meaningful assertion.
+```
+npm run typecheck && npm run build && node tools/verify.js
+```
+
+New behaviour gets a new `check(...)` written **before** the implementation, so
+the run goes red first.
+
+Existing assertions this work invalidates, which must be rewritten rather than
+deleted wholesale:
+
+- The Park block (`verify.js:65-71`) — deleted; Park no longer exists.
+- The Dismiss block (`verify.js:73-78`) — the `page.once('dialog', ...)`
+  handler must become an interaction with the new modal.
+- The card-click assertion (`verify.js:48-52`) — clicking at `x:20, y:20` must
+  become an explicit click on the name button, and a second assertion added
+  that clicking the card body does *not* navigate.
+
+`routeFor` is pure and its three-way split across Aisha's book is the single
+most valuable assertion in this change: `david` → clarify, `priya` →
+specialist, `chen` → draft.
