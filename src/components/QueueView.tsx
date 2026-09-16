@@ -160,7 +160,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
               <div key={o.id} className="glass-tight p-4 mb-2 flex items-center justify-between">
                 <div>
                   <div className="t-h3">{c.name}</div>
-                  <div className="t-meta">{c.segment} · {c.tier}</div>
+                  <div className="t-meta">{c.segment}</div>
                 </div>
                 <Pill variant="neutral">Reason: {dismissed[o.id]}</Pill>
               </div>

@@ -58,7 +58,9 @@ tools/             verify.js (Playwright suite), serve.js (static server for
    conviction (how many distinct pieces of news corroborate the impact) —
    surfaced per-opportunity as qualitative High/Medium/Low pills, never as a
    raw number. Also: hard gates vs soft filters, correlated-conviction
-   clusters, park/dismiss with a governed cadence.
+   clusters, and an agent that routes each opportunity to its next step — draft
+   a message, refer to a specialist desk, or call the client to clarify — with
+   its reasoning shown on the card and the RM free to overrule it.
 2. **Clients** — a position page per client, ordered by whichever constraint
    is most binding today, every figure evidence-traced to its source,
    including a client's cross-border footprint (operating countries,
@@ -102,9 +104,10 @@ node tools/verify.js
 
 `verify.js` builds nothing itself — run `npm run build` first. It serves `dist/`
 locally and drives it with Playwright: all 6 modules, all 6 required
-demonstration scenes (a refusal, gates vs. filters, a caught inconsistency, a
-parked opportunity resurfacing, a correlated cluster, an expired document
-blocking action), the signal-score ranking and momentum classification, zero
+demonstration scenes (a refusal, gates vs. filters, a caught inconsistency, an
+opportunity routed to a specialist and handed off, a correlated cluster, an
+expired document blocking action), the signal-score ranking and momentum
+classification, zero
 JS errors, no horizontal overflow at 1400px or 400px.
 
 ## Data model notes

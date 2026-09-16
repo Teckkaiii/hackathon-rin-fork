@@ -48,7 +48,7 @@ export function routeFor(opp: Opportunity, client: Client): Route {
     return {
       id: 'specialist',
       label: ROUTE_LABELS.specialist,
-      rationale: `A ${family} instrument is not an RM-led product conversation — route to the specialist desk.`,
+      rationale: `${family} instruments are not an RM-led product conversation — route to the specialist desk.`,
     };
   }
 
@@ -64,6 +64,6 @@ export function routeFor(opp: Opportunity, client: Client): Route {
     id: 'draft',
     label: ROUTE_LABELS.draft,
     rationale:
-      'Gates clear, the instrument is on the approved shelf for this segment, and the client record is current — a direct message is appropriate.',
+      'No specialist trigger — not a Discretionary or Insurance instrument, no concentration breach, and below the RM-led ceiling — a direct message is appropriate.',
   };
 }

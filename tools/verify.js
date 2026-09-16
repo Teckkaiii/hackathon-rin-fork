@@ -119,10 +119,13 @@ function startServer() {
   await priyaCard2.locator('[data-testid="route-toggle"]').click();
   check('Other actions collapses again', await priyaCard2.locator('[data-testid="route-alt"]').count() === 0);
 
-  // The draft route still goes to Outreach
-  await page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' }).locator('[data-testid="route-primary"]').click();
+  // An overridden route runs that route's behaviour: Priya's agent pick is specialist,
+  // so choosing "Draft outreach" from Other actions must open Outreach *for Priya*.
+  await priyaCard2.locator('[data-testid="route-toggle"]').click();
+  await priyaCard2.locator('[data-testid="route-alt"]', { hasText: 'Draft outreach' }).click();
   txt = await page.locator('main').innerText();
-  check('Draft route opens the Outreach tab', txt.includes('Outreach') && await page.locator('#outreach-text').count() === 1);
+  check('Overridden draft route opens the Outreach tab', await page.locator('#outreach-text').count() === 1);
+  check('Overridden draft route loads the overridden client, not the default', await page.inputValue('#outreach-client-select') === 'priya');
   await page.click('nav >> text=Queue');
   await page.waitForTimeout(150);
 

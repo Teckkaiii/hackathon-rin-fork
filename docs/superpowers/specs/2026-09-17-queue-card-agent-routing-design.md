@@ -89,7 +89,7 @@ export interface Route {
 }
 
 export function routeFor(opp: Opportunity, client: Client): Route;
-export const ROUTES: Record<RouteId, { label: string }>;
+export const ROUTE_LABELS: Record<RouteId, string>;
 ```
 
 Rules are evaluated in order; the first match wins.
