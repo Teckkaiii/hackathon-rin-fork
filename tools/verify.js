@@ -45,6 +45,20 @@ function startServer() {
   check('No composite score digit shown anywhere', !/\/\s?100\b|\bscore\s*:\s*\d/i.test(bodyTxtQueue));
   check('Highest signal-score opportunity ranks first (Chen Wei Liang)', (await page.locator('[data-testid="opportunity-card"]').first().innerText()).includes('Chen Wei Liang'));
 
+  // ---- Task 1: card chrome stripped to name + segment + scoring pills ----
+  const chenCard0 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
+  const chenTxt0 = await chenCard0.innerText();
+  check('Card leads with the client name (no rank badge, no orb initials)', chenTxt0.split('\n')[0].trim() === 'Chen Wei Liang');
+  check('Card drops the RM name', !chenTxt0.includes('Aisha Rahman'));
+  check('Card drops the client tier', !/\bPriority\b|\bSignature\b/.test(chenTxt0));
+  check('Card drops the approach pill', !/\bNotify\b/.test(chenTxt0));
+  check('Card drops the product-name pill', !chenTxt0.includes('Structured Deposit'));
+  check('Card drops the signal-recency pill', !chenTxt0.includes('Signal:'));
+  check('Card keeps the segment', chenTxt0.includes('Premier'));
+  check('Card keeps all four scoring pills', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => chenTxt0.includes(s)));
+  check('Card keeps the amount at stake', chenTxt0.includes('380,000'));
+  check('Card keeps the three why-boxes', chenTxt0.includes('Why this client') && chenTxt0.includes('Why now') && chenTxt0.includes('Why this instrument'));
+
   // Clicking a card (not a button) opens the client's position page
   const chenCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
   await chenCard.click({ position: { x: 20, y: 20 } });

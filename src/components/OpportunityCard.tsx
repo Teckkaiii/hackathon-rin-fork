@@ -1,11 +1,9 @@
 import type { Opportunity } from '../types';
 import { CLIENTS } from '../state';
-import { PRODUCTS } from '../lib/queue';
 import { signalBreakdown, type SignalLevel } from '../lib/signal';
 import { fmt } from '../lib/format';
 import { Pill } from './ui/Pill';
 import { Button } from './ui/Button';
-import { Orb } from './ui/Orb';
 
 const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
   high: 'pass', medium: 'flag', low: 'neutral',
@@ -13,10 +11,9 @@ const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
 const LEVEL_LABEL: Record<SignalLevel, string> = { high: 'High', medium: 'Medium', low: 'Low' };
 
 export function OpportunityCard({
-  opp, rank, parkedResurfaceDate, onOpenClient, onOpenOutreach, onPark, onDismiss,
+  opp, parkedResurfaceDate, onOpenClient, onOpenOutreach, onPark, onDismiss,
 }: {
   opp: Opportunity;
-  rank?: number;
   parkedResurfaceDate?: string;
   onOpenClient: (id: string) => void;
   onOpenOutreach: (id: string) => void;
@@ -24,33 +21,19 @@ export function OpportunityCard({
   onDismiss?: (id: string) => void;
 }) {
   const c = CLIENTS[opp.clientId];
-  const prod = PRODUCTS[opp.productId];
   const signal = signalBreakdown(opp);
 
   return (
     <div
-      className="glass-tight border p-5 mb-3 cursor-pointer hover:border-ink-3 transition-colors"
+      className="glass-tight border p-5 mb-3"
       data-oppid={opp.id}
       data-testid="opportunity-card"
       onClick={() => onOpenClient(c.id)}
     >
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex gap-3 items-start min-w-0 flex-1">
-          {rank && (
-            <div className="w-8 h-8 rounded-lg bg-slate text-white font-bold text-[14px] flex items-center justify-center flex-none">
-              {rank}
-            </div>
-          )}
-          <Orb name={c.name} size={38} />
-          <div className="min-w-0 flex-1">
-            <div className="t-h2 break-words">{c.name}</div>
-            <div className="t-meta">{c.segment} · {c.tier} · RM {c.rm}</div>
-            <div className="flex gap-1.5 flex-wrap mt-2">
-              <Pill variant="neutral">{opp.approach}</Pill>
-              <Pill variant="neutral">{prod.name}</Pill>
-              <Pill variant="neutral">Signal: {opp.signal.recency}</Pill>
-            </div>
-          </div>
+        <div className="min-w-0 flex-1">
+          <div className="t-h2 break-words">{c.name}</div>
+          <div className="t-meta">{c.segment}</div>
         </div>
         <div className="text-right">
           <div className="t-micro">Amount at stake</div>

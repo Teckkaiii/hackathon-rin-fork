@@ -72,11 +72,10 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
 
       <div className="t-h3 mb-2.5">{surfaced.length} surfaced</div>
       {surfaced.length
-        ? surfaced.map((o, i) => (
+        ? surfaced.map(o => (
             <OpportunityCard
               key={o.id}
               opp={o}
-              rank={i + 1}
               parkedResurfaceDate={parkDates[o.id] ? new Date(parkDates[o.id]).toLocaleDateString('en-SG', { day: 'numeric', month: 'short' }) : undefined}
               onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })}
               onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
