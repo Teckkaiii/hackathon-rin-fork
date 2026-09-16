@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import type { Opportunity } from '../types';
 import { CLIENTS } from '../state';
 import { signalBreakdown, type SignalLevel } from '../lib/signal';
 import { fmt } from '../lib/format';
 import { Pill } from './ui/Pill';
 import { Button } from './ui/Button';
-import { routeFor, type RouteId } from '../lib/routing';
+import { routeFor, ROUTE_LABELS, type RouteId } from '../lib/routing';
 
 const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
   high: 'pass', medium: 'flag', low: 'neutral',
@@ -23,6 +24,8 @@ export function OpportunityCard({
   const c = CLIENTS[opp.clientId];
   const signal = signalBreakdown(opp);
   const route = routeFor(opp, c);
+  const [showAlts, setShowAlts] = useState(false);
+  const alternates = (Object.keys(ROUTE_LABELS) as RouteId[]).filter(id => id !== route.id);
 
   function runRoute(id: RouteId) {
     if (id === 'draft') onOpenOutreach(c.id);
@@ -72,9 +75,21 @@ export function OpportunityCard({
           <Button data-testid="route-primary" variant="primary" size="sm" onClick={() => runRoute(route.id)}>
             {route.label}
           </Button>
+          <Button data-testid="route-toggle" variant="ghost" size="sm" onClick={() => setShowAlts(v => !v)}>
+            Other actions {showAlts ? '▴' : '▾'}
+          </Button>
           {onDismiss && <Button variant="ghost" size="sm" onClick={() => onDismiss(opp.id)}>Dismiss</Button>}
         </div>
         <div data-testid="route-rationale" className="t-meta mt-2">{route.rationale}</div>
+        {showAlts && (
+          <div className="flex gap-2 flex-wrap mt-2.5">
+            {alternates.map(id => (
+              <Button key={id} data-testid="route-alt" variant="ghost" size="sm" onClick={() => runRoute(id)}>
+                {ROUTE_LABELS[id]}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

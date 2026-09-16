@@ -35,8 +35,32 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
     setDismissTarget(null);
   }
 
+  const [handoffTarget, setHandoffTarget] = useState<{ oppId: string; route: RouteId } | null>(null);
+  const [handoffNote, setHandoffNote] = useState('');
+
   function handoff(oppId: string, route: RouteId) {
-    dispatch({ type: 'ROUTE_OPPORTUNITY', id: oppId, route, note: '' });
+    setHandoffNote('');
+    setHandoffTarget({ oppId, route });
+  }
+
+  function confirmHandoff() {
+    if (handoffTarget) {
+      const { oppId, route } = handoffTarget;
+      const note = handoffNote.trim();
+      const opp = OPPS.find(o => o.id === oppId)!;
+      dispatch({ type: 'ROUTE_OPPORTUNITY', id: oppId, route, note });
+      dispatch({
+        type: 'OUTREACH_NOSEND',
+        entry: {
+          ts: '14 Sep, 09:14',
+          clientId: opp.clientId,
+          kind: 'Non-send',
+          detail: `${ROUTE_LABELS[route]}${note ? ` — ${note}` : ''}`,
+          ref: null,
+        },
+      });
+    }
+    setHandoffTarget(null);
   }
 
   function setFilter(key: keyof typeof filters, value: string | number) {
@@ -157,6 +181,23 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
           className="w-full border border-hairline-2 rounded-xl p-3 text-[14px] leading-relaxed min-h-[80px] font-sans"
           value={dismissReason}
           onChange={e => setDismissReason(e.target.value)}
+        />
+      </Modal>
+
+      <Modal
+        open={handoffTarget !== null}
+        title={handoffTarget ? ROUTE_LABELS[handoffTarget.route] : ''}
+        confirmLabel="Confirm"
+        onConfirm={confirmHandoff}
+        onClose={() => setHandoffTarget(null)}
+      >
+        <div className="t-meta mb-2">
+          This leaves the queue and is recorded in the client's outcome ledger. A note is optional.
+        </div>
+        <textarea
+          className="w-full border border-hairline-2 rounded-xl p-3 text-[14px] leading-relaxed min-h-[80px] font-sans"
+          value={handoffNote}
+          onChange={e => setHandoffNote(e.target.value)}
         />
       </Modal>
     </div>

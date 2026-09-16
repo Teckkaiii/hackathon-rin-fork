@@ -100,10 +100,24 @@ function startServer() {
 
   // Executing a non-draft route hands the item off and drops it from the queue
   await davidCard.locator('[data-testid="route-primary"]').click();
+  check('Handoff opens the note modal', await page.locator('[data-testid="modal"]').count() === 1);
+  await page.fill('[data-testid="modal"] textarea', 'Booked for Thursday morning');
+  await page.click('[data-act="modal-confirm"]');
   txt = await page.locator('main').innerText();
   check('Handed-off item leaves the surfaced list', /2 surfaced/.test(txt));
+  check('Handoff note is recorded', txt.includes('Booked for Thursday morning'));
   check('Handed-off section names the route taken', txt.includes('Handed off') && txt.includes('Call to clarify'));
   check('Handing off kept us on the Queue tab', txt.includes("Today's queue"));
+
+  // The RM can overrule the agent's pick
+  const priyaCard2 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Priya Ravindran' });
+  check('Alternate routes are hidden by default', await priyaCard2.locator('[data-testid="route-alt"]').count() === 0);
+  await priyaCard2.locator('[data-testid="route-toggle"]').click();
+  check('Other actions reveals the two routes not chosen', await priyaCard2.locator('[data-testid="route-alt"]').count() === 2);
+  const altLabels = await priyaCard2.locator('[data-testid="route-alt"]').allInnerTexts();
+  check('Alternates exclude the agent\'s own pick', !altLabels.some(l => l.includes('Refer to specialist')));
+  await priyaCard2.locator('[data-testid="route-toggle"]').click();
+  check('Other actions collapses again', await priyaCard2.locator('[data-testid="route-alt"]').count() === 0);
 
   // The draft route still goes to Outreach
   await page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' }).locator('[data-testid="route-primary"]').click();
@@ -148,6 +162,9 @@ function startServer() {
   // ---- Module 4: Outreach (drafting + sending) ----
   await page.click('nav >> text=Outreach');
   await page.waitForSelector('#outreach-text');
+  await page.selectOption('#outreach-client-select', 'david');
+  check('Handoff wrote an entry to the client ledger', (await page.locator('main').innerText()).includes('Booked for Thursday morning'));
+  await page.selectOption('#outreach-client-select', 'chen');
   check('Blocked client (Robert Teo) excluded from Outreach client selector', !(await page.locator('#outreach-client-select').innerText()).includes('Robert Teo'));
   let draftVal = await page.inputValue('#outreach-text');
   check('Seeded Chen draft loaded with wrong figure', draftVal.includes('500,000'));
