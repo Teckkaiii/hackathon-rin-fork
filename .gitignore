@@ -1,3 +1,5 @@
 node_modules/
 dist/
 tools/shot-*.png
+.worktrees/
+.superpowers/
