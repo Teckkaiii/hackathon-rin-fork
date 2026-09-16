@@ -309,17 +309,20 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 ### Task 3: Remove Park end to end
 
-Park is deleted: the action, the state, the reducer case, the Parked section, and the `parked` parameter threaded through three functions in `lib/queue.ts`.
+Park is deleted: the card's Park button and props, the action, the state, the reducer case, the Parked section, and the `parked` parameter threaded through three functions in `lib/queue.ts`.
+
+> **Execution note (ruled during Task 1 review):** Task 1's original text also stripped the Park props and button from `OpportunityCard.tsx`, but doing so breaks the pre-existing harness assertion at `tools/verify.js` that clicks `button:has-text("Park")` — an assertion this task is the one to rewrite. Task 1 therefore left the card's Park props and JSX in place, and their removal belongs here. This task now owns every Park site.
 
 **Files:**
+- Modify: `src/components/OpportunityCard.tsx` (the `onPark` / `parkedResurfaceDate` props and the Park button/pill JSX)
 - Modify: `src/lib/queue.ts:28-66`
 - Modify: `src/state.ts`
 - Modify: `src/components/QueueView.tsx`
 - Test: `tools/verify.js:65-71`
 
 **Interfaces:**
-- Consumes: `OpportunityCard` from Task 2 (already has no `onPark` prop).
-- Produces: `activeOpps(dismissed, clientIds?)`, `filteredOpps(dismissed, filters, clientsById, clientIds?)` and `clusters(dismissed, driversById, clientIds?)` — each with the leading `parked: Set<string>` argument removed. Task 5 adds a `routed` argument to these same three functions.
+- Consumes: `OpportunityCard` from Task 2 — props `{ opp, parkedResurfaceDate?, onOpenClient, onOpenOutreach, onPark?, onDismiss? }`. The `[data-testid="client-open"]` name button from Task 2 must survive untouched.
+- Produces: `OpportunityCard` props reduced to `{ opp, onOpenClient, onOpenOutreach, onDismiss? }`; `activeOpps(dismissed, clientIds?)`, `filteredOpps(dismissed, filters, clientsById, clientIds?)` and `clusters(dismissed, driversById, clientIds?)` — each with the leading `parked: Set<string>` argument removed. Task 5 adds a `routed` argument to these same three functions.
 
 - [ ] **Step 1: Replace the Park assertions with absence assertions**
 
@@ -352,6 +355,57 @@ npm run build && node tools/verify.js
 ```
 
 Expected: `FAIL No Park button anywhere in the queue`. (`No Parked section` may pass already, since nothing is parked on a fresh load — that is fine, the Park-button check is the one that must go red.)
+
+- [ ] **Step 2b: Strip the Park props and button from the card**
+
+In `src/components/OpportunityCard.tsx`, change the props destructure and type from:
+
+```tsx
+export function OpportunityCard({
+  opp, parkedResurfaceDate, onOpenClient, onOpenOutreach, onPark, onDismiss,
+}: {
+  opp: Opportunity;
+  parkedResurfaceDate?: string;
+  onOpenClient: (id: string) => void;
+  onOpenOutreach: (id: string) => void;
+  onPark?: (id: string) => void;
+  onDismiss?: (id: string) => void;
+}) {
+```
+
+to:
+
+```tsx
+export function OpportunityCard({
+  opp, onOpenClient, onOpenOutreach, onDismiss,
+}: {
+  opp: Opportunity;
+  onOpenClient: (id: string) => void;
+  onOpenOutreach: (id: string) => void;
+  onDismiss?: (id: string) => void;
+}) {
+```
+
+Then, in the action row near the bottom of the file, delete the Park branch so that:
+
+```tsx
+        <Button size="sm" onClick={() => onOpenOutreach(c.id)}>Draft outreach</Button>
+        {parkedResurfaceDate ? (
+          <Pill variant="flag">Parked — resurfaces {parkedResurfaceDate}</Pill>
+        ) : (
+          onPark && <Button variant="ghost" size="sm" onClick={() => onPark(opp.id)}>Park</Button>
+        )}
+        {onDismiss && <Button variant="ghost" size="sm" onClick={() => onDismiss(opp.id)}>Dismiss</Button>}
+```
+
+becomes:
+
+```tsx
+        <Button size="sm" onClick={() => onOpenOutreach(c.id)}>Draft outreach</Button>
+        {onDismiss && <Button variant="ghost" size="sm" onClick={() => onDismiss(opp.id)}>Dismiss</Button>}
+```
+
+Leave everything else in the file — in particular the `[data-testid="client-open"]` name button from Task 2 — exactly as it is. `Pill` is still used by the four scoring pills, so keep its import.
 
 - [ ] **Step 3: Drop the `parked` parameter from the queue functions**
 
@@ -463,6 +517,18 @@ Change the three memos and the list derivation (currently lines 12-20) to:
 
 Delete the entire `{parkedList.length > 0 && ( ... )}` JSX block (currently lines 92-111).
 
+In the `<OpportunityCard ... />` call, delete these two prop lines (the card no longer accepts them after Step 2b):
+
+```tsx
+              parkedResurfaceDate={parkDates[o.id] ? new Date(parkDates[o.id]).toLocaleDateString('en-SG', { day: 'numeric', month: 'short' }) : undefined}
+```
+
+and:
+
+```tsx
+              onPark={id => dispatch({ type: 'PARK', id, resurface: businessDaysAdd(TODAY, 5).toISOString() })}
+```
+
 Finally, `businessDaysAdd` and `TODAY` are now unused. Change the import on line 5 from:
 
 ```tsx
@@ -482,7 +548,7 @@ Expected: `FAIL COUNT: 0` and `JS ERRORS: none`. If typecheck complains about an
 - [ ] **Step 7: Commit**
 
 ```bash
-git add src/lib/queue.ts src/state.ts src/components/QueueView.tsx tools/verify.js
+git add src/components/OpportunityCard.tsx src/lib/queue.ts src/state.ts src/components/QueueView.tsx tools/verify.js
 git commit -m "Remove Park from the queue
 
 Parking added a third disposition that duplicated dismissal without
