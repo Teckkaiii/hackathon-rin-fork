@@ -18,6 +18,7 @@ export type Tab = 'queue' | 'clients' | 'blocked' | 'outreach' | 'news' | 'pastw
 export interface AppState {
   tab: Tab;
   selectedClientId: string | null;
+  clientOrigin: Tab;
   dismissed: Record<string, string>;
   routed: RoutedMap;
   ledger: LedgerEntry[];
@@ -34,6 +35,7 @@ export function initialState(): AppState {
   return {
     tab: 'queue',
     selectedClientId: null,
+    clientOrigin: 'clients',
     dismissed: {},
     routed: {},
     ledger: [],
@@ -65,9 +67,9 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'SET_TAB':
       return { ...state, tab: action.tab, selectedClientId: action.tab === 'clients' ? state.selectedClientId : null };
     case 'OPEN_CLIENT':
-      return { ...state, tab: 'clients', selectedClientId: action.id };
+      return { ...state, tab: 'clients', selectedClientId: action.id, clientOrigin: state.tab };
     case 'BACK_CLIENTS':
-      return { ...state, selectedClientId: null };
+      return { ...state, tab: state.clientOrigin, selectedClientId: null };
     case 'DISMISS':
       return { ...state, dismissed: { ...state.dismissed, [action.id]: action.reason } };
     case 'ROUTE_OPPORTUNITY':

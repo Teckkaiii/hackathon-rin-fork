@@ -38,6 +38,7 @@ export default function App() {
             ? <ClientDetail
                 clientId={state.selectedClientId}
                 onBack={() => dispatch({ type: 'BACK_CLIENTS' })}
+                backLabel={state.clientOrigin === 'queue' ? 'Back to queue' : 'All clients'}
               />
             : <ClientsView onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })} />
         )}

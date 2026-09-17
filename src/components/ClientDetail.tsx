@@ -4,7 +4,7 @@ import { TODAY, fmt, fmtDate, monthsBetween } from '../lib/format';
 import { OPPS } from '../lib/queue';
 import { Pill } from './ui/Pill';
 
-export function ClientDetail({ clientId, onBack }: { clientId: string; onBack: () => void }) {
+export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string; onBack: () => void; backLabel: string }) {
   const c = CLIENTS[clientId];
   const opp = OPPS.find(o => o.clientId === clientId);
   const monthsSince = monthsBetween(new Date(c.suitability.lastReview + 'T00:00:00'), TODAY);
@@ -12,7 +12,7 @@ export function ClientDetail({ clientId, onBack }: { clientId: string; onBack: (
 
   return (
     <div data-testid="client-detail">
-      <button onClick={onBack} className="t-h3 text-slate mb-4 inline-flex items-center gap-1">&larr; All clients</button>
+      <button onClick={onBack} data-testid="client-back" className="t-h3 text-slate mb-4 inline-flex items-center gap-1">&larr; {backLabel}</button>
 
       <div className="font-sans text-[32px] font-extrabold leading-tight tracking-tight text-ink">{c.name}</div>
       <div className="t-meta mb-5">{c.segment}</div>

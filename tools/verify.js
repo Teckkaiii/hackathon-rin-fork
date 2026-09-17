@@ -85,8 +85,10 @@ function startServer() {
   await chenCard2.locator('[data-testid="why-box"]', { hasText: 'Why this client' }).click();
   txt = await page.locator('main').innerText();
   check('Clicking a why-box opens the client\'s profile page', txt.includes('Chen Wei Liang') && txt.includes('rate-locked instrument'));
-  await page.click('nav >> text=Queue');
-  await page.waitForTimeout(150);
+  check('Back button says where it goes when opened from the queue', (await page.locator('[data-testid="client-back"]').innerText()).includes('Back to queue'));
+  await page.click('[data-testid="client-back"]');
+  txt = await page.locator('main').innerText();
+  check('Back from a queue-opened client returns to the queue, not the client list', txt.includes('High revenue opportunities'));
 
   // Park is gone.
   txt = await page.locator('main').innerText();
