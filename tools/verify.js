@@ -80,6 +80,14 @@ function startServer() {
   await page.click('nav >> text=Queue');
   await page.waitForTimeout(150);
 
+  // Why-boxes are also links into the client page
+  const chenCard2 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
+  await chenCard2.locator('[data-testid="why-box"]', { hasText: 'Why this client' }).click();
+  txt = await page.locator('main').innerText();
+  check('Clicking a why-box opens the client\'s profile page', txt.includes('Chen Wei Liang') && /what happened/i.test(txt));
+  await page.click('nav >> text=Queue');
+  await page.waitForTimeout(150);
+
   // Park is gone.
   txt = await page.locator('main').innerText();
   check('No Park button anywhere in the queue', await page.locator('button:has-text("Park")').count() === 0);

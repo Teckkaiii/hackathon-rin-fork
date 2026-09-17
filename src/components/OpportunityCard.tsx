@@ -72,9 +72,9 @@ export function OpportunityCard({
       </div>
 
       <div className="grid md:grid-cols-3 gap-3 mt-4">
-        <WhyBox label="Why this client" value={opp.whyClient} />
-        <WhyBox label="Why now" value={opp.whyNow} />
-        <WhyBox label="Why this instrument" value={opp.whyInstrument} />
+        <WhyBox label="Why this client" value={opp.whyClient} onClick={() => onOpenClient(c.id)} />
+        <WhyBox label="Why now" value={opp.whyNow} onClick={() => onOpenClient(c.id)} />
+        <WhyBox label="Why this instrument" value={opp.whyInstrument} onClick={() => onOpenClient(c.id)} />
       </div>
 
       <div className="mt-4">
@@ -102,11 +102,16 @@ export function OpportunityCard({
   );
 }
 
-function WhyBox({ label, value }: { label: string; value: string }) {
+function WhyBox({ label, value, onClick }: { label: string; value: string; onClick: () => void }) {
   return (
-    <div className="bg-sunk rounded-xl p-3">
+    <button
+      type="button"
+      data-testid="why-box"
+      onClick={onClick}
+      className="bg-sunk rounded-xl p-3 text-left hover:bg-hairline-2/40 transition-colors"
+    >
       <div className="t-micro mb-1">{label}</div>
       <div className="text-[13.5px] leading-relaxed text-ink-2">{value}</div>
-    </div>
+    </button>
   );
 }
