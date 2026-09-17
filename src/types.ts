@@ -125,12 +125,6 @@ export interface LedgerEntry {
   ref: string | null;
 }
 
-export interface BindingConstraint {
-  kind: string;
-  label: string;
-  detail: string;
-}
-
 export type ImpactSeverity = 'high' | 'medium' | 'low';
 export type ImpactBasis = 'confirmed' | 'inferred';
 

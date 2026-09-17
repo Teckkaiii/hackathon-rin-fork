@@ -2,7 +2,6 @@ import { MY_CLIENTS, MY_CLIENT_IDS } from '../state';
 import { TODAY, monthsBetween } from '../lib/format';
 import { blockedClientIds } from '../lib/queue';
 import { Pill } from './ui/Pill';
-import { Orb } from './ui/Orb';
 
 export function ClientsView({ onOpenClient }: { onOpenClient: (id: string) => void }) {
   const blocked = blockedClientIds(MY_CLIENT_IDS);
@@ -25,10 +24,9 @@ export function ClientsView({ onOpenClient }: { onOpenClient: (id: string) => vo
             data-client-id={c.id}
             className="glass-tight p-4 mb-2 flex items-center gap-3.5 cursor-pointer hover:border-ink-3 transition-colors"
           >
-            <Orb name={c.name} />
             <div className="flex-1">
               <div className="t-h3">{c.name}</div>
-              <div className="t-meta">{c.segment} · {c.tier} · RM {c.rm}</div>
+              <div className="t-meta">{c.segment}</div>
             </div>
             <Pill variant={lapsed ? 'block' : 'pass'}>{lapsed ? 'Review lapsed' : 'Docs current'}</Pill>
           </div>

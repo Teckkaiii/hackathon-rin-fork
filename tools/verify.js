@@ -147,6 +147,8 @@ function startServer() {
   await page.click('nav >> text=Clients');
   await page.waitForSelector('[data-testid="client-row"]');
   check('Client directory lists 3 clients (Aisha\'s book, minus the blocked one)', await page.locator('[data-testid="client-row"]').count() === 3, 'count=' + await page.locator('[data-testid="client-row"]').count());
+  check('Client list rows show no avatar icon', await page.locator('[data-testid="client-row"] .orb').count() === 0);
+  check('Client list row shows only name and segment, not tier or RM', !(await page.locator('[data-testid="client-row"]').first().innerText()).includes('RM '));
   check('Blocked client (Robert Teo) not listed among Clients', !(await page.locator('main').innerText()).includes('Robert Teo'));
 
   await page.locator('[data-client-id="priya"]').click();
