@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../lib/cn';
 
 type Variant = 'pass' | 'block' | 'flag' | 'neutral' | 'slate';
@@ -17,9 +17,9 @@ const dotClass: Partial<Record<Variant, string>> = {
   flag: 'dot-flag',
 };
 
-export function Pill({ variant, dot, children, className }: { variant: Variant; dot?: boolean; children: ReactNode; className?: string }) {
+export function Pill({ variant, dot, children, className, ...rest }: { variant: Variant; dot?: boolean; children: ReactNode; className?: string } & HTMLAttributes<HTMLSpanElement>) {
   return (
-    <span className={cn('pill', variantClass[variant], className)}>
+    <span className={cn('pill', variantClass[variant], className)} {...rest}>
       {dot && dotClass[variant] && <span className={cn('dot', dotClass[variant])} />}
       {children}
     </span>

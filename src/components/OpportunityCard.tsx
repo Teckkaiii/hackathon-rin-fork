@@ -11,6 +11,9 @@ const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
   high: 'pass', medium: 'flag', low: 'neutral',
 };
 const LEVEL_LABEL: Record<SignalLevel, string> = { high: 'High', medium: 'Medium', low: 'Low' };
+const WINDOW_VARIANT: Record<SignalLevel, 'block' | 'flag' | 'neutral'> = {
+  high: 'block', medium: 'flag', low: 'neutral',
+};
 
 export function OpportunityCard({
   opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff,
@@ -49,9 +52,13 @@ export function OpportunityCard({
           <div className="t-meta">{c.segment}</div>
         </button>
         <div className="text-right">
-          <div className="t-micro">Amount at stake</div>
+          <div className="t-micro">Opportunity size</div>
           <div className="t-h2 font-serif text-[24px]">{fmt(opp.amountAtStake)}</div>
-          <div className="t-meta">Window to act: {opp.daysToAct} days</div>
+          <div className="mt-1.5">
+            <Pill variant={WINDOW_VARIANT[signal.urgency.level]} dot className="text-[13px] font-semibold" data-testid="window-to-act">
+              {opp.daysToAct} days to act
+            </Pill>
+          </div>
         </div>
       </div>
 

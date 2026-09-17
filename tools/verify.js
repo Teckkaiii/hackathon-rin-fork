@@ -39,6 +39,14 @@ function startServer() {
   check('No blocked card rendered inside Queue itself', await page.locator('[data-testid="blocked-card"]').count() === 0);
   check('No "Open client position" button in Queue', !txt.includes('Open client position'));
 
+  // ---- Greeting, heading, no filters, no RM name in the header ----
+  check('Queue greets the RM by first name, chatbot-style', /Good (morning|afternoon|evening), Aisha\./.test(txt));
+  check('Queue heading is "High revenue opportunities"', txt.includes('High revenue opportunities'));
+  check('"Today\'s queue" heading is gone', !txt.includes("Today's queue"));
+  check('No filter dropdowns on the queue', await page.locator('main select').count() === 0);
+  check('Header no longer shows "RM: <name>"', !(await page.locator('header').innerText()).includes('RM:'));
+  check('Nav order is Queue, Clients, Blocked, News, Past Week, Outreach', (await page.locator('nav button').allInnerTexts()).join('|') === 'Queue|Clients|Blocked|News|Past Week|Outreach');
+
   // Signal score breakdown: quantifies order via momentum / relevancy / urgency / conviction, shown qualitatively (no raw digit score)
   check('Signal breakdown pills shown (Urgency/Relevancy/Momentum/Conviction)', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => txt.includes(s)));
   const bodyTxtQueue = await page.locator('body').innerText();
@@ -56,28 +64,21 @@ function startServer() {
   check('Card drops the signal-recency pill', !chenTxt0.includes('Signal:'));
   check('Card keeps the segment', chenTxt0.includes('Premier'));
   check('Card keeps all four scoring pills', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => chenTxt0.includes(s)));
-  check('Card keeps the amount at stake', chenTxt0.includes('380,000'));
+  check('Card keeps the opportunity size figure', chenTxt0.includes('380,000'));
+  check('Card labels the figure "Opportunity size", not "Amount at stake"', /opportunity size/i.test(chenTxt0) && !/amount at stake/i.test(chenTxt0));
+  check('Window to act is a pronounced pill on the card', await chenCard0.locator('[data-testid="window-to-act"]').count() === 1 && /12 days to act/.test(chenTxt0));
   check('Card keeps the three why-boxes', /why this client/i.test(chenTxt0) && /why now/i.test(chenTxt0) && /why this instrument/i.test(chenTxt0));
 
   // Only the name block navigates; the card body does not.
   const chenCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
-  await chenCard.locator('.t-micro', { hasText: 'Amount at stake' }).click();
+  await chenCard.locator('.t-micro', { hasText: 'Opportunity size' }).click();
   txt = await page.locator('main').innerText();
-  check('Clicking the card body does NOT navigate away from the queue', txt.includes("Today's queue"));
+  check('Clicking the card body does NOT navigate away from the queue', txt.includes('High revenue opportunities'));
   await chenCard.locator('[data-testid="client-open"]').click();
   txt = await page.locator('main').innerText();
   check('Clicking the client name opens that client\'s position page', txt.includes('Chen Wei Liang') && /binding constraint/i.test(txt));
   await page.click('nav >> text=Queue');
   await page.waitForTimeout(150);
-
-  // Gates vs filters
-  await page.selectOption('select >> nth=3', '1000000'); // minAmount select (4th filter select)
-  txt = await page.locator('main').innerText();
-  check('Tightening min amount narrows surfaced set', !/^3 surfaced/m.test(txt));
-  check('Withheld count still 1 when surfaced set shrinks', txt.includes('1 withheld by gates'));
-  await page.selectOption('select >> nth=3', '0');
-  txt = await page.locator('main').innerText();
-  check('Withheld count still 1 after resetting filters', txt.includes('1 withheld by gates') && /3 surfaced/.test(txt));
 
   // Park is gone.
   txt = await page.locator('main').innerText();
@@ -107,7 +108,7 @@ function startServer() {
   check('Handed-off item leaves the surfaced list', /2 surfaced/.test(txt));
   check('Handoff note is recorded', txt.includes('Booked for Thursday morning'));
   check('Handed-off section names the route taken', txt.includes('Handed off') && txt.includes('Call to clarify'));
-  check('Handing off kept us on the Queue tab', txt.includes("Today's queue"));
+  check('Handing off kept us on the Queue tab', txt.includes('High revenue opportunities'));
 
   // The RM can overrule the agent's pick
   const priyaCard2 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Priya Ravindran' });

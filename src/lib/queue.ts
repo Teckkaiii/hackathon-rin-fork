@@ -1,7 +1,6 @@
 import type { Driver, Opportunity } from '../types';
 import { evalGates } from './gates';
 import { signalScore } from './signal';
-import type { Filters } from './filters';
 import { OPPS, PRODUCTS } from './data';
 import type { RoutedMap } from './routing';
 
@@ -30,24 +29,8 @@ export function activeOpps(dismissed: Record<string, string>, routed: RoutedMap,
   return passedOpps(clientIds).filter(o => !(o.id in dismissed) && !(o.id in routed));
 }
 
-export function filteredOpps(
-  dismissed: Record<string, string>,
-  routed: RoutedMap,
-  filters: Filters,
-  clientsById: Record<string, { segment: string; tier: string }>,
-  clientIds?: Set<string>
-): Opportunity[] {
+export function rankedOpps(dismissed: Record<string, string>, routed: RoutedMap, clientIds?: Set<string>): Opportunity[] {
   return activeOpps(dismissed, routed, clientIds)
-    .filter(o => {
-      const c = clientsById[o.clientId];
-      if (filters.segment !== 'all' && c.segment !== filters.segment) return false;
-      if (filters.tier !== 'all' && c.tier !== filters.tier) return false;
-      if (filters.family !== 'all' && PRODUCTS[o.productId].family !== filters.family) return false;
-      if (o.amountAtStake < filters.minAmount) return false;
-      if (filters.recency === 'fresh' && !(o.signal.recency === 'Today' || o.signal.recency === 'Yesterday')) return false;
-      if (filters.recency === 'internal' && o.signal.recency !== 'Internal') return false;
-      return true;
-    })
     .sort((a, b) => signalScore(b) - signalScore(a) || a.daysToAct - b.daysToAct);
 }
 

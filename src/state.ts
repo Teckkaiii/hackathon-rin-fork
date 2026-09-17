@@ -1,7 +1,6 @@
 import clientsData from './data/clients.json';
 import driversData from './data/drivers.json';
 import type { Client, Driver, Approach, CoachCheck, LedgerEntry } from './types';
-import { DEFAULT_FILTERS, type Filters } from './lib/filters';
 import type { RouteId, RoutedMap } from './lib/routing';
 
 export const CLIENTS = clientsData as Record<string, Client>;
@@ -19,7 +18,6 @@ export type Tab = 'queue' | 'clients' | 'blocked' | 'outreach' | 'news' | 'pastw
 export interface AppState {
   tab: Tab;
   selectedClientId: string | null;
-  filters: Filters;
   dismissed: Record<string, string>;
   routed: RoutedMap;
   ledger: LedgerEntry[];
@@ -36,7 +34,6 @@ export function initialState(): AppState {
   return {
     tab: 'queue',
     selectedClientId: null,
-    filters: { ...DEFAULT_FILTERS },
     dismissed: {},
     routed: {},
     ledger: [],
@@ -51,7 +48,6 @@ export type Action =
   | { type: 'SET_TAB'; tab: Tab }
   | { type: 'OPEN_CLIENT'; id: string }
   | { type: 'BACK_CLIENTS' }
-  | { type: 'SET_FILTER'; key: keyof Filters; value: string | number }
   | { type: 'DISMISS'; id: string; reason: string }
   | { type: 'ROUTE_OPPORTUNITY'; id: string; route: RouteId; note: string }
   | { type: 'DRAFT_SET_TEXT'; clientId: string; text: string }
@@ -72,8 +68,6 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, tab: 'clients', selectedClientId: action.id };
     case 'BACK_CLIENTS':
       return { ...state, selectedClientId: null };
-    case 'SET_FILTER':
-      return { ...state, filters: { ...state.filters, [action.key]: action.value } };
     case 'DISMISS':
       return { ...state, dismissed: { ...state.dismissed, [action.id]: action.reason } };
     case 'ROUTE_OPPORTUNITY':

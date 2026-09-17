@@ -36,7 +36,7 @@ src/
   data/            products, drivers, clients, opportunities, momentum —
                    plain JSON
   types.ts         shared type definitions
-  lib/             gates, ranking/filtering, signal scoring, binding-
+  lib/             gates, ranking, signal scoring, binding-
                    constraint ordering, draft checks, news-impact matching,
                    weekly momentum classification — the actual decision logic
   state.ts         one typed reducer driving all app state
@@ -57,7 +57,7 @@ tools/             verify.js (Playwright suite), serve.js (static server for
    portfolio, or just something adjacent?), urgency (window to act) and
    conviction (how many distinct pieces of news corroborate the impact) —
    surfaced per-opportunity as qualitative High/Medium/Low pills, never as a
-   raw number. Also: hard gates vs soft filters, correlated-conviction
+   raw number. Also: hard compliance gates, correlated-conviction
    clusters, and an agent that routes each opportunity to its next step — draft
    a message, refer to a specialist desk, or call the client to clarify — with
    its reasoning shown on the card and the RM free to overrule it.
@@ -69,8 +69,8 @@ tools/             verify.js (Playwright suite), serve.js (static server for
    gate live in Blocked instead of appearing here.
 3. **Blocked** — every client withheld from the Queue entirely by a hard
    compliance gate, with the full gate-by-gate reasoning. Kept out of
-   Clients and Outreach until the blocking condition clears — no filter
-   setting can surface these; gates always run before any ranking.
+   Clients and Outreach until the blocking condition clears; gates always
+   run before any ranking.
 4. **Outreach** — drafts a client message (approach-specific when there's an
    active opportunity, free-form otherwise) and checks it against the
    client's own record (fact-trace, advice-boundary, disclosure, register)
@@ -104,7 +104,7 @@ node tools/verify.js
 
 `verify.js` builds nothing itself — run `npm run build` first. It serves `dist/`
 locally and drives it with Playwright: all 6 modules, all 6 required
-demonstration scenes (a refusal, gates vs. filters, a caught inconsistency, an
+demonstration scenes (a refusal, a compliance gate withholding an item, a caught inconsistency, an
 opportunity routed to a specialist and handed off, a correlated cluster, an
 expired document blocking action), the signal-score ranking and momentum
 classification, zero

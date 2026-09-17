@@ -5,9 +5,9 @@ const TABS: [Tab, string][] = [
   ['queue', 'Queue'],
   ['clients', 'Clients'],
   ['blocked', 'Blocked'],
-  ['outreach', 'Outreach'],
   ['news', 'News'],
   ['pastweek', 'Past Week'],
+  ['outreach', 'Outreach'],
 ];
 
 export function Nav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {

@@ -1,22 +1,18 @@
 import { useMemo, useState } from 'react';
 import type { Action, AppState } from '../state';
-import { CLIENTS, DRIVERS, MY_CLIENT_IDS } from '../state';
-import { PRODUCTS, OPPS, blockedOpps, filteredOpps, clusters } from '../lib/queue';
+import { CLIENTS, DRIVERS, MY_CLIENT_IDS, CURRENT_RM } from '../state';
+import { OPPS, blockedOpps, rankedOpps, clusters } from '../lib/queue';
 import { OpportunityCard } from './OpportunityCard';
 import { Pill } from './ui/Pill';
 import { Modal } from './ui/Modal';
 import { ROUTE_LABELS, type RouteId } from '../lib/routing';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
-  const { filters, dismissed, routed } = state;
+  const { dismissed, routed } = state;
 
-  const surfaced = useMemo(
-    () => filteredOpps(dismissed, routed, filters, CLIENTS, MY_CLIENT_IDS),
-    [dismissed, routed, filters]
-  );
+  const surfaced = useMemo(() => rankedOpps(dismissed, routed, MY_CLIENT_IDS), [dismissed, routed]);
   const blocked = useMemo(() => blockedOpps(MY_CLIENT_IDS), []);
   const cls = useMemo(() => clusters(dismissed, routed, DRIVERS, MY_CLIENT_IDS), [dismissed, routed]);
-  const families = useMemo(() => [...new Set(Object.values(PRODUCTS).map(p => p.family))], []);
   const dismissedList = OPPS.filter(o => o.id in dismissed && MY_CLIENT_IDS.has(o.clientId));
   const handedOffList = OPPS.filter(o => o.id in routed && MY_CLIENT_IDS.has(o.clientId));
 
@@ -63,13 +59,9 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
     setHandoffTarget(null);
   }
 
-  function setFilter(key: keyof typeof filters, value: string | number) {
-    dispatch({ type: 'SET_FILTER', key, value });
-  }
-
   return (
     <div>
-      <div className="t-display mb-1">Today's queue</div>
+      <div className="t-display mb-1">{greeting()}, {CURRENT_RM.split(' ')[0]}.</div>
       <div className="t-lead mb-5">
         Overnight signals resolved against client exposures, after compliance gates, ranked by signal score —
         momentum, news relevancy, urgency and conviction combined.
@@ -85,36 +77,11 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
         </div>
       ))}
 
-      <div className="glass-tight bg-sunk/70 flex flex-wrap gap-2.5 items-center p-3.5 mb-4">
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.segment} onChange={e => setFilter('segment', e.target.value)}>
-          <option value="all">All segments</option>
-          <option value="Premier">Premier</option>
-          <option value="Private">Private</option>
-        </select>
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.tier} onChange={e => setFilter('tier', e.target.value)}>
-          <option value="all">All tiers</option>
-          <option value="Priority">Priority</option>
-          <option value="Signature">Signature</option>
-        </select>
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.family} onChange={e => setFilter('family', e.target.value)}>
-          <option value="all">All product families</option>
-          {families.map(f => <option key={f} value={f}>{f}</option>)}
-        </select>
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.minAmount} onChange={e => setFilter('minAmount', parseInt(e.target.value, 10))}>
-          <option value={0}>Any amount at stake</option>
-          <option value={250000}>≥ SGD 250,000</option>
-          <option value={500000}>≥ SGD 500,000</option>
-          <option value={1000000}>≥ SGD 1,000,000</option>
-        </select>
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.recency} onChange={e => setFilter('recency', e.target.value)}>
-          <option value="all">Any signal recency</option>
-          <option value="fresh">Fresh (today/yesterday)</option>
-          <option value="internal">Internal only</option>
-        </select>
-        <span className="ml-auto t-meta font-semibold">{blocked.length} withheld by gates — see the Blocked tab</span>
+      <div className="flex items-baseline justify-between gap-3 flex-wrap mb-2.5">
+        <div className="t-h1">High revenue opportunities <span className="t-meta font-semibold">· {surfaced.length} surfaced</span></div>
+        <span className="t-meta font-semibold">{blocked.length} withheld by gates — see the Blocked tab</span>
       </div>
 
-      <div className="t-h3 mb-2.5">{surfaced.length} surfaced</div>
       {surfaced.length
         ? surfaced.map(o => (
             <OpportunityCard
@@ -126,7 +93,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
               onHandoff={handoff}
             />
           ))
-        : <div className="glass-tight p-4 t-meta">No opportunities match these filters.</div>}
+        : <div className="glass-tight p-4 t-meta">Nothing on your book needs attention right now.</div>}
 
       {handedOffList.length > 0 && (
         <>
@@ -202,4 +169,11 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
       </Modal>
     </div>
   );
+}
+
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
 }
