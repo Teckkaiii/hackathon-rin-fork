@@ -76,7 +76,7 @@ function startServer() {
   check('Clicking the card body does NOT navigate away from the queue', txt.includes('High revenue opportunities'));
   await chenCard.locator('[data-testid="client-open"]').click();
   txt = await page.locator('main').innerText();
-  check('Clicking the client name opens that client\'s position page', txt.includes('Chen Wei Liang') && /binding constraint/i.test(txt));
+  check('Clicking the client name opens that client\'s position page', txt.includes('Chen Wei Liang') && /what happened/i.test(txt));
   await page.click('nav >> text=Queue');
   await page.waitForTimeout(150);
 
@@ -151,8 +151,33 @@ function startServer() {
 
   await page.locator('[data-client-id="priya"]').click();
   txt = await page.locator('main').innerText();
-  check('Priya binding constraint = concentration', /Binding constraint[\s\S]{0,200}Exposure concentration/i.test(txt));
-  check('Cross-border footprint kept inside client description', txt.includes('Cross-border footprint') && txt.includes('Operating countries'));
+  check('No binding-constraint banner on the client page', !/binding constraint/i.test(txt));
+  check('No "Related opportunity" card on the client page', !txt.includes('Related opportunity'));
+  check('Priya\'s impact hero names the semiconductor headline', txt.includes('Semiconductor sector correction') || txt.includes('Foundry-segment guidance cut'));
+  check('Priya\'s narrative explains the concentration in plain English', txt.includes('42% of Priya\'s portfolio'));
+  check('Cross-Border Exposure kept as its own card', /cross-border exposure/i.test(txt) && /operating countries/i.test(txt));
+  check('Portfolio card shows the concentration figures', txt.includes('42%') && txt.includes('30%'));
+  check('Complaint Records shows Priya\'s open complaint', /complaint records/i.test(txt) && txt.includes('Open') && txt.includes('custody statement'));
+
+  await page.click('text=← All clients');
+  await page.waitForTimeout(150);
+
+  await page.locator('[data-client-id="chen"]').click();
+  txt = await page.locator('main').innerText();
+  check('Chen\'s name renders without an avatar icon', await page.locator('[data-testid="client-detail"] .orb').count() === 0);
+  check('Chen\'s identity line shows only the segment', /Chen Wei Liang\s*\n\s*Premier\b/.test(txt) && !txt.includes('RM Aisha'));
+  check('Impact hero shows all four narrative labels', ['what happened', 'why this client', 'what it means', 'what to do'].every(s => txt.toLowerCase().includes(s)));
+  check('Basic Information card shows tier and RM (moved, not lost)', /basic information/i.test(txt) && txt.includes('Priority') && txt.includes('Aisha Rahman'));
+  check('Risk Profile card renders', /risk profile/i.test(txt) && txt.includes('5–7 years'));
+  check('Complaint Records shows Chen\'s closed complaint', txt.includes('Closed') && txt.includes('fixed deposit renewal'));
+
+  await page.click('text=← All clients');
+  await page.waitForTimeout(150);
+
+  await page.locator('[data-client-id="david"]').click();
+  txt = await page.locator('main').innerText();
+  check('David\'s hero reflects no external driver', /what changed in david's portfolio/i.test(txt));
+  check('Complaint Records shows the empty state for David', txt.includes('No complaints on record.'));
 
   await page.click('text=← All clients');
 

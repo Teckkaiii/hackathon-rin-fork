@@ -1,0 +1,136 @@
+import type { ReactNode } from 'react';
+import { CLIENTS } from '../state';
+import { TODAY, fmt, fmtDate, monthsBetween } from '../lib/format';
+import { OPPS } from '../lib/queue';
+import { Pill } from './ui/Pill';
+
+export function ClientDetail({ clientId, onBack }: { clientId: string; onBack: () => void }) {
+  const c = CLIENTS[clientId];
+  const opp = OPPS.find(o => o.clientId === clientId);
+  const monthsSince = monthsBetween(new Date(c.suitability.lastReview + 'T00:00:00'), TODAY);
+  const lapsed = monthsSince > 12;
+
+  return (
+    <div data-testid="client-detail">
+      <button onClick={onBack} className="t-h3 text-slate mb-4 inline-flex items-center gap-1">&larr; All clients</button>
+
+      <div className="font-sans text-[32px] font-extrabold leading-tight tracking-tight text-ink">{c.name}</div>
+      <div className="t-meta mb-5">{c.segment}</div>
+
+      {opp && (
+        <div className="glass-tight border border-slate/25 bg-gradient-to-br from-[#EFF4F6] to-white p-5 mb-4">
+          <div className="t-micro" style={{ color: '#33454E' }}>
+            {opp.driverId
+              ? `How today's news touches ${c.name.split(' ')[0]}`
+              : `What changed in ${c.name.split(' ')[0]}'s portfolio`}
+          </div>
+          <div className="flex items-center gap-2 flex-wrap mt-1.5 mb-3">
+            <div className="t-h2">{opp.signal.headline}</div>
+            <Pill variant={opp.signal.recency === 'Internal' ? 'neutral' : 'flag'}>{opp.signal.recency}</Pill>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3.5">
+            <NarrativeRow label="What happened" value={opp.narrative.whatHappened} />
+            <NarrativeRow label="Why this client" value={opp.narrative.whyThisClient} />
+            <NarrativeRow label="What it means" value={opp.narrative.whatItMeans} />
+            <NarrativeRow label="What to do" value={opp.narrative.whatToDo} />
+          </div>
+        </div>
+      )}
+
+      <div className="grid md:grid-cols-2 gap-3.5 mb-3.5">
+        <InfoCard eyebrow="Basic Information">
+          <KV label="Tier" value={c.tier} />
+          <KV label="RM" value={c.rm} />
+          <KV label="Mandate" value={c.mandate} />
+          <KV label="KYC" value={`${c.kyc.status} · expires ${fmtDate(c.kyc.expiry)}`} />
+          <KV
+            label="Suitability review"
+            value={
+              <span className="inline-flex items-center gap-2">
+                {fmtDate(c.suitability.lastReview)} ({monthsSince} months ago)
+                {lapsed && <Pill variant="block">Review lapsed</Pill>}
+              </span>
+            }
+          />
+        </InfoCard>
+
+        <InfoCard eyebrow="Risk Profile">
+          <KV label="Rating" value={c.riskProfile.rating} />
+          <KV label="Horizon" value={c.riskProfile.horizon} />
+          <KV label="Loss tolerance" value={c.riskProfile.lossTolerance} />
+          <KV label="Last assessed" value={fmtDate(c.riskProfile.lastAssessed)} />
+          <div className="text-[13.5px] text-ink-2 mt-2 leading-relaxed">{c.riskProfile.notes}</div>
+        </InfoCard>
+
+        <InfoCard eyebrow="Portfolio">
+          {c.holdings.map((h, i) => (
+            <KV key={i} label={h.label} value={`${fmt(h.value)} — ${h.note}`} />
+          ))}
+          {c.concentration && (
+            <KV label="Concentration" value={`${c.concentration.pct}% in ${c.concentration.name} (guideline: ${c.concentration.threshold}%)`} />
+          )}
+          {c.idleCash && (
+            <KV label="Idle cash" value={`${c.idleCash.days} days idle (threshold: ${c.idleCash.threshold} days)`} />
+          )}
+          {c.incomeObjective && (
+            <KV label="Income vs objective" value={`${c.incomeObjective.actual.toLocaleString()} vs ${c.incomeObjective.target.toLocaleString()} ${c.incomeObjective.unit}`} />
+          )}
+          <div className="src mt-1.5">Source: {c.holdings[0].source}</div>
+        </InfoCard>
+
+        {c.crossBorder && (
+          <InfoCard eyebrow="Cross-Border Exposure">
+            <KV label="Operating countries" value={c.crossBorder.operatingCountries.join(', ')} />
+            <KV label="Investment locations" value={c.crossBorder.investmentLocations.join(', ')} />
+            <KV label="Transaction corridors" value={c.crossBorder.transactionCorridors.join('; ')} />
+            <KV label="Treasury exposures" value={c.crossBorder.treasuryExposures.join('; ')} />
+            <KV label="Relationship footprint" value={c.crossBorder.relationshipFootprint.join('; ')} />
+          </InfoCard>
+        )}
+      </div>
+
+      <InfoCard eyebrow="Complaint Records">
+        {c.complaints.length === 0 ? (
+          <div className="t-meta">No complaints on record.</div>
+        ) : (
+          c.complaints.map((cp, i) => (
+            <div key={i} className="flex items-center justify-between gap-3 flex-wrap py-2 border-t border-hairline first:border-t-0">
+              <div>
+                <div className="t-body">{cp.summary}</div>
+                <div className="t-meta">{fmtDate(cp.date)} · {cp.channel}</div>
+              </div>
+              <Pill variant={cp.status === 'Closed' ? 'pass' : 'flag'}>{cp.status}</Pill>
+            </div>
+          ))
+        )}
+      </InfoCard>
+    </div>
+  );
+}
+
+function NarrativeRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="t-micro mb-1">{label}</div>
+      <div className="text-[14px] leading-relaxed text-ink-2">{value}</div>
+    </div>
+  );
+}
+
+function InfoCard({ eyebrow, children }: { eyebrow: string; children: ReactNode }) {
+  return (
+    <div className="glass-tight p-4">
+      <div className="t-micro mb-2.5">{eyebrow}</div>
+      <div className="space-y-2">{children}</div>
+    </div>
+  );
+}
+
+function KV({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="flex justify-between gap-3 text-[13.5px]">
+      <span className="text-ink-3">{label}</span>
+      <span className="text-ink-2 text-right">{value}</span>
+    </div>
+  );
+}
