@@ -27,19 +27,11 @@ export interface Holding {
   source: string;
 }
 
-export interface OpportunityNarrative {
-  whatHappened: string;
-  whyThisClient: string;
-  whatItMeans: string;
-  whatToDo: string;
-}
-
 export interface RiskProfile {
   rating: string;
   horizon: string;
   lossTolerance: string;
   lastAssessed: string;
-  notes: string;
 }
 
 export interface ComplaintRecord {
@@ -93,7 +85,7 @@ export interface Opportunity {
   whyClient: string;
   whyNow: string;
   whyInstrument: string;
-  narrative: OpportunityNarrative;
+  narrative: string;
   gateOverride: GateOverride | null;
 }
 

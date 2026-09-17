@@ -28,12 +28,7 @@ export function ClientDetail({ clientId, onBack }: { clientId: string; onBack: (
             <div className="t-h2">{opp.signal.headline}</div>
             <Pill variant={opp.signal.recency === 'Internal' ? 'neutral' : 'flag'}>{opp.signal.recency}</Pill>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3.5">
-            <NarrativeRow label="What happened" value={opp.narrative.whatHappened} />
-            <NarrativeRow label="Why this client" value={opp.narrative.whyThisClient} />
-            <NarrativeRow label="What it means" value={opp.narrative.whatItMeans} />
-            <NarrativeRow label="What to do" value={opp.narrative.whatToDo} />
-          </div>
+          <div className="text-[14.5px] leading-relaxed text-ink-2">{opp.narrative}</div>
         </div>
       )}
 
@@ -42,7 +37,7 @@ export function ClientDetail({ clientId, onBack }: { clientId: string; onBack: (
           <KV label="Tier" value={c.tier} />
           <KV label="RM" value={c.rm} />
           <KV label="Mandate" value={c.mandate} />
-          <KV label="KYC" value={`${c.kyc.status} · expires ${fmtDate(c.kyc.expiry)}`} />
+          <KV label="KYC" value={c.kyc.status} />
           <KV
             label="Suitability review"
             value={
@@ -59,7 +54,6 @@ export function ClientDetail({ clientId, onBack }: { clientId: string; onBack: (
           <KV label="Horizon" value={c.riskProfile.horizon} />
           <KV label="Loss tolerance" value={c.riskProfile.lossTolerance} />
           <KV label="Last assessed" value={fmtDate(c.riskProfile.lastAssessed)} />
-          <div className="text-[13.5px] text-ink-2 mt-2 leading-relaxed">{c.riskProfile.notes}</div>
         </InfoCard>
 
         <InfoCard eyebrow="Portfolio">
@@ -75,7 +69,6 @@ export function ClientDetail({ clientId, onBack }: { clientId: string; onBack: (
           {c.incomeObjective && (
             <KV label="Income vs objective" value={`${c.incomeObjective.actual.toLocaleString()} vs ${c.incomeObjective.target.toLocaleString()} ${c.incomeObjective.unit}`} />
           )}
-          <div className="src mt-1.5">Source: {c.holdings[0].source}</div>
         </InfoCard>
 
         {c.crossBorder && (
@@ -108,15 +101,6 @@ export function ClientDetail({ clientId, onBack }: { clientId: string; onBack: (
   );
 }
 
-function NarrativeRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <div className="t-micro mb-1">{label}</div>
-      <div className="text-[14px] leading-relaxed text-ink-2">{value}</div>
-    </div>
-  );
-}
-
 function InfoCard({ eyebrow, children }: { eyebrow: string; children: ReactNode }) {
   return (
     <div className="glass-tight p-4">
@@ -130,7 +114,7 @@ function KV({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex justify-between gap-3 text-[13.5px]">
       <span className="text-ink-3">{label}</span>
-      <span className="text-ink-2 text-right">{value}</span>
+      <span className="font-semibold text-ink text-right">{value}</span>
     </div>
   );
 }

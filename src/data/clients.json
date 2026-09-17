@@ -1,105 +1,364 @@
 {
   "chen": {
-    "id": "chen", "name": "Chen Wei Liang", "segment": "Premier", "tier": "Priority", "rm": "Aisha Rahman",
-    "mandate": "Advisory", "risk": "Balanced",
-    "kyc": { "status": "Current", "expiry": "2027-01-15" },
-    "suitability": { "lastReview": "2026-03-20" },
-    "holdings": [{ "label": "SGD Fixed Deposit", "value": 380000, "note": "matures 2026-09-26, rate 3.10% p.a.", "source": "Core Banking · 2026-09-12" }],
-    "concentration": null, "idleCash": null, "incomeObjective": null,
-    "crossBorder": {
-      "operatingCountries": ["Singapore", "Vietnam"],
-      "investmentLocations": ["Singapore"],
-      "transactionCorridors": ["SGD ↔ VND capex and supplier payments", "SGD ↔ USD sourcing payments (China suppliers)"],
-      "treasuryExposures": ["New VND/USD-denominated capex and working-capital exposure, currently unhedged"],
-      "relationshipFootprint": ["Existing OCBC Bank Singapore relationship (Premier)", "No existing OCBC presence in Vietnam"]
+    "id": "chen",
+    "name": "Chen Wei Liang",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-01-15"
     },
-    "riskProfile": { "rating": "Balanced", "horizon": "5–7 years", "lossTolerance": "Moderate — can absorb a short-term drawdown without changing plans", "lastAssessed": "2026-03-20", "notes": "Prioritises capital preservation on near-term maturities; open to growth allocations beyond a 5-year horizon." },
-    "complaints": [ { "date": "2026-02-12", "channel": "Branch", "summary": "Delayed processing on a fixed deposit renewal instruction", "status": "Closed" } ]
+    "suitability": {
+      "lastReview": "2026-03-20"
+    },
+    "holdings": [
+      {
+        "label": "SGD Fixed Deposit",
+        "value": 380000,
+        "note": "matures 2026-09-26, rate 3.10% p.a.",
+        "source": "Core Banking · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": {
+      "operatingCountries": [
+        "Singapore",
+        "Vietnam"
+      ],
+      "investmentLocations": [
+        "Singapore"
+      ],
+      "transactionCorridors": [
+        "SGD ↔ VND capex and supplier payments",
+        "SGD ↔ USD sourcing payments (China suppliers)"
+      ],
+      "treasuryExposures": [
+        "New VND/USD-denominated capex and working-capital exposure, currently unhedged"
+      ],
+      "relationshipFootprint": [
+        "Existing OCBC Bank Singapore relationship (Premier)",
+        "No existing OCBC presence in Vietnam"
+      ]
+    },
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate — can absorb a short-term drawdown without changing plans",
+      "lastAssessed": "2026-03-20"
+    },
+    "complaints": [
+      {
+        "date": "2026-02-12",
+        "channel": "Branch",
+        "summary": "Delayed processing on a fixed deposit renewal instruction",
+        "status": "Closed"
+      }
+    ]
   },
   "priya": {
-    "id": "priya", "name": "Priya Ravindran", "segment": "Private", "tier": "Signature", "rm": "Aisha Rahman",
-    "mandate": "Advisory", "risk": "Growth",
-    "kyc": { "status": "Current", "expiry": "2027-05-02" },
-    "suitability": { "lastReview": "2026-06-01" },
-    "holdings": [{ "label": "Single-name equity position", "value": 1240000, "note": "42% of portfolio in one foundry-segment name", "source": "Portfolio Custody · 2026-09-13" }],
-    "concentration": { "pct": 42, "threshold": 30, "name": "a single foundry-segment holding" },
-    "idleCash": null, "incomeObjective": null,
-    "crossBorder": {
-      "operatingCountries": ["Singapore"],
-      "investmentLocations": ["Singapore", "Taiwan"],
-      "transactionCorridors": ["SGD ↔ TWD custody settlement on the concentrated holding"],
-      "treasuryExposures": ["Unhedged TWD exposure layered on top of the single-name concentration"],
-      "relationshipFootprint": ["Bank of Singapore DPM mandate (OCBC One Group)", "Separate family wealth relationship held with a Hong Kong private bank, outside OCBC's view"]
+    "id": "priya",
+    "name": "Priya Ravindran",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Growth",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-05-02"
     },
-    "riskProfile": { "rating": "Growth", "horizon": "7–10 years", "lossTolerance": "Above-average — mandate accepts single-name concentration as a deliberate choice", "lastAssessed": "2026-06-01", "notes": "Growth-oriented discretionary mandate; concentration is a known and accepted feature of the strategy, subject to the stated guideline." },
-    "complaints": [ { "date": "2026-08-30", "channel": "Relationship Manager", "summary": "Discrepancy queried on a custody statement for the foundry-segment holding", "status": "Open" } ]
+    "suitability": {
+      "lastReview": "2026-06-01"
+    },
+    "holdings": [
+      {
+        "label": "Single-name equity position",
+        "value": 1240000,
+        "note": "42% of portfolio in one foundry-segment name",
+        "source": "Portfolio Custody · 2026-09-13"
+      }
+    ],
+    "concentration": {
+      "pct": 42,
+      "threshold": 30,
+      "name": "a single foundry-segment holding"
+    },
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": {
+      "operatingCountries": [
+        "Singapore"
+      ],
+      "investmentLocations": [
+        "Singapore",
+        "Taiwan"
+      ],
+      "transactionCorridors": [
+        "SGD ↔ TWD custody settlement on the concentrated holding"
+      ],
+      "treasuryExposures": [
+        "Unhedged TWD exposure layered on top of the single-name concentration"
+      ],
+      "relationshipFootprint": [
+        "Bank of Singapore DPM mandate (OCBC One Group)",
+        "Separate family wealth relationship held with a Hong Kong private bank, outside OCBC's view"
+      ]
+    },
+    "riskProfile": {
+      "rating": "Growth",
+      "horizon": "7–10 years",
+      "lossTolerance": "Above-average — mandate accepts single-name concentration as a deliberate choice",
+      "lastAssessed": "2026-06-01"
+    },
+    "complaints": [
+      {
+        "date": "2026-08-30",
+        "channel": "Relationship Manager",
+        "summary": "Discrepancy queried on a custody statement for the foundry-segment holding",
+        "status": "Open"
+      }
+    ]
   },
   "tan": {
-    "id": "tan", "name": "Michael Tan", "segment": "Premier", "tier": "Priority", "rm": "Daniel Goh",
-    "mandate": "Advisory", "risk": "Conservative",
-    "kyc": { "status": "Current", "expiry": "2027-02-11" },
-    "suitability": { "lastReview": "2026-01-18" },
-    "holdings": [{ "label": "SGD Corporate Bond", "value": 250000, "note": "face value, matures 2026-10-01", "source": "Fixed Income Custody · 2026-09-11" }],
-    "concentration": null, "idleCash": null, "incomeObjective": null, "crossBorder": null,
-    "riskProfile": { "rating": "Conservative", "horizon": "3–5 years", "lossTolerance": "Low — prioritises capital certainty over yield", "lastAssessed": "2026-01-18", "notes": "Prefers fixed-income instruments held to maturity; minimal appetite for mark-to-market volatility." },
+    "id": "tan",
+    "name": "Michael Tan",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Daniel Goh",
+    "mandate": "Advisory",
+    "risk": "Conservative",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-02-11"
+    },
+    "suitability": {
+      "lastReview": "2026-01-18"
+    },
+    "holdings": [
+      {
+        "label": "SGD Corporate Bond",
+        "value": 250000,
+        "note": "face value, matures 2026-10-01",
+        "source": "Fixed Income Custody · 2026-09-11"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Conservative",
+      "horizon": "3–5 years",
+      "lossTolerance": "Low — prioritises capital certainty over yield",
+      "lastAssessed": "2026-01-18"
+    },
     "complaints": []
   },
   "sarah": {
-    "id": "sarah", "name": "Sarah Lim", "segment": "Private", "tier": "Signature", "rm": "Daniel Goh",
-    "mandate": "Advisory", "risk": "Balanced",
-    "kyc": { "status": "Renewing soon", "expiry": "2026-10-02" },
-    "suitability": { "lastReview": "2026-02-10" },
-    "holdings": [{ "label": "SGD idle cash balance", "value": 620000, "note": "sitting uninvested since 2026-07-20 (56 days), following a property sale", "source": "Core Banking · 2026-09-13" }],
-    "concentration": null, "idleCash": { "days": 56, "threshold": 45, "source": "Core Banking · 2026-09-13" }, "incomeObjective": null, "crossBorder": null,
-    "riskProfile": { "rating": "Balanced", "horizon": "5–7 years", "lossTolerance": "Moderate", "lastAssessed": "2026-02-10", "notes": "Recently received a lump sum from a property sale; no deployment decision made yet." },
+    "id": "sarah",
+    "name": "Sarah Lim",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Daniel Goh",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Renewing soon",
+      "expiry": "2026-10-02"
+    },
+    "suitability": {
+      "lastReview": "2026-02-10"
+    },
+    "holdings": [
+      {
+        "label": "SGD idle cash balance",
+        "value": 620000,
+        "note": "sitting uninvested since 2026-07-20 (56 days), following a property sale",
+        "source": "Core Banking · 2026-09-13"
+      }
+    ],
+    "concentration": null,
+    "idleCash": {
+      "days": 56,
+      "threshold": 45,
+      "source": "Core Banking · 2026-09-13"
+    },
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-02-10"
+    },
     "complaints": []
   },
   "david": {
-    "id": "david", "name": "David Ong", "segment": "Premier", "tier": "Priority", "rm": "Aisha Rahman",
-    "mandate": "Advisory", "risk": "Balanced",
-    "kyc": { "status": "Current", "expiry": "2027-04-19" },
-    "suitability": { "lastReview": "2026-05-05" },
-    "holdings": [{ "label": "Advisory portfolio", "value": 480000, "note": "diversified income-oriented holdings", "source": "Portfolio Custody · 2026-09-10" }],
-    "concentration": null, "idleCash": null,
-    "incomeObjective": { "target": 30000, "actual": 21400, "unit": "SGD/yr", "source": "Portfolio Income Statement · 2026-09-01" },
-    "crossBorder": {
-      "operatingCountries": ["Singapore", "Indonesia"],
-      "investmentLocations": ["Singapore"],
-      "transactionCorridors": ["SGD ↔ IDR recurring supplier payments"],
-      "treasuryExposures": ["Recurring IDR payables settled through a correspondent bank at retail FX terms"],
-      "relationshipFootprint": ["OCBC Bank Singapore Premier relationship only", "No OCBC NISP (Indonesia) account on file"]
+    "id": "david",
+    "name": "David Ong",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-04-19"
     },
-    "riskProfile": { "rating": "Balanced", "horizon": "10+ years", "lossTolerance": "Moderate", "lastAssessed": "2026-05-05", "notes": "Balanced advisory mandate; income objective is the primary lens for any reallocation conversation." },
+    "suitability": {
+      "lastReview": "2026-05-05"
+    },
+    "holdings": [
+      {
+        "label": "Advisory portfolio",
+        "value": 480000,
+        "note": "diversified income-oriented holdings",
+        "source": "Portfolio Custody · 2026-09-10"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": {
+      "target": 30000,
+      "actual": 21400,
+      "unit": "SGD/yr",
+      "source": "Portfolio Income Statement · 2026-09-01"
+    },
+    "crossBorder": {
+      "operatingCountries": [
+        "Singapore",
+        "Indonesia"
+      ],
+      "investmentLocations": [
+        "Singapore"
+      ],
+      "transactionCorridors": [
+        "SGD ↔ IDR recurring supplier payments"
+      ],
+      "treasuryExposures": [
+        "Recurring IDR payables settled through a correspondent bank at retail FX terms"
+      ],
+      "relationshipFootprint": [
+        "OCBC Bank Singapore Premier relationship only",
+        "No OCBC NISP (Indonesia) account on file"
+      ]
+    },
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "10+ years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-05-05"
+    },
     "complaints": []
   },
   "grace": {
-    "id": "grace", "name": "Grace Koh", "segment": "Private", "tier": "Signature", "rm": "Daniel Goh",
-    "mandate": "Advisory", "risk": "Growth",
-    "kyc": { "status": "Current", "expiry": "2027-06-30" },
-    "suitability": { "lastReview": "2026-04-11" },
-    "holdings": [{ "label": "Single-name equity position", "value": 890000, "note": "holding in a company under a pending corporate action", "source": "Portfolio Custody · 2026-09-13" }],
-    "concentration": null, "idleCash": null, "incomeObjective": null, "crossBorder": null,
-    "riskProfile": { "rating": "Growth", "horizon": "7-10 years", "lossTolerance": "Above-average", "lastAssessed": "2026-04-11", "notes": "Comfortable with single-name exposure as part of a broader growth strategy." },
+    "id": "grace",
+    "name": "Grace Koh",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Daniel Goh",
+    "mandate": "Advisory",
+    "risk": "Growth",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-06-30"
+    },
+    "suitability": {
+      "lastReview": "2026-04-11"
+    },
+    "holdings": [
+      {
+        "label": "Single-name equity position",
+        "value": 890000,
+        "note": "holding in a company under a pending corporate action",
+        "source": "Portfolio Custody · 2026-09-13"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Growth",
+      "horizon": "7-10 years",
+      "lossTolerance": "Above-average",
+      "lastAssessed": "2026-04-11"
+    },
     "complaints": []
   },
   "robert": {
-    "id": "robert", "name": "Robert Teo", "segment": "Premier", "tier": "Priority", "rm": "Aisha Rahman",
-    "mandate": "Advisory", "risk": "Balanced",
-    "kyc": { "status": "Current", "expiry": "2027-01-30" },
-    "suitability": { "lastReview": "2025-05-02" },
-    "holdings": [{ "label": "SGD Fixed Deposit", "value": 410000, "note": "matures 2026-09-20, rate 2.95% p.a.", "source": "Core Banking · 2026-09-12" }],
-    "concentration": null, "idleCash": null, "incomeObjective": null, "crossBorder": null,
-    "riskProfile": { "rating": "Balanced", "horizon": "5-7 years", "lossTolerance": "Moderate", "lastAssessed": "2025-05-02", "notes": "Suitability review is overdue; no new product conversation until it is refreshed." },
+    "id": "robert",
+    "name": "Robert Teo",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-01-30"
+    },
+    "suitability": {
+      "lastReview": "2025-05-02"
+    },
+    "holdings": [
+      {
+        "label": "SGD Fixed Deposit",
+        "value": 410000,
+        "note": "matures 2026-09-20, rate 2.95% p.a.",
+        "source": "Core Banking · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5-7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2025-05-02"
+    },
     "complaints": []
   },
   "michelle": {
-    "id": "michelle", "name": "Michelle Wong", "segment": "Private", "tier": "Signature", "rm": "Daniel Goh",
-    "mandate": "Advisory", "risk": "Balanced",
-    "kyc": { "status": "Current", "expiry": "2027-03-11" },
-    "suitability": { "lastReview": "2026-03-02" },
-    "holdings": [{ "label": "Universal life policy", "value": 310000, "note": "policy surrender value, held with Great Eastern", "source": "Great Eastern policy record · 2026-09-12 (not yet permissioned to OCBC Bank)" }],
-    "concentration": null, "idleCash": null, "incomeObjective": null, "crossBorder": null,
-    "riskProfile": { "rating": "Balanced", "horizon": "10+ years", "lossTolerance": "Moderate", "lastAssessed": "2026-03-02", "notes": "Insurance-linked holding; product conversations route through the Great Eastern policy record." },
+    "id": "michelle",
+    "name": "Michelle Wong",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Daniel Goh",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-03-11"
+    },
+    "suitability": {
+      "lastReview": "2026-03-02"
+    },
+    "holdings": [
+      {
+        "label": "Universal life policy",
+        "value": 310000,
+        "note": "policy surrender value, held with Great Eastern",
+        "source": "Great Eastern policy record · 2026-09-12 (not yet permissioned to OCBC Bank)"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "10+ years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-03-02"
+    },
     "complaints": []
   }
 }

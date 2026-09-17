@@ -76,7 +76,7 @@ function startServer() {
   check('Clicking the card body does NOT navigate away from the queue', txt.includes('High revenue opportunities'));
   await chenCard.locator('[data-testid="client-open"]').click();
   txt = await page.locator('main').innerText();
-  check('Clicking the client name opens that client\'s position page', txt.includes('Chen Wei Liang') && /what happened/i.test(txt));
+  check('Clicking the client name opens that client\'s position page', txt.includes('Chen Wei Liang') && txt.includes('rate-locked instrument'));
   await page.click('nav >> text=Queue');
   await page.waitForTimeout(150);
 
@@ -84,7 +84,7 @@ function startServer() {
   const chenCard2 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
   await chenCard2.locator('[data-testid="why-box"]', { hasText: 'Why this client' }).click();
   txt = await page.locator('main').innerText();
-  check('Clicking a why-box opens the client\'s profile page', txt.includes('Chen Wei Liang') && /what happened/i.test(txt));
+  check('Clicking a why-box opens the client\'s profile page', txt.includes('Chen Wei Liang') && txt.includes('rate-locked instrument'));
   await page.click('nav >> text=Queue');
   await page.waitForTimeout(150);
 
@@ -176,7 +176,7 @@ function startServer() {
   txt = await page.locator('main').innerText();
   check('Chen\'s name renders without an avatar icon', await page.locator('[data-testid="client-detail"] .orb').count() === 0);
   check('Chen\'s identity line shows only the segment', /Chen Wei Liang\s*\n\s*Premier\b/.test(txt) && !txt.includes('RM Aisha'));
-  check('Impact hero shows all four narrative labels', ['what happened', 'why this client', 'what it means', 'what to do'].every(s => txt.toLowerCase().includes(s)));
+  check('Impact hero is a single merged paragraph, not four labeled sections', !/why this client/i.test(txt) && !/what it means/i.test(txt) && txt.includes('rate-locked instrument'));
   check('Basic Information card shows tier and RM (moved, not lost)', /basic information/i.test(txt) && txt.includes('Priority') && txt.includes('Aisha Rahman'));
   check('Risk Profile card renders', /risk profile/i.test(txt) && txt.includes('5–7 years'));
   check('Complaint Records shows Chen\'s closed complaint', txt.includes('Closed') && txt.includes('fixed deposit renewal'));
