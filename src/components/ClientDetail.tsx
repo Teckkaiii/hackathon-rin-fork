@@ -75,9 +75,7 @@ export function ClientDetail({ clientId, onBack }: { clientId: string; onBack: (
           <InfoCard eyebrow="Cross-Border Exposure">
             <KV label="Operating countries" value={c.crossBorder.operatingCountries.join(', ')} />
             <KV label="Investment locations" value={c.crossBorder.investmentLocations.join(', ')} />
-            <KV label="Transaction corridors" value={c.crossBorder.transactionCorridors.join('; ')} />
             <KV label="Treasury exposures" value={c.crossBorder.treasuryExposures.join('; ')} />
-            <KV label="Relationship footprint" value={c.crossBorder.relationshipFootprint.join('; ')} />
           </InfoCard>
         )}
       </div>

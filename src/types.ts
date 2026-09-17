@@ -44,9 +44,7 @@ export interface ComplaintRecord {
 export interface CrossBorderProfile {
   operatingCountries: string[];
   investmentLocations: string[];
-  transactionCorridors: string[];
   treasuryExposures: string[];
-  relationshipFootprint: string[];
 }
 
 export interface Client {

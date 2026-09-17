@@ -33,16 +33,8 @@
       "investmentLocations": [
         "Singapore"
       ],
-      "transactionCorridors": [
-        "SGD ↔ VND capex and supplier payments",
-        "SGD ↔ USD sourcing payments (China suppliers)"
-      ],
       "treasuryExposures": [
         "New VND/USD-denominated capex and working-capital exposure, currently unhedged"
-      ],
-      "relationshipFootprint": [
-        "Existing OCBC Bank Singapore relationship (Premier)",
-        "No existing OCBC presence in Vietnam"
       ]
     },
     "riskProfile": {
@@ -98,15 +90,8 @@
         "Singapore",
         "Taiwan"
       ],
-      "transactionCorridors": [
-        "SGD ↔ TWD custody settlement on the concentrated holding"
-      ],
       "treasuryExposures": [
         "Unhedged TWD exposure layered on top of the single-name concentration"
-      ],
-      "relationshipFootprint": [
-        "Bank of Singapore DPM mandate (OCBC One Group)",
-        "Separate family wealth relationship held with a Hong Kong private bank, outside OCBC's view"
       ]
     },
     "riskProfile": {
@@ -237,15 +222,8 @@
       "investmentLocations": [
         "Singapore"
       ],
-      "transactionCorridors": [
-        "SGD ↔ IDR recurring supplier payments"
-      ],
       "treasuryExposures": [
         "Recurring IDR payables settled through a correspondent bank at retail FX terms"
-      ],
-      "relationshipFootprint": [
-        "OCBC Bank Singapore Premier relationship only",
-        "No OCBC NISP (Indonesia) account on file"
       ]
     },
     "riskProfile": {
