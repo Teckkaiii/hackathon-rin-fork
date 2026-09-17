@@ -27,6 +27,28 @@ export interface Holding {
   source: string;
 }
 
+export interface OpportunityNarrative {
+  whatHappened: string;
+  whyThisClient: string;
+  whatItMeans: string;
+  whatToDo: string;
+}
+
+export interface RiskProfile {
+  rating: string;
+  horizon: string;
+  lossTolerance: string;
+  lastAssessed: string;
+  notes: string;
+}
+
+export interface ComplaintRecord {
+  date: string;
+  channel: string;
+  summary: string;
+  status: 'Open' | 'Closed';
+}
+
 export interface CrossBorderProfile {
   operatingCountries: string[];
   investmentLocations: string[];
@@ -50,6 +72,8 @@ export interface Client {
   idleCash: { days: number; threshold: number; source: string } | null;
   incomeObjective: { target: number; actual: number; unit: string; source: string } | null;
   crossBorder: CrossBorderProfile | null;
+  riskProfile: RiskProfile;
+  complaints: ComplaintRecord[];
 }
 
 export interface GateOverride {
@@ -69,6 +93,7 @@ export interface Opportunity {
   whyClient: string;
   whyNow: string;
   whyInstrument: string;
+  narrative: OpportunityNarrative;
   gateOverride: GateOverride | null;
 }
 
