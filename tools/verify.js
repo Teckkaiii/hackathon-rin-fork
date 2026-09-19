@@ -47,10 +47,15 @@ function startServer() {
   check('Header no longer shows "RM: <name>"', !(await page.locator('header').innerText()).includes('RM:'));
   check('Nav order is Queue, Clients, Blocked, News, Past Week, Outreach', (await page.locator('nav button').allInnerTexts()).join('|') === 'Queue|Clients|Blocked|News|Past Week|Outreach');
 
-  // Signal score breakdown: quantifies order via momentum / relevancy / urgency / conviction, shown qualitatively (no raw digit score)
-  check('Signal breakdown pills shown (Urgency/Relevancy/Momentum/Conviction)', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => txt.includes(s)));
-  const bodyTxtQueue = await page.locator('body').innerText();
-  check('No composite score digit shown anywhere', !/\/\s?100\b|\bscore\s*:\s*\d/i.test(bodyTxtQueue));
+  // Signal score: shown as a single 0-100 figure on the card; clicking it reveals the momentum / relevancy / urgency / conviction breakdown, each also out of 100
+  check('Signal score shown on every card (out of 100)', await page.locator('[data-testid="signal-score"]').count() === await page.locator('[data-testid="opportunity-card"]').count() && /Signal score:\s*\d+\/100/.test(txt));
+  check('Breakdown hidden until the score is clicked', await page.locator('[data-testid="signal-breakdown"]').count() === 0);
+  await page.locator('[data-testid="signal-score"]').first().click();
+  txt = await page.locator('main').innerText();
+  check('Clicking the score expands the breakdown (Urgency/Relevancy/Momentum/Conviction, each out of 100)', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => txt.includes(s)) && /Urgency:\s*\d+\/100/.test(txt));
+  await page.locator('[data-testid="signal-score"]').first().click();
+  txt = await page.locator('main').innerText();
+  check('Clicking the score again collapses the breakdown', await page.locator('[data-testid="signal-breakdown"]').count() === 0);
   check('Highest signal-score opportunity ranks first (Chen Wei Liang)', (await page.locator('[data-testid="opportunity-card"]').first().innerText()).includes('Chen Wei Liang'));
 
   // ---- Task 1: card chrome stripped to name + segment + scoring pills ----
@@ -63,7 +68,11 @@ function startServer() {
   check('Card drops the product-name pill', !chenTxt0.includes('Structured Deposit'));
   check('Card drops the signal-recency pill', !chenTxt0.includes('Signal:'));
   check('Card keeps the segment', chenTxt0.includes('Premier'));
-  check('Card keeps all four scoring pills', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => chenTxt0.includes(s)));
+  check('Card keeps the signal score', /Signal score:\s*\d+\/100/.test(chenTxt0));
+  await chenCard0.locator('[data-testid="signal-score"]').click();
+  const chenTxtExpanded = await chenCard0.innerText();
+  check('Card keeps all four scoring pills once expanded', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => chenTxtExpanded.includes(s)));
+  await chenCard0.locator('[data-testid="signal-score"]').click();
   check('Card keeps the opportunity size figure', chenTxt0.includes('380,000'));
   check('Card labels the figure "Opportunity size", not "Amount at stake"', /opportunity size/i.test(chenTxt0) && !/amount at stake/i.test(chenTxt0));
   check('Window to act is a pronounced pill on the card', await chenCard0.locator('[data-testid="window-to-act"]').count() === 1 && /12 days to act/.test(chenTxt0));
@@ -232,6 +241,16 @@ function startServer() {
     const i = txt.indexOf('SGD rates expected to ease');
     return i > -1 && txt.slice(Math.max(0, i - 300), i + 300).includes('Priority');
   })());
+  check('News tab is grouped by client, not by story', await page.locator('[data-testid="news-client-open"]').count() >= 2);
+  const firstNewsClient = await page.locator('[data-testid="news-client-open"]').first().innerText();
+  check('Client group leads with its most impactful item', (() => {
+    const i = txt.indexOf(firstNewsClient);
+    return i > -1 && txt.slice(i, i + 400).includes('High impact');
+  })());
+  await page.locator('[data-testid="news-client-open"]').first().click();
+  check('Clicking a client name in News opens that client\'s position page', await page.locator('[data-testid="client-detail"]').count() === 1);
+  await page.click('[data-testid="client-back"]');
+  await page.waitForTimeout(150);
 
   // ---- Module 6: Past Week (momentum) ----
   await page.click('nav >> text=Past Week');

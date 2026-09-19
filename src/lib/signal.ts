@@ -11,13 +11,14 @@ export interface SignalDimension {
 
 export interface SignalBreakdown {
   score: number;
+  level: SignalLevel;
   urgency: SignalDimension;
   relevancy: SignalDimension;
   momentum: SignalDimension;
   conviction: SignalDimension & { count: number };
 }
 
-function levelFor(score: number): SignalLevel {
+export function levelFor(score: number): SignalLevel {
   if (score >= 75) return 'high';
   if (score >= 45) return 'medium';
   return 'low';
@@ -74,6 +75,7 @@ export function signalBreakdown(opp: Opportunity): SignalBreakdown {
   const score = Math.round((urgency + relevancy + momentum + convictionScore) / 4);
   return {
     score,
+    level: levelFor(score),
     urgency: { score: urgency, level: levelFor(urgency) },
     relevancy: { score: relevancy, level: levelFor(relevancy) },
     momentum: { score: momentum, level: levelFor(momentum) },

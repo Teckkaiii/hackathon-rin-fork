@@ -15,11 +15,6 @@ const WINDOW_VARIANT: Record<SignalLevel, 'block' | 'flag' | 'neutral'> = {
   high: 'block', medium: 'flag', low: 'neutral',
 };
 
-const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
-  high: 'pass', medium: 'flag', low: 'neutral',
-};
-const LEVEL_LABEL: Record<SignalLevel, string> = { high: 'High', medium: 'Medium', low: 'Low' };
-
 export function OpportunityCard({
   opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff,
 }: {
@@ -33,6 +28,7 @@ export function OpportunityCard({
   const signal = signalBreakdown(opp);
   const route = routeFor(opp, c);
   const [showAlts, setShowAlts] = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(false);
   const alternates = (Object.keys(ROUTE_LABELS) as RouteId[]).filter(id => id !== route.id);
 
   function runRoute(id: RouteId) {
@@ -67,13 +63,28 @@ export function OpportunityCard({
         </div>
       </div>
 
-      <div className="flex gap-1.5 flex-wrap mt-3">
-        <Pill variant={LEVEL_VARIANT[signal.urgency.level]} dot>Urgency: {LEVEL_LABEL[signal.urgency.level]}</Pill>
-        <Pill variant={LEVEL_VARIANT[signal.relevancy.level]} dot>Relevancy: {LEVEL_LABEL[signal.relevancy.level]}</Pill>
-        <Pill variant={LEVEL_VARIANT[signal.momentum.level]} dot>Momentum: {LEVEL_LABEL[signal.momentum.level]}</Pill>
-        <Pill variant={LEVEL_VARIANT[signal.conviction.level]} dot>
-          Conviction: {signal.conviction.count} {signal.conviction.count === 1 ? 'piece' : 'pieces'} of news
-        </Pill>
+      <div className="mt-3">
+        <button
+          type="button"
+          data-testid="signal-score"
+          onClick={() => setShowBreakdown(v => !v)}
+          className="inline-block"
+        >
+          <Pill variant={LEVEL_VARIANT[signal.level]} dot className="cursor-pointer hover:brightness-95">
+            Signal score: {signal.score}/100 {showBreakdown ? '▴' : '▾'}
+          </Pill>
+        </button>
+
+        {showBreakdown && (
+          <div className="flex gap-1.5 flex-wrap mt-2" data-testid="signal-breakdown">
+            <Pill variant={LEVEL_VARIANT[signal.urgency.level]} dot>Urgency: {signal.urgency.score}/100</Pill>
+            <Pill variant={LEVEL_VARIANT[signal.relevancy.level]} dot>Relevancy: {signal.relevancy.score}/100</Pill>
+            <Pill variant={LEVEL_VARIANT[signal.momentum.level]} dot>Momentum: {signal.momentum.score}/100</Pill>
+            <Pill variant={LEVEL_VARIANT[signal.conviction.level]} dot>
+              Conviction: {signal.conviction.score}/100 ({signal.conviction.count} {signal.conviction.count === 1 ? 'piece' : 'pieces'} of news)
+            </Pill>
+          </div>
+        )}
       </div>
 
       <div className="grid md:grid-cols-3 gap-3 mt-4">

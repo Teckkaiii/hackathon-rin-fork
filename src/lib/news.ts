@@ -27,6 +27,26 @@ const INFERRED_MATCH: Record<string, { test: (c: Client) => boolean; reason: (c:
     test: c => c.holdings.some(h => /foundry|semiconductor/i.test(h.label) || /foundry|semiconductor/i.test(h.note)),
     reason: c => `Holds a position described as "${c.holdings[0].note}" — the same sector as this news, but not yet linked to this signal in the record.`,
   },
+  'reit-rerating': {
+    test: c => c.holdings.some(h => /reit/i.test(h.label) || /reit/i.test(h.note)),
+    reason: c => `Holds a ${c.holdings[0].label.toLowerCase()} (${c.holdings[0].note}) — the same rate-sensitive sector as this news, but not yet linked to this signal in the record.`,
+  },
+  'cross-border-fx-vol': {
+    test: c => !!c.crossBorder && c.crossBorder.treasuryExposures.length > 0,
+    reason: c => `Carries an unhedged cross-border treasury exposure (${c.crossBorder!.treasuryExposures[0].toLowerCase()}) — directly exposed to this FX move, but not yet linked to this signal in the record.`,
+  },
+  'usd-mmf-yield': {
+    test: c => c.holdings.some(h => /money market/i.test(h.label)),
+    reason: c => `Holds a ${c.holdings[0].label.toLowerCase()} (${c.holdings[0].note}) — the same instrument type as this news, but not yet linked to this signal in the record.`,
+  },
+  'par-fund-bonus-trim': {
+    test: c => c.holdings.some(h => /universal life|participating|endowment/i.test(h.label)),
+    reason: c => `Holds a ${c.holdings[0].label.toLowerCase()} (${c.holdings[0].note}) — the same policy type as this news, but not yet linked to this signal in the record.`,
+  },
+  'ig-credit-spread-widening': {
+    test: c => c.holdings.some(h => /corporate bond/i.test(h.label)),
+    reason: c => `Holds a ${c.holdings[0].label.toLowerCase()} (${c.holdings[0].note}) — directly exposed to this spread move, but not yet linked to this signal in the record.`,
+  },
 };
 
 // Flags an item by how many clients it lands on and how hard. A single
@@ -83,4 +103,38 @@ export function newsItems(clientIds?: Set<string>): NewsItem[] {
 
   const RECENCY_ORDER = { Yesterday: 0, Today: 1, Internal: 2 };
   return items.sort((a, b) => RECENCY_ORDER[a.recency] - RECENCY_ORDER[b.recency]);
+}
+
+export interface ClientNewsItem extends NewsItem {
+  impact: NewsImpact;
+}
+
+export interface ClientNewsGroup {
+  client: Client;
+  items: ClientNewsItem[];
+}
+
+const BASIS_RANK = { confirmed: 0, inferred: 1 };
+
+// Same news, re-keyed per client: each client sees only the items that
+// impact them, most impactful first — the mirror image of newsItems(),
+// which is keyed per driver.
+export function newsByClient(clientIds?: Set<string>): ClientNewsGroup[] {
+  const pool = clientIds ? CLIENT_LIST.filter(c => clientIds.has(c.id)) : CLIENT_LIST;
+  const items = newsItems(clientIds);
+
+  const groups = pool
+    .map(client => {
+      const clientItems: ClientNewsItem[] = items
+        .filter(item => item.impacts.some(im => im.clientId === client.id))
+        .map(item => ({ ...item, impact: item.impacts.find(im => im.clientId === client.id)! }))
+        .sort((a, b) =>
+          SEVERITY_RANK[a.impact.severity] - SEVERITY_RANK[b.impact.severity] ||
+          BASIS_RANK[a.impact.basis] - BASIS_RANK[b.impact.basis]
+        );
+      return { client, items: clientItems };
+    })
+    .filter(g => g.items.length > 0);
+
+  return groups.sort((a, b) => SEVERITY_RANK[a.items[0].impact.severity] - SEVERITY_RANK[b.items[0].impact.severity]);
 }

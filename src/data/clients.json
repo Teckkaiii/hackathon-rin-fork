@@ -338,5 +338,75 @@
       "lastAssessed": "2026-03-02"
     },
     "complaints": []
+  },
+  "farhan": {
+    "id": "farhan",
+    "name": "Farhan Hassan",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Daniel Goh",
+    "mandate": "Advisory",
+    "risk": "Growth",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-07-22"
+    },
+    "suitability": {
+      "lastReview": "2026-04-15"
+    },
+    "holdings": [
+      {
+        "label": "Singapore REIT position",
+        "value": 340000,
+        "note": "12% of portfolio, distribution yield 5.8% p.a.",
+        "source": "Portfolio Custody · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Growth",
+      "horizon": "7–10 years",
+      "lossTolerance": "Above-average",
+      "lastAssessed": "2026-04-15"
+    },
+    "complaints": []
+  },
+  "weixin": {
+    "id": "weixin",
+    "name": "Wei Xin Tan",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Daniel Goh",
+    "mandate": "Advisory",
+    "risk": "Conservative",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-08-09"
+    },
+    "suitability": {
+      "lastReview": "2026-05-20"
+    },
+    "holdings": [
+      {
+        "label": "USD Money Market Fund",
+        "value": 500000,
+        "note": "parked pending reinvestment decision since 2026-08-25",
+        "source": "Fund Platform · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Conservative",
+      "horizon": "3–5 years",
+      "lossTolerance": "Low",
+      "lastAssessed": "2026-05-20"
+    },
+    "complaints": []
   }
 }

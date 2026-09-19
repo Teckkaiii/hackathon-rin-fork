@@ -47,7 +47,7 @@ export default function App() {
         )}
         {state.tab === 'blocked' && <BlockedView />}
         {state.tab === 'outreach' && <OutreachView state={state} dispatch={dispatch} />}
-        {state.tab === 'news' && <NewsView />}
+        {state.tab === 'news' && <NewsView onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })} />}
         {state.tab === 'pastweek' && <PastWeekView />}
       </main>
 
