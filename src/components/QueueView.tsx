@@ -13,6 +13,10 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
   const surfaced = useMemo(() => rankedOpps(dismissed, routed, MY_CLIENT_IDS), [dismissed, routed]);
   const blocked = useMemo(() => blockedOpps(MY_CLIENT_IDS), []);
   const cls = useMemo(() => clusters(dismissed, routed, DRIVERS, MY_CLIENT_IDS), [dismissed, routed]);
+  const overnightDrivers = useMemo(() => {
+    const ids = [...new Set(OPPS.filter(o => MY_CLIENT_IDS.has(o.clientId) && o.driverId).map(o => o.driverId as string))];
+    return ids.map(id => DRIVERS[id].label);
+  }, []);
   const dismissedList = OPPS.filter(o => o.id in dismissed && MY_CLIENT_IDS.has(o.clientId));
   const handedOffList = OPPS.filter(o => o.id in routed && MY_CLIENT_IDS.has(o.clientId));
 
@@ -61,13 +65,21 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
 
   return (
     <div>
-      <div className="t-display mb-1">{greeting()}, {CURRENT_RM.split(' ')[0]}.</div>
-      <div className="t-lead mb-1">
-        Overnight signals resolved against client exposures, after compliance gates, ranked by signal score —
-        momentum, news relevancy, urgency and conviction combined.
+      <div className="t-display mb-3">{greeting()}, {CURRENT_RM.split(' ')[0]}.</div>
+
+      <div
+        data-testid="queue-stat-strip"
+        className="flex items-stretch gap-0 rounded-2xl bg-gradient-to-br from-graphite via-ink to-graphite text-white overflow-hidden mb-4 shadow-[0_8px_24px_rgba(0,0,0,0.18)]"
+      >
+        <StatBlock value={surfaced.length} label="Surfaced" />
+        <div className="w-px bg-white/10 my-4" />
+        <StatBlock value={blocked.length} label="Withheld" />
+        <div className="w-px bg-white/10 my-4" />
+        <StatBlock value={overnightDrivers.length} label="Signals overnight" />
       </div>
-      <div className="t-meta font-semibold mb-5">
-        {surfaced.length} {surfaced.length === 1 ? 'opportunity' : 'opportunities'} surfaced today · {blocked.length} withheld by gates — see the Blocked tab
+
+      <div className="t-lead mb-5" data-testid="queue-summary">
+        {overnightSummary(overnightDrivers, surfaced.length, blocked.length)}
       </div>
 
       {cls.map(cl => (
@@ -177,4 +189,24 @@ function greeting(): string {
   if (h < 12) return 'Good morning';
   if (h < 18) return 'Good afternoon';
   return 'Good evening';
+}
+
+function StatBlock({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex-1 px-5 py-4 min-w-[110px]">
+      <div className="num text-[32px] font-extrabold leading-none tracking-tight">{String(value).padStart(2, '0')}</div>
+      <div className="t-micro text-white/60 mt-1.5">{label}</div>
+    </div>
+  );
+}
+
+function overnightSummary(driverLabels: string[], surfacedCount: number, blockedCount: number): string {
+  const overnight = driverLabels.length
+    ? `Overnight: ${driverLabels.join(' · ')}.`
+    : 'No material overnight signals.';
+  const surfacedPhrase = `That leaves ${surfacedCount} ${surfacedCount === 1 ? 'client' : 'clients'} worth a look today`;
+  const blockedPhrase = blockedCount > 0
+    ? `, with ${blockedCount} more on hold pending compliance — see the Blocked tab.`
+    : '.';
+  return `${overnight} ${surfacedPhrase}${blockedPhrase}`;
 }

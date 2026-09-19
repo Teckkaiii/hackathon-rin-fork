@@ -68,11 +68,6 @@ export function OpportunityCard({
         </div>
       </div>
 
-      <div className="mt-3 bg-sunk border border-hairline rounded-xl px-4 py-3 flex items-baseline gap-2 flex-wrap" data-testid="signal-headline">
-        <span className="t-micro flex-none">Signal · {opp.signal.recency}</span>
-        <span className="t-h3">{opp.signal.headline}</span>
-      </div>
-
       <div className="flex gap-6 items-start mt-4 pt-4 border-t border-hairline flex-wrap" data-testid="signal-breakdown">
         <div className="flex-none">
           <div className="num text-[44px] font-extrabold leading-none text-ink" data-testid="signal-score">{signal.score}</div>

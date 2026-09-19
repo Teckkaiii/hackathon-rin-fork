@@ -34,9 +34,10 @@ function startServer() {
   // ---- Module 1: Queue (scoped to the signed-in RM's own book — Aisha Rahman) ----
   let txt = await page.locator('main').innerText();
   check('Queue renders opportunity cards', await page.locator('[data-testid="opportunity-card"]').count() === 3, 'count=' + await page.locator('[data-testid="opportunity-card"]').count());
-  check('3 surfaced (all gates passed)', /3 opportunities surfaced/.test(txt));
-  check('Blocked count shown, points to Blocked tab', txt.includes('1 withheld by gates') && txt.includes('Blocked tab'));
-  check('Surfaced/withheld summary sits under the greeting', /Good (morning|afternoon|evening), Aisha\.[\s\S]{0,400}opportunities surfaced today/.test(txt));
+  check('Stat strip shows 3 surfaced (all gates passed)', (await page.locator('[data-testid="queue-stat-strip"]').innerText()).includes('03'));
+  check('Blocked count shown in stat strip, points to Blocked tab', (await page.locator('[data-testid="queue-stat-strip"]').innerText()).includes('01') && txt.includes('Blocked tab'));
+  check('Plain-English summary sits under the greeting, names the overnight signals', /Good (morning|afternoon|evening), Aisha\.[\s\S]{0,400}Overnight: SGD rates expected to ease/.test(txt));
+  check('Summary explains what surfaced and what is blocked', /3 clients worth a look today/.test(txt) && /on hold pending compliance/.test(txt));
   check('No blocked card rendered inside Queue itself', await page.locator('[data-testid="blocked-card"]').count() === 0);
   check('No "Open client position" button in Queue', !txt.includes('Open client position'));
 
@@ -61,7 +62,7 @@ function startServer() {
   check('Card drops the RM name', !chenTxt0.includes('Aisha Rahman'));
   check('Card drops the client tier', !/\bPriority\b/.test(chenTxt0));
   check('Card keeps the segment', chenTxt0.includes('Premier'));
-  check('Card keeps the signal headline', chenTxt0.includes('SGD rates expected to ease'));
+  check('Card drops the raw signal-headline bar', !chenTxt0.includes('SGD rates expected to ease') && await chenCard0.locator('[data-testid="signal-headline"]').count() === 0);
   check('Card keeps all four scoring dimensions, always expanded', ['Urgency', 'Relevancy', 'Momentum', 'Conviction'].every(s => chenTxt0.includes(s)));
   check('Card keeps the opportunity size figure', chenTxt0.includes('380,000'));
   check('Card labels the figure "Opportunity size", not "Amount at stake"', /opportunity size/i.test(chenTxt0) && !/amount at stake/i.test(chenTxt0));
@@ -114,7 +115,7 @@ function startServer() {
   await page.fill('[data-testid="modal"] textarea', 'Booked for Thursday morning');
   await page.click('[data-act="modal-confirm"]');
   txt = await page.locator('main').innerText();
-  check('Handed-off item leaves the surfaced list', /2 opportunities surfaced/.test(txt));
+  check('Handed-off item leaves the surfaced list', (await page.locator('[data-testid="queue-stat-strip"]').innerText()).includes('02'));
   check('Handoff note is recorded', txt.includes('Booked for Thursday morning'));
   check('Handed-off section names the route taken', txt.includes('Handed off') && txt.includes('Call to clarify'));
   check('Handing off kept us on the Queue tab', txt.includes('High revenue opportunities'));
