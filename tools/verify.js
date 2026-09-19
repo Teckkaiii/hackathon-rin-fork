@@ -202,8 +202,12 @@ function startServer() {
 
   // ---- Module 4: Outreach (chat-driven drafting + sending) ----
   const rinCount = () => page.locator('[data-testid="chat-msg-rin"]').count();
+  // A reply first appears, then streams in word by word; wait for both before reading it.
   const waitForRin = async (prev) => {
-    await page.waitForFunction(n => document.querySelectorAll('[data-testid="chat-msg-rin"]').length > n, prev, { timeout: 5000 });
+    await page.waitForFunction(
+      n => document.querySelectorAll('[data-testid="chat-msg-rin"]').length > n && !document.querySelector('[data-streaming]'),
+      prev, { timeout: 8000 }
+    );
     return page.locator('[data-testid="chat-msg-rin"]').last().innerText();
   };
 

@@ -143,12 +143,21 @@ RIN's futurism comes from **light and glow, not darkness**. Concretely:
   side (a 1px line, not a bordered cell) — keeps a dashboard-dense layout
   from feeling heavy.
 
-Motion (not yet implemented anywhere, but the direction future work should
-take): prefer a brief, subtle transition over a static change — a number
-that ticks up rather than jumps, a glow that fades in rather than appears.
-Keep every transition under ~250ms; RIN is a decision tool an RM uses
-dozens of times a day, and anything slower reads as friction, not as
-"future."
+Motion, in two registers:
+
+- **Transitions** (a change the user caused): under ~250ms. Bubble
+  slide-in is 220ms; the draft's red flash on rewrite is 900ms but it's a
+  decay, not a delay — the content is already there.
+- **Presence** (ambient, signalling a state): allowed to be slow because
+  nothing is waiting on it. The RIN orb breathes on a 2.8s loop when idle
+  and 1.1s with an orbiting ring while thinking; typing dots bounce; a
+  reply streams in word-by-word with a caret, capped at 1.2s regardless of
+  length so a long reply never drags. These live in `src/index.css` under
+  "RIN, the assistant" and are what makes the chat read as a *someone*
+  rather than a form. Don't add ambient motion to anything that isn't RIN.
+
+RIN is a decision tool an RM uses dozens of times a day — anything the RM
+has to wait on that runs past ~250ms reads as friction, not as "future."
 
 ## Typography
 

@@ -58,6 +58,12 @@ function firstName(client: Client): string {
   return client.name.split(' ')[0];
 }
 
+// Lower-case a label for use mid-sentence without flattening acronyms:
+// "SGD Fixed Deposit" -> "SGD fixed deposit".
+function softLower(s: string): string {
+  return s.split(' ').map(w => (/^[A-Z]{2,}$/.test(w) ? w : w.toLowerCase())).join(' ');
+}
+
 function capitalise(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
@@ -66,9 +72,9 @@ function approachLine(client: Client, opp: Opportunity): string {
   const h = client.holdings[0];
   switch (opp.approach) {
     case 'Notify':
-      return `your ${h.label.toLowerCase()} of ${fmt(h.value)} comes up for renewal within the next ${opp.daysToAct} days, and there is a rate change expected before then that is worth knowing about.`;
+      return `your ${softLower(h.label)} of ${fmt(h.value)} comes up for renewal within the next ${opp.daysToAct} days, and there is a rate change expected before then that is worth knowing about.`;
     case 'Contextualise':
-      return `something in today's market news touches a position you hold — your ${h.label.toLowerCase()} of ${fmt(h.value)} — and I wanted you to hear it from me first.`;
+      return `something in today's market news touches a position you hold — your ${softLower(h.label)} of ${fmt(h.value)} — and I wanted you to hear it from me first.`;
     case 'Review':
       return 'when we last reviewed your portfolio we set an objective together, and the latest figures suggest it has drifted. I think it is worth a short review.';
   }
@@ -113,7 +119,7 @@ export function openingMessage(client: Client, opp: Opportunity | undefined): st
   if (!opp) {
     return `There's no active opportunity for ${first} today. You can still write a note on the right and I'll check it before it goes.`;
   }
-  return `I've drafted a note to ${first} — ${opp.signal.headline.toLowerCase()}. Want it more formal, more casual, shorter, or with the figures from the record?`;
+  return `I've drafted a note to ${first} — ${softLower(opp.signal.headline)}. Want it more formal, more casual, shorter, or with the figures from the record?`;
 }
 
 export function replyFor(intent: Intent | null, client: Client): string {
