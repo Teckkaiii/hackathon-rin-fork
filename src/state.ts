@@ -2,6 +2,7 @@ import clientsData from './data/clients.json';
 import driversData from './data/drivers.json';
 import type { Client, Driver, Approach, CoachCheck, LedgerEntry } from './types';
 import type { RouteId, RoutedMap } from './lib/routing';
+import type { ChatMessage, DraftSpec } from './lib/assistant';
 
 export const CLIENTS = clientsData as Record<string, Client>;
 export const DRIVERS = driversData as Record<string, Driver>;
@@ -26,6 +27,8 @@ export interface AppState {
   draftResultByClient: Record<string, CoachCheck[] | undefined>;
   outreachClientId: string;
   outreachApproach: Approach | null;
+  chatByClient: Record<string, ChatMessage[]>;
+  specByClient: Record<string, DraftSpec>;
 }
 
 const SEED_DRAFT_CHEN =
@@ -43,6 +46,8 @@ export function initialState(): AppState {
     draftResultByClient: {},
     outreachClientId: 'chen',
     outreachApproach: null,
+    chatByClient: {},
+    specByClient: {},
   };
 }
 
@@ -59,6 +64,8 @@ export type Action =
   | { type: 'DRAFT_REJECT'; clientId: string }
   | { type: 'SET_OUTREACH_CLIENT'; id: string }
   | { type: 'SET_APPROACH'; approach: Approach }
+  | { type: 'CHAT_APPEND'; clientId: string; message: ChatMessage }
+  | { type: 'SET_DRAFT_SPEC'; clientId: string; spec: DraftSpec }
   | { type: 'OUTREACH_SEND'; entry: LedgerEntry }
   | { type: 'OUTREACH_NOSEND'; entry: LedgerEntry };
 
@@ -101,6 +108,16 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'OUTREACH_SEND':
     case 'OUTREACH_NOSEND':
       return { ...state, ledger: [...state.ledger, action.entry] };
+    case 'CHAT_APPEND':
+      return {
+        ...state,
+        chatByClient: {
+          ...state.chatByClient,
+          [action.clientId]: [...(state.chatByClient[action.clientId] ?? []), action.message],
+        },
+      };
+    case 'SET_DRAFT_SPEC':
+      return { ...state, specByClient: { ...state.specByClient, [action.clientId]: action.spec } };
     default:
       return state;
   }
