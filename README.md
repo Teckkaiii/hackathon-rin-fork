@@ -33,10 +33,12 @@ building.
 
 ```
 src/
-  data/            products, drivers, clients, opportunities — plain JSON
+  data/            products, drivers, clients, opportunities, momentum —
+                   plain JSON
   types.ts         shared type definitions
-  lib/             gates, ranking/filtering, binding-constraint ordering,
-                   Conversation Coach checks — the actual decision logic
+  lib/             gates, ranking, signal scoring, binding-
+                   constraint ordering, draft checks, news-impact matching,
+                   weekly momentum classification — the actual decision logic
   state.ts         one typed reducer driving all app state
   components/      one component per module, plus small ui/ primitives
   App.tsx          shell: masthead, nav, view switch
@@ -47,22 +49,51 @@ tools/             verify.js (Playwright suite), serve.js (static server for
                    verifying a production build), screenshot.js
 ```
 
-## The five modules
+## The modules
 
-1. **Queue** — the ranked daily opportunity list, hard gates vs soft filters,
-   correlated-conviction clusters, park/dismiss with a governed cadence.
-2. **Clients** — a position page per client, ordered by whichever constraint is
-   most binding today, every figure evidence-traced to its source.
-3. **Coach** — drafts a client message and checks it against the client's own
-   record (fact-trace, advice-boundary, disclosure, register) before it goes.
-4. **Outreach** — approach-specific drafts, nothing sends without explicit RM
-   approval, every send/non-send writes to an outcome ledger.
-5. **Desk View** — team-lead surface: coverage, refusal volume by reason,
-   cross-RM clusters, documentation currency. No RM performance scoring.
+1. **Queue** — the ranked daily opportunity list. Ranking is quantified by a
+   signal score combining momentum (is the underlying trend durable or
+   choppy this week?), relevancy (does the news actually touch this client's
+   portfolio, or just something adjacent?), urgency (window to act) and
+   conviction (how many distinct pieces of news corroborate the impact) —
+   surfaced per-opportunity as qualitative High/Medium/Low pills, never as a
+   raw number. Also: hard compliance gates, correlated-conviction
+   clusters, and an agent that routes each opportunity to its next step — draft
+   a message, refer to a specialist desk, or call the client to clarify — with
+   its reasoning shown on the card and the RM free to overrule it.
+2. **Clients** — a position page per client, ordered by whichever constraint
+   is most binding today, every figure evidence-traced to its source,
+   including a client's cross-border footprint (operating countries,
+   investment locations, transaction corridors, treasury exposures,
+   relationship footprint) where relevant. Clients withheld by a compliance
+   gate live in Blocked instead of appearing here.
+3. **Blocked** — every client withheld from the Queue entirely by a hard
+   compliance gate, with the full gate-by-gate reasoning. Kept out of
+   Clients and Outreach until the blocking condition clears; gates always
+   run before any ranking.
+4. **Outreach** — drafts a client message (approach-specific when there's an
+   active opportunity, free-form otherwise) and checks it against the
+   client's own record (fact-trace, advice-boundary, disclosure, register)
+   before it goes. Nothing sends without explicit RM approval; every
+   send/non-send writes to an outcome ledger. Blocked clients aren't
+   selectable here.
+5. **News** — market/desk events from the last day, read against the RM's own
+   book: which clients are affected, how severely, and whether the impact is
+   confirmed (already linked to a signal on an opportunity) or inferred (a
+   holdings match RIN hasn't had reviewed). Items reaching several clients
+   severely are flagged.
+6. **Past Week** — seven days of daily impact reads per theme, against the
+   RM's own book. A theme where every day landed the same direction of impact
+   is high momentum, durable enough to build a recommendation around; a theme
+   that flips between favorable and adverse is low momentum, and clients
+   touched only by low-momentum themes are deprioritized rather than pushed
+   toward a long-term action the trend doesn't actually support.
 
-Hard constraints the build honors throughout: no composite client score, no
-propensity/acceptance score, gates always run before ranking, and no invented
-revenue figures (amount-at-stake only, not predicted benefit).
+Hard constraints the build honors throughout: no composite client score
+digit shown anywhere (the signal score drives sort order but only its
+qualitative High/Medium/Low breakdown is ever rendered), no propensity/
+acceptance score, gates always run before ranking, and no invented revenue
+figures (amount-at-stake only, not predicted benefit).
 
 ## Verifying changes
 
@@ -72,10 +103,12 @@ node tools/verify.js
 ```
 
 `verify.js` builds nothing itself — run `npm run build` first. It serves `dist/`
-locally and drives it with Playwright: all 5 modules, all 6 required
-demonstration scenes (a refusal, gates vs. filters, a caught inconsistency, a
-parked opportunity resurfacing, a correlated cluster, an expired document
-blocking action), zero JS errors, no horizontal overflow at 1400px or 400px.
+locally and drives it with Playwright: all 6 modules, all 6 required
+demonstration scenes (a refusal, a compliance gate withholding an item, a caught inconsistency, an
+opportunity routed to a specialist and handed off, a correlated cluster, an
+expired document blocking action), the signal-score ranking and momentum
+classification, zero
+JS errors, no horizontal overflow at 1400px or 400px.
 
 ## Data model notes
 

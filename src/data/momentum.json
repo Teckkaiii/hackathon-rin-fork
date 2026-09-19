@@ -1,0 +1,50 @@
+{
+  "rate-cut": {
+    "id": "rate-cut",
+    "label": "SGD rates expected to ease",
+    "detail": "Desk read on the SGD rate trajectory over the past week, against clients holding rate-locked fixed income due for renewal.",
+    "driverId": "rate-cut",
+    "clientIds": ["chen", "tan"],
+    "days": [
+      { "date": "2026-09-08", "impact": "adverse", "note": "Desk flags early signs of softer core inflation prints." },
+      { "date": "2026-09-09", "impact": "adverse", "note": "3M SORA drifts lower on the read-through." },
+      { "date": "2026-09-10", "impact": "adverse", "note": "MAS commentary read as dovish by the desk." },
+      { "date": "2026-09-11", "impact": "adverse", "note": "Swap curve continues to price in an easing move." },
+      { "date": "2026-09-12", "impact": "adverse", "note": "Peer desks converge on a ~25bps Q4 cut view." },
+      { "date": "2026-09-13", "impact": "adverse", "note": "Desk note formalises the ~25bps Q4 easing call." },
+      { "date": "2026-09-14", "impact": "adverse", "note": "View unchanged heading into the new week." }
+    ]
+  },
+  "sector-semis": {
+    "id": "sector-semis",
+    "label": "Foundry-segment sentiment",
+    "detail": "Daily sentiment read on the foundry segment over the past week, against clients concentrated in the sector.",
+    "driverId": "sector-semis",
+    "clientIds": ["priya"],
+    "days": [
+      { "date": "2026-09-08", "impact": "favorable", "note": "Sentiment steady; no guidance change flagged." },
+      { "date": "2026-09-09", "impact": "adverse", "note": "Inventory-build concerns surface in the foundry segment." },
+      { "date": "2026-09-10", "impact": "favorable", "note": "A major peer beats estimates; sentiment recovers." },
+      { "date": "2026-09-11", "impact": "adverse", "note": "Wafer-demand downgrade chatter resurfaces." },
+      { "date": "2026-09-12", "impact": "favorable", "note": "Another peer reaffirms guidance; partial rebound." },
+      { "date": "2026-09-13", "impact": "adverse", "note": "Desk flags a guidance review as imminent." },
+      { "date": "2026-09-14", "impact": "adverse", "note": "Foundry-segment guidance cut ~8% across peer set following a wafer-demand downgrade, published this morning." }
+    ]
+  },
+  "vietnam-fdi": {
+    "id": "vietnam-fdi",
+    "label": "Vietnam manufacturing FDI trend",
+    "detail": "Weekly read on manufacturing FDI momentum into Vietnam, against clients expanding operations into the corridor.",
+    "driverId": null,
+    "clientIds": ["chen"],
+    "days": [
+      { "date": "2026-09-08", "impact": "favorable", "note": "Vietnam manufacturing PMI holds in expansion territory for a sixth straight month." },
+      { "date": "2026-09-09", "impact": "favorable", "note": "Industrial-park occupancy in the Bac Ninh corridor continues to tighten." },
+      { "date": "2026-09-10", "impact": "favorable", "note": "Singapore–Vietnam trade corridor volumes tick up on the month." },
+      { "date": "2026-09-11", "impact": "favorable", "note": "Another Singapore-based manufacturer announces a similar Vietnam build-out." },
+      { "date": "2026-09-12", "impact": "favorable", "note": "VND holds stable against a basket of regional currencies." },
+      { "date": "2026-09-13", "impact": "favorable", "note": "Desk note: FDI inflows into Vietnam manufacturing remain on an upward trend into Q4." },
+      { "date": "2026-09-14", "impact": "favorable", "note": "Trend unchanged heading into the new week." }
+    ]
+  }
+}

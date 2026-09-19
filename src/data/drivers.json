@@ -2,11 +2,15 @@
   "rate-cut": {
     "id": "rate-cut",
     "label": "SGD rates expected to ease",
-    "detail": "Desk note (2026-09-13): 3M SORA expected to ease ~25bps by Q4 on softer core inflation. Renewing fixed-rate instruments at maturity risks resetting into a lower rate."
+    "detail": "Desk note (2026-09-13): 3M SORA expected to ease ~25bps by Q4 on softer core inflation. Renewing fixed-rate instruments at maturity risks resetting into a lower rate.",
+    "date": "2026-09-13",
+    "recency": "Yesterday"
   },
   "sector-semis": {
     "id": "sector-semis",
     "label": "Semiconductor sector correction",
-    "detail": "Foundry-segment guidance cut ~8% across peer set following a wafer-demand downgrade, published 2026-09-12."
+    "detail": "Foundry-segment guidance cut ~8% across peer set following a wafer-demand downgrade, published this morning.",
+    "date": "2026-09-14",
+    "recency": "Today"
   }
 }

@@ -4,9 +4,10 @@ import type { Tab } from '../state';
 const TABS: [Tab, string][] = [
   ['queue', 'Queue'],
   ['clients', 'Clients'],
-  ['coach', 'Coach'],
+  ['blocked', 'Blocked'],
+  ['news', 'News'],
+  ['pastweek', 'Past Week'],
   ['outreach', 'Outreach'],
-  ['desk', 'Desk View'],
 ];
 
 export function Nav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
