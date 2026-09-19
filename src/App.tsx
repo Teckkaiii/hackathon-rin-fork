@@ -17,17 +17,14 @@ export default function App() {
       <div className="h-[3px] bg-red" />
       <header className="bg-card border-b border-hairline sticky top-0 z-40">
         <div className="max-w-[1160px] mx-auto px-5 flex items-center gap-4 py-3.5 flex-wrap">
-          <div className="w-9 h-9 rounded-[11px] bg-graphite text-white flex items-center justify-center font-bold text-[15px] flex-none">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate via-graphite to-ink text-white flex items-center justify-center font-bold text-[15px] tracking-wide flex-none shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_4px_14px_rgba(0,0,0,0.35)]">
             RIN
           </div>
           <div>
-            <div className="font-sans font-extrabold text-[18px] leading-none text-ink">Revenue Intelligence Network</div>
-            <div className="t-meta">Premier &amp; Private Banking · daily decision layer</div>
+            <div className="font-sans font-extrabold text-[20px] leading-none tracking-tight text-ink">RIN</div>
+            <div className="t-meta">Revenue Intelligence Network · daily decision layer</div>
           </div>
           <Nav tab={state.tab} onChange={tab => dispatch({ type: 'SET_TAB', tab })} />
-          <span className="text-[11.5px] font-semibold text-red-deep bg-red-wash px-2.5 py-1 rounded-full flex-none">
-            Synthetic prototype
-          </span>
         </div>
       </header>
 

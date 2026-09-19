@@ -54,10 +54,10 @@ export function OpportunityCard({
         >
           <div className="t-micro text-red">Rank {String(rank).padStart(2, '0')} · {opp.approach}</div>
           <div className="t-h1 mt-1 break-words group-hover:underline">{c.name}</div>
-          <div className="t-meta mt-1">{c.segment} · {c.tier} · {c.mandate} · RM {c.rm}</div>
+          <div className="t-meta mt-1">{c.segment}</div>
         </button>
         <div className="text-right">
-          <div className="t-micro">Amount at stake</div>
+          <div className="t-micro">Opportunity size</div>
           <div className="num text-[26px] font-extrabold leading-none text-ink mt-1">{fmtNumber(opp.amountAtStake)}</div>
           <div className="t-meta mt-1">SGD · rolls over {fmtRollsOver(opp.daysToAct)}</div>
           <div className="mt-2">

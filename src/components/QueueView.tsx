@@ -62,9 +62,12 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
   return (
     <div>
       <div className="t-display mb-1">{greeting()}, {CURRENT_RM.split(' ')[0]}.</div>
-      <div className="t-lead mb-5">
+      <div className="t-lead mb-1">
         Overnight signals resolved against client exposures, after compliance gates, ranked by signal score —
         momentum, news relevancy, urgency and conviction combined.
+      </div>
+      <div className="t-meta font-semibold mb-5">
+        {surfaced.length} {surfaced.length === 1 ? 'opportunity' : 'opportunities'} surfaced today · {blocked.length} withheld by gates — see the Blocked tab
       </div>
 
       {cls.map(cl => (
@@ -77,10 +80,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
         </div>
       ))}
 
-      <div className="flex items-baseline justify-between gap-3 flex-wrap mb-2.5">
-        <div className="t-h1">High revenue opportunities <span className="t-meta font-semibold">· {surfaced.length} surfaced</span></div>
-        <span className="t-meta font-semibold">{blocked.length} withheld by gates — see the Blocked tab</span>
-      </div>
+      <div className="t-h1 mb-2.5">High revenue opportunities</div>
 
       {surfaced.length
         ? surfaced.map((o, i) => (
