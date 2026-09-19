@@ -47,40 +47,29 @@ function startServer() {
   check('Header no longer shows "RM: <name>"', !(await page.locator('header').innerText()).includes('RM:'));
   check('Nav order is Queue, Clients, Blocked, News, Past Week, Outreach', (await page.locator('nav button').allInnerTexts()).join('|') === 'Queue|Clients|Blocked|News|Past Week|Outreach');
 
-  // Signal score: shown as a single 0-100 figure on the card; clicking it reveals the momentum / relevancy / urgency / conviction breakdown, each also out of 100
-  check('Signal score shown on every card (out of 100)', await page.locator('[data-testid="signal-score"]').count() === await page.locator('[data-testid="opportunity-card"]').count() && /Signal score:\s*\d+\/100/.test(txt));
-  check('Breakdown hidden until the score is clicked', await page.locator('[data-testid="signal-breakdown"]').count() === 0);
-  await page.locator('[data-testid="signal-score"]').first().click();
-  txt = await page.locator('main').innerText();
-  check('Clicking the score expands the breakdown (Urgency/Relevancy/Momentum/Conviction, each out of 100)', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => txt.includes(s)) && /Urgency:\s*\d+\/100/.test(txt));
-  await page.locator('[data-testid="signal-score"]').first().click();
-  txt = await page.locator('main').innerText();
-  check('Clicking the score again collapses the breakdown', await page.locator('[data-testid="signal-breakdown"]').count() === 0);
+  // Signal score: shown as a single 0-100 figure on the card, always expanded into its
+  // momentum / relevancy / urgency / conviction breakdown (no click needed).
+  check('Signal score shown on every card', await page.locator('[data-testid="signal-score"]').count() === await page.locator('[data-testid="opportunity-card"]').count());
+  check('Breakdown always visible on every card', await page.locator('[data-testid="signal-breakdown"]').count() === await page.locator('[data-testid="opportunity-card"]').count() && ['Urgency', 'Relevancy', 'Momentum', 'Conviction'].every(s => txt.includes(s)));
   check('Highest signal-score opportunity ranks first (Chen Wei Liang)', (await page.locator('[data-testid="opportunity-card"]').first().innerText()).includes('Chen Wei Liang'));
 
-  // ---- Task 1: card chrome stripped to name + segment + scoring pills ----
+  // ---- Card leads with rank, approach and client identity, and keeps the full scoring breakdown ----
   const chenCard0 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
   const chenTxt0 = await chenCard0.innerText();
-  check('Card leads with the client name (no rank badge, no orb initials)', chenTxt0.split('\n')[0].trim() === 'Chen Wei Liang');
-  check('Card drops the RM name', !chenTxt0.includes('Aisha Rahman'));
-  check('Card drops the client tier', !/\bPriority\b|\bSignature\b/.test(chenTxt0));
-  check('Card drops the approach pill', !/\bNotify\b/.test(chenTxt0));
-  check('Card drops the product-name pill', !chenTxt0.includes('Structured Deposit'));
-  check('Card drops the signal-recency pill', !chenTxt0.includes('Signal:'));
+  check('Card leads with rank and approach', /rank 01/i.test(chenTxt0) && /notify/i.test(chenTxt0));
+  check('Card keeps the RM name', chenTxt0.includes('Aisha Rahman'));
+  check('Card keeps the client tier', /\bPriority\b/.test(chenTxt0));
   check('Card keeps the segment', chenTxt0.includes('Premier'));
-  check('Card keeps the signal score', /Signal score:\s*\d+\/100/.test(chenTxt0));
-  await chenCard0.locator('[data-testid="signal-score"]').click();
-  const chenTxtExpanded = await chenCard0.innerText();
-  check('Card keeps all four scoring pills once expanded', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => chenTxtExpanded.includes(s)));
-  await chenCard0.locator('[data-testid="signal-score"]').click();
-  check('Card keeps the opportunity size figure', chenTxt0.includes('380,000'));
-  check('Card labels the figure "Opportunity size", not "Amount at stake"', /opportunity size/i.test(chenTxt0) && !/amount at stake/i.test(chenTxt0));
+  check('Card keeps the signal headline', chenTxt0.includes('SGD rates expected to ease'));
+  check('Card keeps all four scoring dimensions, always expanded', ['Urgency', 'Relevancy', 'Momentum', 'Conviction'].every(s => chenTxt0.includes(s)));
+  check('Card keeps the amount-at-stake figure', chenTxt0.includes('380,000'));
+  check('Card labels the figure "Amount at stake"', /amount at stake/i.test(chenTxt0));
   check('Window to act is a pronounced pill on the card', await chenCard0.locator('[data-testid="window-to-act"]').count() === 1 && /12 days to act/.test(chenTxt0));
   check('Card keeps the three why-boxes', /why this client/i.test(chenTxt0) && /why now/i.test(chenTxt0) && /why this instrument/i.test(chenTxt0));
 
   // Only the name block navigates; the card body does not.
   const chenCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
-  await chenCard.locator('.t-micro', { hasText: 'Opportunity size' }).click();
+  await chenCard.locator('.t-micro', { hasText: 'Amount at stake' }).click();
   txt = await page.locator('main').innerText();
   check('Clicking the card body does NOT navigate away from the queue', txt.includes('High revenue opportunities'));
   await chenCard.locator('[data-testid="client-open"]').click();

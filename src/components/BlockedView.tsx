@@ -8,10 +8,9 @@ export function BlockedView() {
   return (
     <div>
       <div className="t-display mb-1">Blocked</div>
-      <div className="t-lead mb-5">
-        Clients withheld from the Queue entirely by a hard compliance gate — same production quality as a surfaced
-        opportunity, kept out of Clients and Outreach until the blocking condition clears. No filter setting can
-        surface these; gates run before any ranking.
+      <div className="t-lead mb-5 max-w-[760px]">
+        Withheld from the queue entirely by a hard compliance gate. Gates always run before ranking, so no filter
+        setting can surface these.
       </div>
 
       {blocked.length

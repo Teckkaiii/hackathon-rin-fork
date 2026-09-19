@@ -1,52 +1,50 @@
 import type { ReactNode } from 'react';
 import { CLIENTS } from '../state';
-import { TODAY, fmt, fmtDate, monthsBetween } from '../lib/format';
+import { TODAY, fmt, fmtDate, monthsBetween, prettyNote } from '../lib/format';
 import { OPPS } from '../lib/queue';
 import { Pill } from './ui/Pill';
 
 export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string; onBack: () => void; backLabel: string }) {
   const c = CLIENTS[clientId];
   const opp = OPPS.find(o => o.clientId === clientId);
+  const oppCount = OPPS.filter(o => o.clientId === clientId).length;
   const monthsSince = monthsBetween(new Date(c.suitability.lastReview + 'T00:00:00'), TODAY);
   const lapsed = monthsSince > 12;
 
   return (
     <div data-testid="client-detail">
-      <button onClick={onBack} data-testid="client-back" className="t-h3 text-slate mb-4 inline-flex items-center gap-1">&larr; {backLabel}</button>
+      <button onClick={onBack} data-testid="client-back" className="t-meta font-semibold text-ink-2 mb-4 inline-flex items-center gap-1 hover:text-ink">&larr; {backLabel}</button>
 
-      <div className="font-sans text-[32px] font-extrabold leading-tight tracking-tight text-ink">{c.name}</div>
-      <div className="t-meta mb-5">{c.segment}</div>
+      <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
+        <div>
+          <div className="font-sans text-[30px] font-extrabold leading-tight tracking-tight text-ink">{c.name}</div>
+          <div className="t-meta mt-0.5">{c.segment} · {c.tier} · {c.mandate} mandate · KYC current to {fmtDate(c.kyc.expiry)}</div>
+        </div>
+        <div className="flex gap-2 flex-none">
+          <Pill variant={lapsed ? 'block' : 'pass'}>{lapsed ? 'Suitability lapsed' : `Suitability current · ${monthsSince} months ago`}</Pill>
+          <Pill variant="neutral">{oppCount} open {oppCount === 1 ? 'opportunity' : 'opportunities'}</Pill>
+        </div>
+      </div>
 
       {opp && (
-        <div className="glass-tight border border-slate/25 bg-gradient-to-br from-[#EFF4F6] to-white p-5 mb-4">
-          <div className="t-micro" style={{ color: '#33454E' }}>
+        <div className="panel-dark mb-4">
+          <div className="t-micro text-white/50">
             {opp.driverId
               ? `How today's news touches ${c.name.split(' ')[0]}`
               : `What changed in ${c.name.split(' ')[0]}'s portfolio`}
           </div>
-          <div className="flex items-center gap-2 flex-wrap mt-1.5 mb-3">
-            <div className="t-h2">{opp.signal.headline}</div>
-            <Pill variant={opp.signal.recency === 'Internal' ? 'neutral' : 'flag'}>{opp.signal.recency}</Pill>
-          </div>
-          <div className="text-[14.5px] leading-relaxed text-ink-2">{opp.narrative}</div>
+          <div className="text-[20px] font-extrabold mt-1.5 mb-2.5">{opp.signal.headline}</div>
+          <div className="text-[14.5px] leading-relaxed text-white/70">{opp.narrative}</div>
         </div>
       )}
 
       <div className="grid md:grid-cols-2 gap-3.5 mb-3.5">
-        <InfoCard eyebrow="Basic Information">
+        <InfoCard eyebrow="Relationship">
           <KV label="Tier" value={c.tier} />
           <KV label="RM" value={c.rm} />
           <KV label="Mandate" value={c.mandate} />
           <KV label="KYC" value={c.kyc.status} />
-          <KV
-            label="Suitability review"
-            value={
-              <span className="inline-flex items-center gap-2">
-                {fmtDate(c.suitability.lastReview)} ({monthsSince} months ago)
-                {lapsed && <Pill variant="block">Review lapsed</Pill>}
-              </span>
-            }
-          />
+          <KV label="Suitability review" value={`${fmtDate(c.suitability.lastReview)} · ${monthsSince} mo ago`} />
         </InfoCard>
 
         <InfoCard eyebrow="Risk Profile">
@@ -56,9 +54,16 @@ export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string
           <KV label="Last assessed" value={fmtDate(c.riskProfile.lastAssessed)} />
         </InfoCard>
 
-        <InfoCard eyebrow="Portfolio">
+        <InfoCard eyebrow="Portfolio · evidence-traced">
           {c.holdings.map((h, i) => (
-            <KV key={i} label={h.label} value={`${fmt(h.value)} — ${h.note}`} />
+            <div key={i} className={i > 0 ? 'pt-3 mt-3 border-t border-hairline' : ''}>
+              <div className="flex justify-between items-baseline gap-3">
+                <span className="t-h3">{h.label}</span>
+                <span className="num text-[19px] font-semibold text-ink">{h.value.toLocaleString('en-SG')}</span>
+              </div>
+              <div className="t-meta mt-0.5">{prettyNote(h.note)}</div>
+              <div className="src mt-1">Source: {h.source}</div>
+            </div>
           ))}
           {c.concentration && (
             <KV label="Concentration" value={`${c.concentration.pct}% in ${c.concentration.name} (guideline: ${c.concentration.threshold}%)`} />
@@ -72,10 +77,10 @@ export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string
         </InfoCard>
 
         {c.crossBorder && (
-          <InfoCard eyebrow="Cross-Border Exposure">
-            <KV label="Operating countries" value={c.crossBorder.operatingCountries.join(', ')} />
-            <KV label="Investment locations" value={c.crossBorder.investmentLocations.join(', ')} />
-            <KV label="Treasury exposures" value={c.crossBorder.treasuryExposures.join('; ')} />
+          <InfoCard eyebrow="Cross-Border Footprint">
+            <KV label="Operating" value={c.crossBorder.operatingCountries.join(', ')} />
+            <KV label="Investments" value={c.crossBorder.investmentLocations.join(', ')} />
+            <KV label="Treasury" value={c.crossBorder.treasuryExposures.join('; ')} />
           </InfoCard>
         )}
       </div>
@@ -85,9 +90,9 @@ export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string
           <div className="t-meta">No complaints on record.</div>
         ) : (
           c.complaints.map((cp, i) => (
-            <div key={i} className="flex items-center justify-between gap-3 flex-wrap py-2 border-t border-hairline first:border-t-0">
+            <div key={i} className="flex items-center justify-between gap-3 flex-wrap py-2 border-t border-hairline first:border-t-0 first:pt-0">
               <div>
-                <div className="t-body">{cp.summary}</div>
+                <div className="t-body font-semibold text-ink">{cp.summary}</div>
                 <div className="t-meta">{fmtDate(cp.date)} · {cp.channel}</div>
               </div>
               <Pill variant={cp.status === 'Closed' ? 'pass' : 'flag'}>{cp.status}</Pill>

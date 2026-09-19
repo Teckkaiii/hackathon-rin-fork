@@ -2,22 +2,26 @@ import { useState } from 'react';
 import type { Opportunity } from '../types';
 import { CLIENTS } from '../state';
 import { signalBreakdown, type SignalLevel } from '../lib/signal';
-import { fmt } from '../lib/format';
+import { fmtNumber, fmtRollsOver } from '../lib/format';
+import { cn } from '../lib/cn';
 import { Pill } from './ui/Pill';
 import { Button } from './ui/Button';
 import { routeFor, ROUTE_LABELS, type RouteId } from '../lib/routing';
 
-const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
-  high: 'pass', medium: 'flag', low: 'neutral',
-};
-const LEVEL_LABEL: Record<SignalLevel, string> = { high: 'High', medium: 'Medium', low: 'Low' };
 const WINDOW_VARIANT: Record<SignalLevel, 'block' | 'flag' | 'neutral'> = {
   high: 'block', medium: 'flag', low: 'neutral',
 };
+const BAR_COLOR = {
+  urgency: 'bg-gold',
+  relevancy: 'bg-green',
+  momentum: 'bg-green',
+  conviction: 'bg-slate',
+} as const;
 
 export function OpportunityCard({
-  opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff,
+  rank, opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff,
 }: {
+  rank: number;
   opp: Opportunity;
   onOpenClient: (id: string) => void;
   onOpenOutreach: (id: string) => void;
@@ -28,7 +32,6 @@ export function OpportunityCard({
   const signal = signalBreakdown(opp);
   const route = routeFor(opp, c);
   const [showAlts, setShowAlts] = useState(false);
-  const [showBreakdown, setShowBreakdown] = useState(false);
   const alternates = (Object.keys(ROUTE_LABELS) as RouteId[]).filter(id => id !== route.id);
 
   function runRoute(id: RouteId) {
@@ -49,42 +52,40 @@ export function OpportunityCard({
           className="min-w-0 flex-1 text-left group"
           onClick={() => onOpenClient(c.id)}
         >
-          <div className="t-h2 break-words group-hover:underline">{c.name}</div>
-          <div className="t-meta">{c.segment}</div>
+          <div className="t-micro text-red">Rank {String(rank).padStart(2, '0')} · {opp.approach}</div>
+          <div className="t-h1 mt-1 break-words group-hover:underline">{c.name}</div>
+          <div className="t-meta mt-1">{c.segment} · {c.tier} · {c.mandate} · RM {c.rm}</div>
         </button>
         <div className="text-right">
-          <div className="t-micro">Opportunity size</div>
-          <div className="t-h2 font-serif text-[24px]">{fmt(opp.amountAtStake)}</div>
-          <div className="mt-1.5">
-            <Pill variant={WINDOW_VARIANT[signal.urgency.level]} dot className="text-[13px] font-semibold" data-testid="window-to-act">
+          <div className="t-micro">Amount at stake</div>
+          <div className="num text-[26px] font-extrabold leading-none text-ink mt-1">{fmtNumber(opp.amountAtStake)}</div>
+          <div className="t-meta mt-1">SGD · rolls over {fmtRollsOver(opp.daysToAct)}</div>
+          <div className="mt-2">
+            <Pill variant={WINDOW_VARIANT[signal.urgency.level]} className="text-[13px] font-semibold px-4 py-1.5" data-testid="window-to-act">
               {opp.daysToAct} days to act
             </Pill>
           </div>
         </div>
       </div>
 
-      <div className="mt-3">
-        <button
-          type="button"
-          data-testid="signal-score"
-          onClick={() => setShowBreakdown(v => !v)}
-          className="inline-block"
-        >
-          <Pill variant={LEVEL_VARIANT[signal.level]} dot className="cursor-pointer hover:brightness-95">
-            Signal score: {signal.score}/100 {showBreakdown ? '▴' : '▾'}
-          </Pill>
-        </button>
+      <div className="mt-3 bg-sunk border border-hairline rounded-xl px-4 py-3 flex items-baseline gap-2 flex-wrap" data-testid="signal-headline">
+        <span className="t-micro flex-none">Signal · {opp.signal.recency}</span>
+        <span className="t-h3">{opp.signal.headline}</span>
+      </div>
 
-        {showBreakdown && (
-          <div className="flex gap-1.5 flex-wrap mt-2" data-testid="signal-breakdown">
-            <Pill variant={LEVEL_VARIANT[signal.urgency.level]} dot>Urgency: {signal.urgency.score}/100</Pill>
-            <Pill variant={LEVEL_VARIANT[signal.relevancy.level]} dot>Relevancy: {signal.relevancy.score}/100</Pill>
-            <Pill variant={LEVEL_VARIANT[signal.momentum.level]} dot>Momentum: {signal.momentum.score}/100</Pill>
-            <Pill variant={LEVEL_VARIANT[signal.conviction.level]} dot>
-              Conviction: {signal.conviction.score}/100 ({signal.conviction.count} {signal.conviction.count === 1 ? 'piece' : 'pieces'} of news)
-            </Pill>
+      <div className="flex gap-6 items-start mt-4 pt-4 border-t border-hairline flex-wrap" data-testid="signal-breakdown">
+        <div className="flex-none">
+          <div className="num text-[44px] font-extrabold leading-none text-ink" data-testid="signal-score">{signal.score}</div>
+          <div className="t-micro mt-1">Signal / 100</div>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-x-5 gap-y-4 flex-1 min-w-[280px]">
+          <div className="flex flex-col gap-4">
+            <MetricBar label="Urgency" score={signal.urgency.score} detail={signal.urgency.detail} color={BAR_COLOR.urgency} />
+            <MetricBar label="Conviction" score={signal.conviction.score} detail={signal.conviction.detail} color={BAR_COLOR.conviction} />
           </div>
-        )}
+          <MetricBar label="Relevancy" score={signal.relevancy.score} detail={signal.relevancy.detail} color={BAR_COLOR.relevancy} />
+          <MetricBar label="Momentum" score={signal.momentum.score} detail={signal.momentum.detail} color={BAR_COLOR.momentum} />
+        </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-3 mt-4">
@@ -114,6 +115,21 @@ export function OpportunityCard({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function MetricBar({ label, score, detail, color }: { label: string; score: number; detail: string; color: string }) {
+  return (
+    <div>
+      <div className="flex items-baseline justify-between gap-2">
+        <div className="t-h3">{label}</div>
+        <div className="num text-[15px] font-semibold text-ink-2">{score}</div>
+      </div>
+      <div className="h-[6px] rounded-full bg-hairline-2/50 mt-1.5 overflow-hidden">
+        <div className={cn('h-full rounded-full', color)} style={{ width: `${score}%` }} />
+      </div>
+      <div className="t-meta mt-1">{detail}</div>
     </div>
   );
 }

@@ -83,9 +83,10 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
       </div>
 
       {surfaced.length
-        ? surfaced.map(o => (
+        ? surfaced.map((o, i) => (
             <OpportunityCard
               key={o.id}
+              rank={i + 1}
               opp={o}
               onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })}
               onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
