@@ -1,172 +1,214 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Action, AppState } from '../state';
 import { MY_CLIENTS, MY_CLIENT_IDS, CLIENTS } from '../state';
+import type { CoachCheck } from '../types';
 import { OPPS, blockedClientIds } from '../lib/queue';
-import { runCoachChecks, suggestRewrite } from '../lib/coach';
-import { fmt } from '../lib/format';
-import { Pill } from './ui/Pill';
+import { runCoachChecks } from '../lib/coach';
+import {
+  DEFAULT_SPEC, applyIntent, parseIntent, renderDraft, replyFor, openingMessage,
+  checkFailureMessage, sentMessage, type Intent,
+} from '../lib/assistant';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
 
-const APPROACHES = ['Notify', 'Contextualise', 'Review'] as const;
+const CHIPS: { id: string; label: string; intent: Intent }[] = [
+  { id: 'formal', label: 'More formal', intent: 'formal' },
+  { id: 'casual', label: 'More casual', intent: 'casual' },
+  { id: 'shorter', label: 'Shorter', intent: 'shorter' },
+  { id: 'figures', label: 'Add the figures', intent: 'figures' },
+  { id: 'reset', label: 'Start over', intent: 'reset' },
+];
 
-function outreachDraft(clientId: string, approach: string): string {
-  const c = CLIENTS[clientId];
-  const opp = OPPS.find(o => o.clientId === clientId);
-  if (!opp) return '';
-  const h = c.holdings[0];
-  if (approach === 'Notify') {
-    return `Hi ${c.name.split(' ')[0]},\n\nYour ${h.label.toLowerCase()} of ${fmt(h.value)} is ${h.note}. Worth a short call before the renewal date to walk through the options.\n\nThis message is for information only and is not financial advice.`;
-  }
-  if (approach === 'Contextualise') {
-    return `Hi ${c.name.split(' ')[0]},\n\nA market event today touches a position you hold (${h.label.toLowerCase()}, ${fmt(h.value)}). Happy to walk through what it means for you when convenient.\n\nThis message is for information only and is not financial advice.`;
-  }
-  return `Hi ${c.name.split(' ')[0]},\n\nWhen we last reviewed your portfolio, we set an objective together. It looks like it's drifted — worth a short review call to see whether anything should change.\n\nThis message is for information only and is not financial advice.`;
-}
+const REPLY_DELAY_MS = 600;
 
 export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
   const clientId = state.outreachClientId;
   const c = CLIENTS[clientId];
   const opp = OPPS.find(o => o.clientId === clientId);
-  const approach = state.outreachApproach || opp?.approach || 'Notify';
-  const text = state.draftByClient[clientId] ?? (opp ? outreachDraft(clientId, approach) : '');
-  const results = state.draftResultByClient[clientId];
-
-  function switchClient(id: string) {
-    dispatch({ type: 'SET_OUTREACH_CLIENT', id });
-  }
-  function switchApproach(a: typeof APPROACHES[number]) {
-    dispatch({ type: 'SET_APPROACH', approach: a });
-    dispatch({ type: 'DRAFT_SET_TEXT', clientId, text: outreachDraft(clientId, a) });
-  }
+  const spec = state.specByClient[clientId] ?? DEFAULT_SPEC;
+  const text = state.draftByClient[clientId] ?? (opp ? renderDraft(c, opp, spec) : '');
+  const chat = state.chatByClient[clientId] ?? [];
+  const first = c.name.split(' ')[0];
 
   const ledgerForClient = state.ledger.filter(l => l.clientId === clientId);
   const blocked = blockedClientIds(MY_CLIENT_IDS);
   const selectableClients = MY_CLIENTS.filter(cc => !blocked.has(cc.id) || cc.id === clientId);
 
+  const [typing, setTyping] = useState(false);
+  const [input, setInput] = useState('');
+  const [pending, setPending] = useState<CoachCheck[] | null>(null);
   const [nonSendOpen, setNonSendOpen] = useState(false);
   const [nonSendReason, setNonSendReason] = useState('Client travelling this week');
+  const timer = useRef<number | null>(null);
+  const threadEnd = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chat.length === 0) {
+      dispatch({ type: 'CHAT_APPEND', clientId, message: { role: 'rin', text: openingMessage(c, opp) } });
+    }
+  }, [clientId]);
+
+  useEffect(() => {
+    threadEnd.current?.scrollIntoView({ block: 'nearest' });
+  }, [chat.length, typing]);
+
+  useEffect(() => () => { if (timer.current) window.clearTimeout(timer.current); }, []);
+
+  function rinSays(reply: string, applyChange?: () => void) {
+    setTyping(true);
+    timer.current = window.setTimeout(() => {
+      applyChange?.();
+      dispatch({ type: 'CHAT_APPEND', clientId, message: { role: 'rin', text: reply } });
+      setTyping(false);
+    }, REPLY_DELAY_MS);
+  }
+
+  function ask(userText: string, intentOverride?: Intent) {
+    if (!userText.trim() || typing) return;
+    dispatch({ type: 'CHAT_APPEND', clientId, message: { role: 'rm', text: userText } });
+    setPending(null);
+    const intent = intentOverride ?? parseIntent(userText);
+    rinSays(replyFor(intent, c), () => {
+      if (intent && opp) {
+        const next = applyIntent(spec, intent);
+        dispatch({ type: 'SET_DRAFT_SPEC', clientId, spec: next });
+        dispatch({ type: 'DRAFT_SET_TEXT', clientId, text: renderDraft(c, opp, next) });
+      }
+    });
+  }
+
+  function commitSend(approach: string) {
+    const ref = 'ARC-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+    dispatch({
+      type: 'OUTREACH_SEND',
+      entry: { ts: '14 Sep, 09:14', clientId, kind: 'Sent', detail: `${approach} message sent`, ref: 'Archived Client Comms · ' + ref },
+    });
+    setPending(null);
+    rinSays(sentMessage(c, ref));
+  }
+
+  function send() {
+    if (!opp || typing) return;
+    const checks = runCoachChecks(c, text);
+    if (checks.every(k => k.status === 'pass')) {
+      commitSend(opp.approach);
+      return;
+    }
+    setPending(checks);
+    rinSays(checkFailureMessage(checks));
+  }
+
+  function switchClient(id: string) {
+    setPending(null);
+    setInput('');
+    dispatch({ type: 'SET_OUTREACH_CLIENT', id });
+  }
+
+  const canSendAnyway = pending !== null && pending.every(k => k.status !== 'fail');
 
   return (
     <div>
       <div className="t-display mb-1">Outreach</div>
       <div className="t-lead mb-5">
-        Draft a client message, grounded in the client's own record and, when there's an active signal, the
-        opportunity that surfaced them. RIN checks the draft before it goes — the RM's edit is always the final
-        text, and nothing sends without explicit approval and a write to the archived channel.
+        Talk to RIN to shape the message. RIN checks it against {c.name}'s own record before anything goes —
+        nothing sends without your say-so, and every send or non-send is written to the outcome ledger.
       </div>
 
-      <div className="glass p-5 mb-4">
-        <select
-          id="outreach-client-select"
-          className="border border-hairline-2 rounded-lg px-2.5 py-2 text-[14px] mb-3"
-          value={clientId}
-          onChange={e => switchClient(e.target.value)}
-        >
-          {selectableClients.map(cc => <option key={cc.id} value={cc.id}>{cc.name}</option>)}
-        </select>
+      <select
+        id="outreach-client-select"
+        className="border border-hairline-2 rounded-lg px-2.5 py-2 text-[14px] mb-4 bg-white"
+        value={clientId}
+        onChange={e => switchClient(e.target.value)}
+      >
+        {selectableClients.map(cc => <option key={cc.id} value={cc.id}>{cc.name}</option>)}
+      </select>
 
-        {opp && (
-          <>
-            <div className="t-h3 mb-2">Approach</div>
-            <div className="flex gap-1.5 flex-wrap mb-3">
-              {APPROACHES.map(a => (
-                <Button key={a} size="sm" variant={a === approach ? 'primary' : 'default'} onClick={() => switchApproach(a)}>
-                  {a}
-                </Button>
-              ))}
-            </div>
-          </>
-        )}
+      <div className="grid md:grid-cols-2 gap-4 mb-4">
+        <div className="glass p-5 flex flex-col" data-testid="chat-panel">
+          <div className="t-micro mb-3">Chat with RIN</div>
 
-        <textarea
-          id="outreach-text"
-          className="w-full border border-hairline-2 rounded-xl p-3.5 text-[14.5px] leading-relaxed min-h-[130px] font-sans"
-          value={text}
-          onChange={e => dispatch({ type: 'DRAFT_SET_TEXT', clientId, text: e.target.value })}
-        />
-
-        <div className="flex gap-2 flex-wrap mt-3">
-          <Button data-act="outreach-review" variant="primary" size="sm" onClick={() => dispatch({ type: 'DRAFT_REVIEW', clientId, checks: runCoachChecks(c, text) })}>
-            Review draft
-          </Button>
-          <Button data-act="outreach-clear" variant="ghost" size="sm" onClick={() => dispatch({ type: 'DRAFT_CLEAR', clientId })}>
-            Clear
-          </Button>
-          {opp && (
-            <>
-              <Button
-                data-act="outreach-send"
-                variant="red" size="sm"
-                onClick={() => {
-                  const ref = 'ARC-' + Math.random().toString(36).slice(2, 8).toUpperCase();
-                  dispatch({
-                    type: 'OUTREACH_SEND',
-                    entry: { ts: '14 Sep, 09:14', clientId, kind: 'Sent', detail: `${approach} message sent`, ref: 'Archived Client Comms · ' + ref },
-                  });
-                }}
-              >
-                Send
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => { setNonSendReason('Client travelling this week'); setNonSendOpen(true); }}>
-                Log a non-send
-              </Button>
-            </>
-          )}
-        </div>
-
-        {!opp && (
-          <div className="t-meta mt-2.5">
-            No active opportunity for this client today — you can still draft and review a message manually, but
-            sending is tied to a surfaced opportunity.
+          <div className="flex-1 overflow-y-auto max-h-[440px] space-y-3 pr-1" data-testid="chat-thread">
+            {chat.map((m, i) => (
+              m.role === 'rin' ? (
+                <div key={i} data-testid="chat-msg-rin" className="flex gap-2.5 items-start">
+                  <RinAvatar />
+                  <div className="bg-sunk rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-[14px] leading-relaxed text-ink-2 whitespace-pre-wrap max-w-[85%]">{m.text}</div>
+                </div>
+              ) : (
+                <div key={i} data-testid="chat-msg-rm" className="flex gap-2.5 items-start justify-end">
+                  <div className="bg-slate text-white rounded-2xl rounded-tr-sm px-3.5 py-2.5 text-[14px] leading-relaxed max-w-[85%]">{m.text}</div>
+                </div>
+              )
+            ))}
+            {typing && (
+              <div data-testid="chat-typing" className="flex gap-2.5 items-start">
+                <RinAvatar />
+                <div className="bg-sunk rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-ink-3 tracking-[0.25em]">•••</div>
+              </div>
+            )}
+            <div ref={threadEnd} />
           </div>
-        )}
-      </div>
 
-      {results && (
-        <div className="glass p-5 mb-4">
-          <div className="t-h3 mb-2">Checks</div>
-          {results.map((r, i) => (
-            <div key={i} className="flex items-start gap-2.5 py-2.5 border-t border-hairline first:border-t-0">
-              <Pill variant={r.status === 'pass' ? 'pass' : r.status === 'flag' ? 'flag' : 'block'} dot>
-                {r.status === 'pass' ? 'Pass' : r.status === 'flag' ? 'Flag' : 'Fail'}
-              </Pill>
-              <div>
-                <div className="t-h3">{r.rule}</div>
-                <div className="text-[13.5px] text-ink-2">{r.detail}</div>
-              </div>
+          <div className="flex gap-1.5 flex-wrap mt-3">
+            {pending ? (
+              <>
+                <Button data-testid="chip-fix" size="sm" variant="primary" disabled={typing} onClick={() => ask('Fix it for me', 'fix')}>
+                  Fix it for me
+                </Button>
+                {canSendAnyway && opp && (
+                  <Button data-testid="chip-send-anyway" size="sm" disabled={typing} onClick={() => commitSend(opp.approach)}>
+                    Send anyway
+                  </Button>
+                )}
+              </>
+            ) : (
+              CHIPS.map(ch => (
+                <Button key={ch.id} data-testid={`chip-${ch.id}`} size="sm" disabled={typing || !opp} onClick={() => ask(ch.label, ch.intent)}>
+                  {ch.label}
+                </Button>
+              ))
+            )}
+          </div>
+
+          <form
+            className="flex gap-2 mt-3"
+            onSubmit={e => { e.preventDefault(); const t = input; setInput(''); ask(t); }}
+          >
+            <input
+              id="chat-input"
+              className="flex-1 border border-hairline-2 rounded-full px-4 py-2 text-[14px] bg-white"
+              placeholder="Ask RIN to change the draft…"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              disabled={typing}
+            />
+            <Button type="submit" variant="primary" size="sm" disabled={typing || !input.trim()}>Ask</Button>
+          </form>
+        </div>
+
+        <div className="glass p-5">
+          <div className="t-micro mb-3">Draft · {c.name}</div>
+          <textarea
+            id="outreach-text"
+            className="w-full border border-hairline-2 rounded-xl p-3.5 text-[14.5px] leading-relaxed min-h-[320px] font-sans"
+            value={text}
+            onChange={e => dispatch({ type: 'DRAFT_SET_TEXT', clientId, text: e.target.value })}
+          />
+          <div className="flex gap-2 flex-wrap mt-3">
+            <Button data-act="outreach-send" variant="red" size="sm" disabled={!opp || typing} onClick={send}>
+              Send to {first}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => { setNonSendReason('Client travelling this week'); setNonSendOpen(true); }}>
+              Log a non-send
+            </Button>
+          </div>
+          {!opp && (
+            <div className="t-meta mt-2.5">
+              No active opportunity for this client today — sending is tied to a surfaced opportunity.
             </div>
-          ))}
-
-          {results.some(r => r.rule === 'Draft is real, sendable content' && r.status === 'fail') ? (
-            <div className="t-meta mt-2.5">No rewrite to suggest — write the actual message you intend to send, then review it again.</div>
-          ) : results.some(r => r.status !== 'pass') ? (
-            <>
-              <div className="t-h3 mt-3.5 mb-2">Suggested rewrite</div>
-              <div className="bg-sunk rounded-xl p-3.5 text-[13.5px] whitespace-pre-wrap leading-relaxed">
-                {suggestRewrite(c, text)}
-              </div>
-              <div className="flex gap-2 mt-3">
-                <Button
-                  data-act="outreach-accept"
-                  variant="primary" size="sm"
-                  onClick={() => {
-                    const rewritten = suggestRewrite(c, text);
-                    dispatch({ type: 'DRAFT_ACCEPT', clientId, text: rewritten, checks: runCoachChecks(c, rewritten) });
-                  }}
-                >
-                  Accept rewrite
-                </Button>
-                <Button data-act="outreach-reject" variant="ghost" size="sm" onClick={() => dispatch({ type: 'DRAFT_REJECT', clientId })}>
-                  Reject — keep my draft
-                </Button>
-              </div>
-            </>
-          ) : (
-            <div className="t-meta mt-2.5">No suggested rewrite — every check passed.</div>
           )}
         </div>
-      )}
+      </div>
 
       <div className="glass p-5">
         <div className="t-h3 mb-2">Outcome ledger — {c.name}</div>
@@ -212,6 +254,14 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
           onChange={e => setNonSendReason(e.target.value)}
         />
       </Modal>
+    </div>
+  );
+}
+
+function RinAvatar() {
+  return (
+    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#4A5F6B] to-slate text-white text-[10px] font-bold flex items-center justify-center flex-none">
+      RIN
     </div>
   );
 }

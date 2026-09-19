@@ -200,26 +200,73 @@ function startServer() {
   txt = await page.locator('main').innerText();
   check('Robert Teo withheld (suitability) surfaced in Blocked tab', txt.includes('Robert Teo') && txt.includes('Suitability & mandate fit'));
 
-  // ---- Module 4: Outreach (drafting + sending) ----
+  // ---- Module 4: Outreach (chat-driven drafting + sending) ----
+  const rinCount = () => page.locator('[data-testid="chat-msg-rin"]').count();
+  const waitForRin = async (prev) => {
+    await page.waitForFunction(n => document.querySelectorAll('[data-testid="chat-msg-rin"]').length > n, prev, { timeout: 5000 });
+    return page.locator('[data-testid="chat-msg-rin"]').last().innerText();
+  };
+
   await page.click('nav >> text=Outreach');
   await page.waitForSelector('#outreach-text');
   await page.selectOption('#outreach-client-select', 'david');
   check('Handoff wrote an entry to the client ledger', (await page.locator('main').innerText()).includes('Booked for Thursday morning'));
   await page.selectOption('#outreach-client-select', 'chen');
   check('Blocked client (Robert Teo) excluded from Outreach client selector', !(await page.locator('#outreach-client-select').innerText()).includes('Robert Teo'));
+  check('Old "Review draft" button is gone', await page.locator('[data-act="outreach-review"]').count() === 0);
+  check('Approach selector chips are gone', await page.locator('button:has-text("Contextualise")').count() === 0);
+
+  await page.waitForSelector('[data-testid="chat-msg-rin"]');
+  check('RIN opens the conversation with a drafted note', (await page.locator('[data-testid="chat-msg-rin"]').first().innerText()).includes("I've drafted a note to Chen"));
   let draftVal = await page.inputValue('#outreach-text');
   check('Seeded Chen draft loaded with wrong figure', draftVal.includes('500,000'));
-  await page.click('[data-act="outreach-review"]');
-  txt = await page.locator('main').innerText();
-  check('Fact-trace check fails on wrong figure', txt.includes('380,000') && txt.includes('Fact trace'));
-  check('Suggested rewrite shown with corrected figure', (await page.locator('text=Suggested rewrite').locator('xpath=following-sibling::div[1]').innerText()).includes('380,000'));
-  await page.click('[data-act="outreach-accept"]');
-  draftVal = await page.inputValue('#outreach-text');
-  check('Accepted rewrite replaces draft text with correct figure', draftVal.includes('380,000') && !draftVal.includes('500,000'));
 
+  // Send is the last check: the wrong figure is caught in chat and nothing is sent
+  let prev = await rinCount();
   await page.click('[data-act="outreach-send"]');
+  let lastRin = await waitForRin(prev);
+  check('RIN refuses to send and explains the fact-trace failure', lastRin.includes("I can't send this yet") && lastRin.includes('380,000'));
+  check('Nothing was written to the ledger on a refused send', !(await page.locator('main').innerText()).includes('Archived Client Comms'));
+
+  // "Fix it for me" regenerates the draft from the record
+  prev = await rinCount();
+  await page.click('[data-testid="chip-fix"]');
+  lastRin = await waitForRin(prev);
+  draftVal = await page.inputValue('#outreach-text');
+  check('Fix rewrites the draft from the record', draftVal.includes('380,000') && !draftVal.includes('500,000'));
+  check('RIN explains the fix', lastRin.includes('Rewritten from Chen'));
+
+  // A preset chip changes the live draft
+  prev = await rinCount();
+  await page.click('[data-testid="chip-casual"]');
+  await waitForRin(prev);
+  draftVal = await page.inputValue('#outreach-text');
+  check('"More casual" chip loosens the greeting', draftVal.includes("hope you're well"));
+
+  // Free text is understood and applied
+  prev = await rinCount();
+  await page.fill('#chat-input', 'make it more formal please');
+  await page.press('#chat-input', 'Enter');
+  lastRin = await waitForRin(prev);
+  draftVal = await page.inputValue('#outreach-text');
+  check('Free-text "formal" request is understood and applied', draftVal.startsWith('Dear Chen Wei Liang'));
+  check('RIN replies in natural language about the change', lastRin.includes('more formal'));
+  check('The RM\'s message appears in the thread', (await page.locator('[data-testid="chat-msg-rm"]').last().innerText()).includes('make it more formal please'));
+
+  // An unrecognised request gets a helpful redirect, not silence
+  prev = await rinCount();
+  await page.fill('#chat-input', 'what is the weather like');
+  await page.press('#chat-input', 'Enter');
+  lastRin = await waitForRin(prev);
+  check('Unrecognised request gets a helpful redirect', lastRin.includes('I can adjust the tone'));
+
+  // A clean draft sends
+  prev = await rinCount();
+  await page.click('[data-act="outreach-send"]');
+  lastRin = await waitForRin(prev);
   txt = await page.locator('main').innerText();
   check('Outreach send writes archived-channel ledger entry', txt.includes('Archived Client Comms'));
+  check('RIN confirms the send in chat', lastRin.includes('Sent to Chen'));
 
   // ---- Module 5: News ----
   await page.click('nav >> text=News');
