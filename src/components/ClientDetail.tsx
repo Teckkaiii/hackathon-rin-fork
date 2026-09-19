@@ -27,14 +27,14 @@ export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string
       </div>
 
       {opp && (
-        <div className="panel-dark mb-4">
-          <div className="t-micro text-white/50">
+        <div className="mesh-red mb-4">
+          <div className="t-micro text-red">
             {opp.driverId
               ? `How today's news touches ${c.name.split(' ')[0]}`
               : `What changed in ${c.name.split(' ')[0]}'s portfolio`}
           </div>
           <div className="text-[20px] font-extrabold mt-1.5 mb-2.5">{opp.signal.headline}</div>
-          <div className="text-[14.5px] leading-relaxed text-white/70">{opp.narrative}</div>
+          <div className="text-[14.5px] leading-relaxed text-ink-2">{opp.narrative}</div>
         </div>
       )}
 

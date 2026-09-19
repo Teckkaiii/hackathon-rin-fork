@@ -17,7 +17,7 @@ export default function App() {
       <div className="h-[3px] bg-red" />
       <header className="bg-card border-b border-hairline sticky top-0 z-40">
         <div className="max-w-[1160px] mx-auto px-5 flex items-center gap-4 py-3.5 flex-wrap">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate via-graphite to-ink text-white flex items-center justify-center font-bold text-[15px] tracking-wide flex-none shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_4px_14px_rgba(0,0,0,0.35)]">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red to-red-deep text-white flex items-center justify-center font-bold text-[15px] tracking-wide flex-none shadow-glow-sm">
             RIN
           </div>
           <div>

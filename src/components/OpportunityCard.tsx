@@ -70,7 +70,7 @@ export function OpportunityCard({
 
       <div className="flex gap-6 items-start mt-4 pt-4 border-t border-hairline flex-wrap" data-testid="signal-breakdown">
         <div className="flex-none">
-          <div className="num text-[44px] font-extrabold leading-none text-ink" data-testid="signal-score">{signal.score}</div>
+          <div className="num text-[44px] font-extrabold leading-none text-red" data-testid="signal-score">{signal.score}</div>
           <div className="t-micro mt-1">Signal / 100</div>
         </div>
         <div className="grid sm:grid-cols-3 gap-x-5 gap-y-4 flex-1 min-w-[280px]">

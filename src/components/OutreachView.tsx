@@ -260,7 +260,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
 
 function RinAvatar() {
   return (
-    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#4A5F6B] to-slate text-white text-[10px] font-bold flex items-center justify-center flex-none">
+    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-red to-red-deep text-white text-[10px] font-bold flex items-center justify-center flex-none">
       RIN
     </div>
   );

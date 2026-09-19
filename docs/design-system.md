@@ -106,10 +106,9 @@ rule. If a surface needs visual weight or contrast, reach for one of:
 3. **A light glass/glow treatment** (below) — contrast through blur,
    shadow, and a red-tinted gradient mesh, not through darkness.
 
-`graphite` (`#1C1D1F` / `#26282B`) and the `.panel-dark` component class in
-`src/index.css` currently violate this and are **deprecated** — see
-Migration Notes below. Do not use them in new work, and replace them where
-you touch them.
+There is deliberately no `graphite` token and no `.panel-dark` class any
+more — both were removed on 2026-09-20 so that the easy dark option simply
+isn't there to reach for. Don't reintroduce them.
 
 ## The look: light glass + red glow
 
@@ -171,17 +170,15 @@ Unchanged — already working well and not brand-specific:
 **Keep as-is** (already consistent with this system):
 `.glass`, `.glass-tight`, `.pill*`, `.dot*`, `.btn-red`, `.orb`.
 
-**Needs rework** to satisfy the no-black rule (tracked here, not fixed by
-this document alone — see Migration Notes):
-- `.panel-dark` (`bg-graphite`) — deprecated, replace with `.mesh-red` or a
-  `slate` fill depending on how much visual weight the moment needs.
-- `.btn-primary` (`bg-ink`) — should move to `red` as the primary action
-  color; `ink` was likely chosen before this document existed and predates
-  the "one red carries the brand" rule.
-- The header's RIN mark (`bg-gradient-to-br from-slate via-graphite to-ink`)
-  and the queue's stat strip (`from-graphite via-ink to-graphite`) —
-  both graphite/ink gradients, both need to move to a red gradient or a
-  `.mesh-red` light treatment.
+**Also in the system now** (applied 2026-09-20):
+- `.mesh-red` — the hero surface (client-page impact hero, queue stat strip).
+- `.glow-red` / `shadow-glow` / `shadow-glow-sm` — the red glow ring, used on
+  the header mark, active nav tab, and primary buttons.
+- `.btn-primary` is `bg-red` with `bg-red-deep` on hover; `.btn-red` is now
+  visually identical and kept only so existing call sites don't churn.
+- The RIN avatar in Outreach chat is a red gradient — RIN is the brand, so
+  it wears the brand color. The RM's own bubbles stay `slate`.
+- The modal scrim is `slate/30` with a backdrop blur, not a black overlay.
 
 ## Do / Don't
 
@@ -204,21 +201,15 @@ this document alone — see Migration Notes):
 - Don't introduce beige/cream tones — the canvas is pink-white, sampled
   directly from OCBC's own app, not a warm neutral chosen for taste.
 
-## Migration notes (as of 2026-09-20)
+## Migration log
 
-This document was written after the fact, against a codebase that already
-has some now-nonconforming surfaces. They are not fixed by writing this
-file — that's separate, deliberate follow-up work:
+**2026-09-20 — applied across the app.** The `graphite` token and the
+`.panel-dark` class are gone from the codebase entirely; `canvas` moved to
+the sampled pink-white; `.btn-primary`, the header mark, the active nav
+tab, the queue stat strip, the client-page hero, the Outreach RIN avatar,
+the modal scrim, and the signal-score numeral all now follow this
+document. A `grep -rn "graphite\|panel-dark\|bg-black" src` returns
+nothing — if it ever does again, that's a regression against this file.
 
-- `tailwind.config.js`: `canvas` is still `#EDEAE5` (beige) — should become
-  `#F7F1F1`.
-- `src/index.css`: `.panel-dark` still uses `bg-graphite`; `.btn-primary`
-  still uses `bg-ink`.
-- `src/App.tsx`: the header mark's gradient is `slate → graphite → ink`.
-- `src/components/QueueView.tsx`: the stat strip's gradient is
-  `graphite → ink → graphite`.
-
-None of these are wrong in isolation — they were reasonable choices before
-this document existed. They're listed here so the next pass through the UI
-has a concrete checklist rather than having to re-discover the same four
-spots.
+When you add a surface that needs weight, the check is: is it `red`,
+`slate`, or `.mesh-red`? If it's none of those, stop.

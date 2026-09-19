@@ -69,12 +69,12 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
 
       <div
         data-testid="queue-stat-strip"
-        className="flex items-stretch gap-0 rounded-2xl bg-gradient-to-br from-graphite via-ink to-graphite text-white overflow-hidden mb-4 shadow-[0_8px_24px_rgba(0,0,0,0.18)]"
+        className="mesh-red flex items-stretch gap-0 !p-0 overflow-hidden mb-4"
       >
         <StatBlock value={surfaced.length} label="Surfaced" />
-        <div className="w-px bg-white/10 my-4" />
+        <div className="w-px bg-red/15 my-4" />
         <StatBlock value={blocked.length} label="Withheld" />
-        <div className="w-px bg-white/10 my-4" />
+        <div className="w-px bg-red/15 my-4" />
         <StatBlock value={overnightDrivers.length} label="Signals overnight" />
       </div>
 
@@ -194,8 +194,8 @@ function greeting(): string {
 function StatBlock({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex-1 px-5 py-4 min-w-[110px]">
-      <div className="num text-[32px] font-extrabold leading-none tracking-tight">{String(value).padStart(2, '0')}</div>
-      <div className="t-micro text-white/60 mt-1.5">{label}</div>
+      <div className="num text-[32px] font-extrabold leading-none tracking-tight text-red">{String(value).padStart(2, '0')}</div>
+      <div className="t-micro mt-1.5">{label}</div>
     </div>
   );
 }

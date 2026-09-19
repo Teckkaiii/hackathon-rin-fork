@@ -22,7 +22,7 @@ export function Modal({ open, title, confirmLabel, onConfirm, onClose, children 
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-slate/30 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div

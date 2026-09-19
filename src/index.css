@@ -11,7 +11,7 @@ body {
   line-height: 1.6;
 }
 
-::selection { background: rgba(225,38,27,.16); }
+::selection { background: rgba(227,6,19,.16); }
 
 :focus-visible { outline: 2px solid theme('colors.red.DEFAULT'); outline-offset: 2px; border-radius: 6px; }
 
@@ -34,8 +34,16 @@ body {
   }
   .glass-tight { @apply bg-card border border-hairline rounded-xl2; }
 
-  /* dark graphite panel — used sparingly for the callouts that most deserve attention */
-  .panel-dark { @apply bg-graphite text-white rounded-xl2 p-5; }
+  /* hero surface — a soft red gradient mesh over the pink-white canvas, for the one
+     callout on a page that most deserves attention. Light and glowing, never dark. */
+  .mesh-red {
+    @apply rounded-xl2 border border-red/15 p-5;
+    background:
+      radial-gradient(at 15% 20%, rgba(227,6,19,0.09), transparent 55%),
+      radial-gradient(at 85% 0%, rgba(227,6,19,0.05), transparent 50%),
+      #FBF3F4;
+  }
+  .glow-red { @apply shadow-glow; }
 
   /* orb avatar — circular ring, bold sans initials */
   .orb {
@@ -56,8 +64,8 @@ body {
 
   .btn { @apply inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-[14px] font-semibold border border-hairline-2 bg-white text-ink-2 transition-colors; }
   .btn:hover { @apply border-ink-3; }
-  .btn-primary { @apply bg-ink text-white border-none shadow-glass; }
-  .btn-primary:hover { @apply bg-graphite-hi; }
+  .btn-primary { @apply bg-red text-white border-none shadow-glow-sm; }
+  .btn-primary:hover { @apply bg-red-deep; }
   .btn-red { @apply bg-red text-white border-none shadow-glass; }
   .btn-ghost { @apply border-transparent bg-transparent text-ink-3; }
   .btn-sm { @apply px-3 py-1.5 text-[13px]; }

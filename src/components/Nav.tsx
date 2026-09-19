@@ -19,7 +19,7 @@ export function Nav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void })
           onClick={() => onChange(id)}
           className={cn(
             'rounded-full px-3.5 py-2 text-[14px] font-semibold transition-colors',
-            tab === id ? 'bg-graphite text-white shadow-glass' : 'text-ink-2 hover:bg-sunk'
+            tab === id ? 'bg-red text-white shadow-glow-sm' : 'text-ink-2 hover:bg-red-wash'
           )}
         >
           {label}
