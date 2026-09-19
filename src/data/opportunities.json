@@ -1,8 +1,16 @@
 [
   {
-    "id": "op-chen", "clientId": "chen", "approach": "Notify", "productId": "sd-sgd", "driverId": "rate-cut",
-    "signal": { "recency": "Yesterday", "headline": "SGD rates expected to ease before quarter end" },
-    "amountAtStake": 380000, "daysToAct": 12,
+    "id": "op-chen",
+    "clientId": "chen",
+    "approach": "Notify",
+    "productId": "sd-sgd",
+    "driverId": "rate-cut",
+    "signal": {
+      "recency": "Yesterday",
+      "headline": "SGD rates expected to ease before quarter end"
+    },
+    "amountAtStake": 380000,
+    "daysToAct": 12,
     "whyClient": "SGD 380,000 fixed deposit maturing in 12 days — currently his only rate-locked instrument.",
     "whyNow": "The desk expects SGD rates to ease before the renewal date. Left alone, the deposit rolls over automatically at whatever rate applies on 2026-09-26.",
     "whyInstrument": "A short-tenor structured deposit locks today's rate ahead of the move, without extending duration.",
@@ -10,9 +18,17 @@
     "gateOverride": null
   },
   {
-    "id": "op-priya", "clientId": "priya", "approach": "Contextualise", "productId": "dpm", "driverId": "sector-semis",
-    "signal": { "recency": "Today", "headline": "Foundry-segment guidance cut ~8% across peer set" },
-    "amountAtStake": 1240000, "daysToAct": 3,
+    "id": "op-priya",
+    "clientId": "priya",
+    "approach": "Contextualise",
+    "productId": "dpm",
+    "driverId": "sector-semis",
+    "signal": {
+      "recency": "Today",
+      "headline": "Foundry-segment guidance cut ~8% across peer set"
+    },
+    "amountAtStake": 1240000,
+    "daysToAct": 3,
     "whyClient": "42% of her portfolio sits in one foundry-segment name — well past the 30% concentration threshold for her mandate.",
     "whyNow": "A sector-wide guidance cut published this morning directly touches the held name; relevance to this conversation decays fast as the news ages.",
     "whyInstrument": "A discretionary-mandate rebalance conversation, not a sale recommendation — the point is to discuss the concentration, not to pitch a product.",
@@ -20,9 +36,17 @@
     "gateOverride": null
   },
   {
-    "id": "op-tan", "clientId": "tan", "approach": "Notify", "productId": "bond-sgd", "driverId": "rate-cut",
-    "signal": { "recency": "Yesterday", "headline": "SGD rates expected to ease before quarter end" },
-    "amountAtStake": 250000, "daysToAct": 17,
+    "id": "op-tan",
+    "clientId": "tan",
+    "approach": "Notify",
+    "productId": "bond-sgd",
+    "driverId": "rate-cut",
+    "signal": {
+      "recency": "Yesterday",
+      "headline": "SGD rates expected to ease before quarter end"
+    },
+    "amountAtStake": 250000,
+    "daysToAct": 17,
     "whyClient": "SGD 250,000 corporate bond maturing in 17 days.",
     "whyNow": "Same rate move as above: reinvesting after the move, rather than before, risks a lower running yield on the replacement instrument.",
     "whyInstrument": "A comparable-tenor bond, reinvested ahead of the rate move.",
@@ -30,9 +54,17 @@
     "gateOverride": null
   },
   {
-    "id": "op-sarah", "clientId": "sarah", "approach": "Review", "productId": "fund-div", "driverId": null,
-    "signal": { "recency": "Internal", "headline": "No external signal — internally triggered by an idle-cash threshold" },
-    "amountAtStake": 620000, "daysToAct": 30,
+    "id": "op-sarah",
+    "clientId": "sarah",
+    "approach": "Review",
+    "productId": "fund-div",
+    "driverId": null,
+    "signal": {
+      "recency": "Internal",
+      "headline": "No external signal — internally triggered by an idle-cash threshold"
+    },
+    "amountAtStake": 620000,
+    "daysToAct": 30,
     "whyClient": "SGD 620,000 has sat uninvested for 56 days, past the 45-day idle-cash threshold for her segment.",
     "whyNow": "The cash arrived from a property sale in July and has not yet been reviewed against her stated objectives.",
     "whyInstrument": "An income-oriented fund conversation, sized to how much of the balance she actually wants deployed.",
@@ -40,9 +72,17 @@
     "gateOverride": null
   },
   {
-    "id": "op-david", "clientId": "david", "approach": "Review", "productId": "fund-div", "driverId": null,
-    "signal": { "recency": "Internal", "headline": "No external signal — internally triggered by an income-objective gap" },
-    "amountAtStake": 480000, "daysToAct": 21,
+    "id": "op-david",
+    "clientId": "david",
+    "approach": "Review",
+    "productId": "fund-div",
+    "driverId": null,
+    "signal": {
+      "recency": "Internal",
+      "headline": "No external signal — internally triggered by an income-objective gap"
+    },
+    "amountAtStake": 480000,
+    "daysToAct": 21,
     "whyClient": "Trailing portfolio income of SGD 21,400/yr sits 29% below his stated objective of SGD 30,000/yr.",
     "whyNow": "The gap has held for a full quarterly review cycle without being raised.",
     "whyInstrument": "A higher-income reallocation, discussed against the objective he set — not a yield-chasing pitch.",
@@ -50,33 +90,144 @@
     "gateOverride": null
   },
   {
-    "id": "op-grace", "clientId": "grace", "approach": "Contextualise", "productId": "dpm", "driverId": null,
-    "signal": { "recency": "Today", "headline": "Pending corporate action on a held name" },
-    "amountAtStake": 890000, "daysToAct": 5,
+    "id": "op-grace",
+    "clientId": "grace",
+    "approach": "Contextualise",
+    "productId": "dpm",
+    "driverId": null,
+    "signal": {
+      "recency": "Today",
+      "headline": "Pending corporate action on a held name"
+    },
+    "amountAtStake": 890000,
+    "daysToAct": 5,
     "whyClient": "SGD 890,000 held in a company that is the subject of a pending corporate action.",
     "whyNow": "The action was announced this morning.",
     "whyInstrument": "Would ordinarily be a portfolio conversation.",
     "narrative": "A corporate action was announced this morning affecting a company Grace holds SGD 890,000 in, which would ordinarily be a timely portfolio conversation — but this conversation is currently withheld; see the Blocked tab for the information-barrier restriction in effect.",
-    "gateOverride": { "gate": "mnpi", "reason": "Client's immediate family holds a board seat at the counterparty, and OCBC's advisory desk is engaged on this transaction. An information barrier is in effect (ref. IB-2026-0091) until the deal is announced publicly or terminated." }
+    "gateOverride": {
+      "gate": "mnpi",
+      "reason": "Client's immediate family holds a board seat at the counterparty, and OCBC's advisory desk is engaged on this transaction. An information barrier is in effect (ref. IB-2026-0091) until the deal is announced publicly or terminated."
+    }
   },
   {
-    "id": "op-robert", "clientId": "robert", "approach": "Notify", "productId": "fd-sgd", "driverId": null,
-    "signal": { "recency": "Internal", "headline": "Contractual maturity date, no external signal" },
-    "amountAtStake": 410000, "daysToAct": 6,
+    "id": "op-robert",
+    "clientId": "robert",
+    "approach": "Notify",
+    "productId": "fd-sgd",
+    "driverId": null,
+    "signal": {
+      "recency": "Internal",
+      "headline": "Contractual maturity date, no external signal"
+    },
+    "amountAtStake": 410000,
+    "daysToAct": 6,
     "whyClient": "SGD 410,000 fixed deposit maturing in 6 days.",
     "whyNow": "Renewal decision is due before 2026-09-20.",
     "whyInstrument": "Would ordinarily be a straightforward renewal conversation.",
     "narrative": "No external event here — Robert's SGD 410,000 fixed deposit reaches its contractual maturity in 6 days, with a renewal decision due before 20 September, which would ordinarily be a straightforward conversation — but this conversation is currently withheld; see the Blocked tab for the suitability-review restriction in effect.",
-    "gateOverride": { "gate": "suitability", "reason": "Suitability review lapsed 2026-05-02 — 4 months past the 12-month refresh policy. No product conversation may proceed until the review is refreshed." }
+    "gateOverride": {
+      "gate": "suitability",
+      "reason": "Suitability review lapsed 2026-05-02 — 4 months past the 12-month refresh policy. No product conversation may proceed until the review is refreshed."
+    }
   },
   {
-    "id": "op-michelle", "clientId": "michelle", "approach": "Contextualise", "productId": "ilp", "driverId": null,
-    "signal": { "recency": "Today", "headline": "Policy bonus declaration affecting surrender value" },
-    "amountAtStake": 310000, "daysToAct": 10,
+    "id": "op-michelle",
+    "clientId": "michelle",
+    "approach": "Contextualise",
+    "productId": "ilp",
+    "driverId": null,
+    "signal": {
+      "recency": "Today",
+      "headline": "Policy bonus declaration affecting surrender value"
+    },
+    "amountAtStake": 310000,
+    "daysToAct": 10,
     "whyClient": "A bonus declaration on her Great Eastern policy affects its surrender value.",
     "whyNow": "The declaration was booked to the policy record this morning.",
     "whyInstrument": "Would ordinarily be a policy-review conversation.",
     "narrative": "A bonus was declared this morning on Michelle's Great Eastern policy, affecting its surrender value — the updated figure sits on a policy record she holds outside OCBC Bank's own systems, which would ordinarily prompt a policy-review conversation — but this conversation is currently withheld; see the Blocked tab for the cross-entity permission restriction in effect.",
-    "gateOverride": { "gate": "permission", "reason": "This detail originates from a Great Eastern policy record. Cross-entity data-sharing consent for this client is not on file with OCBC Bank, so the specific figure may not cross the One Group perimeter to this RM until consent is obtained." }
+    "gateOverride": {
+      "gate": "permission",
+      "reason": "This detail originates from a Great Eastern policy record. Cross-entity data-sharing consent for this client is not on file with OCBC Bank, so the specific figure may not cross the One Group perimeter to this RM until consent is obtained."
+    }
+  },
+  {
+    "id": "op-huiling",
+    "clientId": "huiling",
+    "approach": "Contextualise",
+    "productId": "fund-div",
+    "driverId": "reit-rerating",
+    "signal": {
+      "recency": "Yesterday",
+      "headline": "S-REITs re-rate higher on dovish rate outlook"
+    },
+    "amountAtStake": 720000,
+    "daysToAct": 9,
+    "whyClient": "35% of her portfolio sits in Singapore REITs — past the 30% concentration guideline for her mandate.",
+    "whyNow": "The S-REIT index is up ~4% on the week as rate expectations fall; the re-rating has lifted an already-concentrated position.",
+    "whyInstrument": "A conversation about trimming the concentration into a diversified income fund — not a sale recommendation.",
+    "narrative": "S-REITs have re-rated about 4% higher this week as falling SGD rate expectations lift their distribution-yield appeal. 35% of Hui Ling's portfolio sits in Singapore REITs — already past her 30% concentration guideline — so the rally has made a large position larger. Worth a conversation about whether the size still matches her mandate, not a sale recommendation.",
+    "gateOverride": null
+  },
+  {
+    "id": "op-marcus",
+    "clientId": "marcus",
+    "approach": "Notify",
+    "productId": "bond-sgd",
+    "driverId": "ig-credit-spread-widening",
+    "signal": {
+      "recency": "Today",
+      "headline": "Investment-grade credit spreads widen on risk-off tone"
+    },
+    "amountAtStake": 300000,
+    "daysToAct": 8,
+    "whyClient": "SGD 300,000 corporate bond maturing in 8 days.",
+    "whyNow": "SGD investment-grade spreads widened ~8bps this week; a replacement bond bought now carries a better running yield than one bought after spreads normalise.",
+    "whyInstrument": "A comparable-tenor SGD corporate bond, reinvested while spreads are wide.",
+    "narrative": "SGD investment-grade credit spreads have widened about 8 basis points this week on broader risk-off positioning. Marcus's SGD 300,000 corporate bond matures in 8 days, so he is reinvesting into this window whether he plans to or not — and a replacement bought while spreads are wide carries a better running yield than one bought after they tighten. A short heads-up so the reinvestment is a decision, not a default.",
+    "gateOverride": null
+  },
+  {
+    "id": "op-boonkiat",
+    "clientId": "boonkiat",
+    "approach": "Contextualise",
+    "productId": "dpm",
+    "driverId": null,
+    "signal": {
+      "recency": "Today",
+      "headline": "Pending merger announced on a held name"
+    },
+    "amountAtStake": 560000,
+    "daysToAct": 4,
+    "whyClient": "SGD 560,000 held in a company that is the subject of a pending merger.",
+    "whyNow": "The merger was announced this morning.",
+    "whyInstrument": "Would ordinarily be a portfolio conversation.",
+    "narrative": "A merger was announced this morning involving a company Boon Kiat holds SGD 560,000 in, which would ordinarily be a timely portfolio conversation — but this conversation is currently withheld; see the Blocked tab for the information-barrier restriction in effect.",
+    "gateOverride": {
+      "gate": "mnpi",
+      "reason": "OCBC's investment banking arm is advising the acquirer. An information barrier is in effect (ref. IB-2026-0104) until the transaction completes or is abandoned."
+    }
+  },
+  {
+    "id": "op-nadia",
+    "clientId": "nadia",
+    "approach": "Contextualise",
+    "productId": "ilp",
+    "driverId": null,
+    "signal": {
+      "recency": "Yesterday",
+      "headline": "Participating-fund bonus rate trimmed on a held policy"
+    },
+    "amountAtStake": 420000,
+    "daysToAct": 12,
+    "whyClient": "A bonus-rate trim on her Great Eastern policy affects its surrender value.",
+    "whyNow": "The revised rate was booked to the policy record yesterday.",
+    "whyInstrument": "Would ordinarily be a policy-review conversation.",
+    "narrative": "Great Eastern trimmed the participating-fund bonus rate on Nadia's policy yesterday, which changes its surrender value — ordinarily a policy-review conversation. But the updated figure sits on a policy record she holds outside OCBC Bank's own systems, and this conversation is currently withheld; see the Blocked tab for the cross-entity permission restriction in effect.",
+    "gateOverride": {
+      "gate": "permission",
+      "reason": "This detail originates from a Great Eastern policy record. Cross-entity data-sharing consent for this client is not on file with OCBC Bank, so the specific figure may not cross the One Group perimeter to this RM until consent is obtained."
+    }
   }
 ]

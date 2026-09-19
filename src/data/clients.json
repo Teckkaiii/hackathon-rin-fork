@@ -408,5 +408,709 @@
       "lastAssessed": "2026-05-20"
     },
     "complaints": []
+  },
+  "huiling": {
+    "id": "huiling",
+    "name": "Lim Hui Ling",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Growth",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-04-30"
+    },
+    "suitability": {
+      "lastReview": "2026-05-12"
+    },
+    "holdings": [
+      {
+        "label": "Singapore REIT portfolio",
+        "value": 720000,
+        "note": "35% of portfolio in S-REITs, distribution yield 5.6% p.a.",
+        "source": "Portfolio Custody · 2026-09-13"
+      }
+    ],
+    "concentration": {
+      "pct": 35,
+      "threshold": 30,
+      "name": "Singapore REITs"
+    },
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Growth",
+      "horizon": "7–10 years",
+      "lossTolerance": "Above-average — income-seeking, accepts sector concentration",
+      "lastAssessed": "2026-05-12"
+    },
+    "complaints": []
+  },
+  "marcus": {
+    "id": "marcus",
+    "name": "Marcus Wong",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-02-18"
+    },
+    "suitability": {
+      "lastReview": "2026-04-03"
+    },
+    "holdings": [
+      {
+        "label": "SGD Corporate Bond",
+        "value": 300000,
+        "note": "face value, matures 2026-10-05, coupon 3.60% p.a.",
+        "source": "Fixed Income Custody · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-04-03"
+    },
+    "complaints": [
+      {
+        "date": "2026-06-04",
+        "channel": "Contact centre",
+        "summary": "Coupon credited two days late after a public holiday",
+        "status": "Closed"
+      }
+    ]
+  },
+  "boonkiat": {
+    "id": "boonkiat",
+    "name": "Tan Boon Kiat",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Growth",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-03-09"
+    },
+    "suitability": {
+      "lastReview": "2026-02-21"
+    },
+    "holdings": [
+      {
+        "label": "Single-name equity position",
+        "value": 560000,
+        "note": "holding in a listed company that is the subject of a pending merger",
+        "source": "Portfolio Custody · 2026-09-13"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Growth",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-02-21"
+    },
+    "complaints": []
+  },
+  "nadia": {
+    "id": "nadia",
+    "name": "Nadia Sulaiman",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-06-14"
+    },
+    "suitability": {
+      "lastReview": "2026-06-30"
+    },
+    "holdings": [
+      {
+        "label": "Universal life policy",
+        "value": 420000,
+        "note": "policy surrender value, held with Great Eastern",
+        "source": "Great Eastern policy record · 2026-09-12 (not yet permissioned to OCBC Bank)"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "10+ years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-06-30"
+    },
+    "complaints": []
+  },
+  "rajesh": {
+    "id": "rajesh",
+    "name": "Rajesh Menon",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Growth",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-05-21"
+    },
+    "suitability": {
+      "lastReview": "2026-03-15"
+    },
+    "holdings": [
+      {
+        "label": "Global equity fund",
+        "value": 980000,
+        "note": "diversified developed-market equity exposure",
+        "source": "Fund Platform · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Growth",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-03-15"
+    },
+    "complaints": []
+  },
+  "siewmei": {
+    "id": "siewmei",
+    "name": "Ong Siew Mei",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Conservative",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-01-27"
+    },
+    "suitability": {
+      "lastReview": "2026-07-08"
+    },
+    "holdings": [
+      {
+        "label": "SGD Fixed Deposit",
+        "value": 260000,
+        "note": "matures 2027-01-15, rate 2.85% p.a.",
+        "source": "Core Banking · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Conservative",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-07-08"
+    },
+    "complaints": []
+  },
+  "danielchua": {
+    "id": "danielchua",
+    "name": "Daniel Chua",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-08-02"
+    },
+    "suitability": {
+      "lastReview": "2026-01-30"
+    },
+    "holdings": [
+      {
+        "label": "Balanced multi-asset fund",
+        "value": 410000,
+        "note": "quarterly rebalanced, income units",
+        "source": "Fund Platform · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-01-30"
+    },
+    "complaints": []
+  },
+  "felicia": {
+    "id": "felicia",
+    "name": "Felicia Ng",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Aisha Rahman",
+    "mandate": "Discretionary",
+    "risk": "Growth",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-04-11"
+    },
+    "suitability": {
+      "lastReview": "2026-08-19"
+    },
+    "holdings": [
+      {
+        "label": "Discretionary Portfolio Mandate",
+        "value": 1450000,
+        "note": "growth mandate, rebalanced monthly",
+        "source": "Bank of Singapore DPM · 2026-09-13"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Growth",
+      "horizon": "10+ years",
+      "lossTolerance": "High — long horizon, no near-term liquidity needs",
+      "lastAssessed": "2026-08-19"
+    },
+    "complaints": []
+  },
+  "hafiz": {
+    "id": "hafiz",
+    "name": "Hafiz Rahman",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-02-05"
+    },
+    "suitability": {
+      "lastReview": "2026-05-27"
+    },
+    "holdings": [
+      {
+        "label": "SGD Corporate Bond",
+        "value": 220000,
+        "note": "face value, matures 2027-06-30, coupon 3.35% p.a.",
+        "source": "Fixed Income Custody · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-05-27"
+    },
+    "complaints": []
+  },
+  "jasmine": {
+    "id": "jasmine",
+    "name": "Jasmine Koh",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-07-19"
+    },
+    "suitability": {
+      "lastReview": "2026-04-22"
+    },
+    "holdings": [
+      {
+        "label": "USD Money Market Fund",
+        "value": 650000,
+        "note": "parked following a business divestment in March",
+        "source": "Fund Platform · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": {
+      "operatingCountries": [
+        "Singapore",
+        "Malaysia"
+      ],
+      "investmentLocations": [
+        "Singapore",
+        "United States"
+      ],
+      "treasuryExposures": [
+        "USD cash balance unhedged against SGD"
+      ]
+    },
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-04-22"
+    },
+    "complaints": []
+  },
+  "kevin": {
+    "id": "kevin",
+    "name": "Kevin Loh",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Conservative",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-03-28"
+    },
+    "suitability": {
+      "lastReview": "2026-06-11"
+    },
+    "holdings": [
+      {
+        "label": "SGD Fixed Deposit",
+        "value": 180000,
+        "note": "matures 2026-12-02, rate 2.90% p.a.",
+        "source": "Core Banking · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Conservative",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-06-11"
+    },
+    "complaints": []
+  },
+  "meilin": {
+    "id": "meilin",
+    "name": "Teo Mei Lin",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-05-06"
+    },
+    "suitability": {
+      "lastReview": "2026-02-09"
+    },
+    "holdings": [
+      {
+        "label": "Dividend Income Fund",
+        "value": 340000,
+        "note": "monthly distribution units",
+        "source": "Fund Platform · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": {
+      "target": 18000,
+      "actual": 16900,
+      "unit": "SGD/yr",
+      "source": "Portfolio Income Statement · 2026-09-01"
+    },
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-02-09"
+    },
+    "complaints": []
+  },
+  "nicholas": {
+    "id": "nicholas",
+    "name": "Nicholas Yeo",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Growth",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-01-13"
+    },
+    "suitability": {
+      "lastReview": "2026-07-24"
+    },
+    "holdings": [
+      {
+        "label": "Structured note (equity-linked)",
+        "value": 900000,
+        "note": "autocall, next observation 2026-11-20",
+        "source": "Structured Products Desk · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Growth",
+      "horizon": "5–7 years",
+      "lossTolerance": "Above-average",
+      "lastAssessed": "2026-07-24"
+    },
+    "complaints": []
+  },
+  "priyanka": {
+    "id": "priyanka",
+    "name": "Priyanka Nair",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-06-25"
+    },
+    "suitability": {
+      "lastReview": "2026-03-03"
+    },
+    "holdings": [
+      {
+        "label": "Balanced multi-asset fund",
+        "value": 295000,
+        "note": "accumulation units",
+        "source": "Fund Platform · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-03-03"
+    },
+    "complaints": []
+  },
+  "samuel": {
+    "id": "samuel",
+    "name": "Samuel Goh",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Conservative",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-02-14"
+    },
+    "suitability": {
+      "lastReview": "2026-08-05"
+    },
+    "holdings": [
+      {
+        "label": "SGD Fixed Deposit",
+        "value": 500000,
+        "note": "matures 2027-02-14, rate 2.80% p.a.",
+        "source": "Core Banking · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Conservative",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-08-05"
+    },
+    "complaints": [
+      {
+        "date": "2026-01-22",
+        "channel": "Branch",
+        "summary": "Requested statement not received by post",
+        "status": "Closed"
+      }
+    ]
+  },
+  "shalini": {
+    "id": "shalini",
+    "name": "Shalini Pillai",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-04-19"
+    },
+    "suitability": {
+      "lastReview": "2026-05-30"
+    },
+    "holdings": [
+      {
+        "label": "Global bond fund",
+        "value": 780000,
+        "note": "investment-grade, hedged to SGD",
+        "source": "Fund Platform · 2026-09-12"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-05-30"
+    },
+    "complaints": []
+  },
+  "terence": {
+    "id": "terence",
+    "name": "Terence Lau",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Growth",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-03-17"
+    },
+    "suitability": {
+      "lastReview": "2026-06-18"
+    },
+    "holdings": [
+      {
+        "label": "Singapore equity portfolio",
+        "value": 270000,
+        "note": "diversified across banks, REITs and industrials",
+        "source": "Portfolio Custody · 2026-09-13"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Growth",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-06-18"
+    },
+    "complaints": []
+  },
+  "vanessa": {
+    "id": "vanessa",
+    "name": "Vanessa Lim",
+    "segment": "Private",
+    "tier": "Signature",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-05-29"
+    },
+    "suitability": {
+      "lastReview": "2026-01-16"
+    },
+    "holdings": [
+      {
+        "label": "Universal life policy",
+        "value": 380000,
+        "note": "policy in force, premiums current",
+        "source": "Great Eastern policy record · 2026-09-12 (consent on file)"
+      }
+    ],
+    "concentration": null,
+    "idleCash": null,
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "10+ years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-01-16"
+    },
+    "complaints": []
+  },
+  "weijie": {
+    "id": "weijie",
+    "name": "Ho Wei Jie",
+    "segment": "Premier",
+    "tier": "Priority",
+    "rm": "Aisha Rahman",
+    "mandate": "Advisory",
+    "risk": "Balanced",
+    "kyc": {
+      "status": "Current",
+      "expiry": "2027-07-07"
+    },
+    "suitability": {
+      "lastReview": "2026-04-14"
+    },
+    "holdings": [
+      {
+        "label": "SGD idle cash balance",
+        "value": 150000,
+        "note": "sitting uninvested since 2026-08-30 (15 days)",
+        "source": "Core Banking · 2026-09-13"
+      }
+    ],
+    "concentration": null,
+    "idleCash": {
+      "days": 15,
+      "threshold": 45,
+      "source": "Core Banking · 2026-09-13"
+    },
+    "incomeObjective": null,
+    "crossBorder": null,
+    "riskProfile": {
+      "rating": "Balanced",
+      "horizon": "5–7 years",
+      "lossTolerance": "Moderate",
+      "lastAssessed": "2026-04-14"
+    },
+    "complaints": []
   }
 }

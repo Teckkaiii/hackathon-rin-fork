@@ -34,11 +34,12 @@ function startServer() {
 
   // ---- Module 1: Queue (scoped to the signed-in RM's own book — Aisha Rahman) ----
   let txt = await page.locator('main').innerText();
-  check('Queue renders opportunity cards', await page.locator('[data-testid="opportunity-card"]').count() === 3, 'count=' + await page.locator('[data-testid="opportunity-card"]').count());
-  check('Stat strip shows 3 surfaced (all gates passed)', (await page.locator('[data-testid="queue-stat-strip"]').innerText()).includes('03'));
-  check('Blocked count shown in stat strip, points to Blocked tab', (await page.locator('[data-testid="queue-stat-strip"]').innerText()).includes('01') && txt.includes('Blocked tab'));
+  check('Queue renders 5 opportunity cards', await page.locator('[data-testid="opportunity-card"]').count() === 5, 'count=' + await page.locator('[data-testid="opportunity-card"]').count());
+  const strip0 = await page.locator('[data-testid="queue-stat-strip"]').innerText();
+  check('Stat strip shows 5 surfaced (all gates passed)', /05\s+surfaced/i.test(strip0));
+  check('Stat strip shows 3 withheld, summary points to Blocked tab', /03\s+withheld/i.test(strip0) && txt.includes('Blocked tab'));
   check('Plain-English summary sits under the greeting, names the overnight signals', /Good (morning|afternoon|evening), Aisha\.[\s\S]{0,400}Overnight: SGD rates expected to ease/.test(txt));
-  check('Summary explains what surfaced and what is blocked', /3 clients worth a look today/.test(txt) && /on hold pending compliance/.test(txt));
+  check('Summary explains what surfaced and what is blocked', /5 clients worth a look today/.test(txt) && /3 more on hold pending compliance/.test(txt));
   check('No blocked card rendered inside Queue itself', await page.locator('[data-testid="blocked-card"]').count() === 0);
   check('No "Open client position" button in Queue', !txt.includes('Open client position'));
 
@@ -115,7 +116,7 @@ function startServer() {
   await page.fill('[data-testid="modal"] textarea', 'Booked for Thursday morning');
   await page.click('[data-act="modal-confirm"]');
   txt = await page.locator('main').innerText();
-  check('Handed-off item leaves the surfaced list', (await page.locator('[data-testid="queue-stat-strip"]').innerText()).includes('02'));
+  check('Handed-off item leaves the surfaced list', /04\s+surfaced/i.test(await page.locator('[data-testid="queue-stat-strip"]').innerText()));
   check('Handoff note is recorded', txt.includes('Booked for Thursday morning'));
   check('Handed-off section names the route taken', txt.includes('Handed off') && txt.includes('Call to clarify'));
   check('Handing off kept us on the Queue tab', ON_QUEUE.test(txt));
@@ -156,7 +157,7 @@ function startServer() {
   // ---- Module 2: Clients ----
   await page.click('nav >> text=Clients');
   await page.waitForSelector('[data-testid="client-row"]');
-  check('Client directory lists 3 clients (Aisha\'s book, minus the blocked one)', await page.locator('[data-testid="client-row"]').count() === 3, 'count=' + await page.locator('[data-testid="client-row"]').count());
+  check('Client directory lists 20 clients (Aisha\'s book, minus the 3 blocked)', await page.locator('[data-testid="client-row"]').count() === 20, 'count=' + await page.locator('[data-testid="client-row"]').count());
   check('Client list rows show no avatar icon', await page.locator('[data-testid="client-row"] .orb').count() === 0);
   check('Client list row shows only name and segment, not tier or RM', !(await page.locator('[data-testid="client-row"]').first().innerText()).includes('RM '));
   check('Blocked client (Robert Teo) not listed among Clients', !(await page.locator('main').innerText()).includes('Robert Teo'));
@@ -196,7 +197,7 @@ function startServer() {
   // ---- Module 3: Blocked ----
   await page.click('nav >> text=Blocked');
   await page.waitForSelector('[data-testid="blocked-card"]');
-  check('Blocked tab shows exactly 1 blocked card', await page.locator('[data-testid="blocked-card"]').count() === 1);
+  check('Blocked tab shows exactly 3 blocked cards', await page.locator('[data-testid="blocked-card"]').count() === 3);
   txt = await page.locator('main').innerText();
   check('Robert Teo withheld (suitability) surfaced in Blocked tab', txt.includes('Robert Teo') && txt.includes('Suitability & mandate fit'));
 
