@@ -106,20 +106,3 @@ export function runCoachChecks(client: Client, text: string): CoachCheck[] {
 
   return results;
 }
-
-export function suggestRewrite(client: Client, text: string): string {
-  const trueAmount = client.holdings[0].value;
-  let out = text.replace(/SGD\s?[\d,]{4,}/gi, fmt(trueAmount));
-  out = out
-    .replace(/great rate[s]?/gi, 'a rate that may not hold')
-    .replace(/don'?t miss (this|it)/gi, 'worth reviewing before the renewal date')
-    .replace(/act now!?/gi, '')
-    .replace(/limited time/gi, '');
-  out = out
-    .replace(/i('| )?d? recommend/gi, 'wanted to flag')
-    .replace(/you should (invest|buy|move|switch)/gi, 'you may want to discuss whether to $1');
-  if (!/not (financial|investment) advice|indicative only/i.test(out)) {
-    out = out.trim() + '\n\nThis message is for information only and is not financial advice. Rates and terms are indicative and subject to change and to suitability review.';
-  }
-  return out;
-}

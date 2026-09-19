@@ -1,6 +1,6 @@
 import clientsData from './data/clients.json';
 import driversData from './data/drivers.json';
-import type { Client, Driver, Approach, CoachCheck, LedgerEntry } from './types';
+import type { Client, Driver, LedgerEntry } from './types';
 import type { RouteId, RoutedMap } from './lib/routing';
 import type { ChatMessage, DraftSpec } from './lib/assistant';
 
@@ -24,9 +24,7 @@ export interface AppState {
   routed: RoutedMap;
   ledger: LedgerEntry[];
   draftByClient: Record<string, string>;
-  draftResultByClient: Record<string, CoachCheck[] | undefined>;
   outreachClientId: string;
-  outreachApproach: Approach | null;
   chatByClient: Record<string, ChatMessage[]>;
   specByClient: Record<string, DraftSpec>;
 }
@@ -43,9 +41,7 @@ export function initialState(): AppState {
     routed: {},
     ledger: [],
     draftByClient: { chen: SEED_DRAFT_CHEN },
-    draftResultByClient: {},
     outreachClientId: 'chen',
-    outreachApproach: null,
     chatByClient: {},
     specByClient: {},
   };
@@ -58,12 +54,7 @@ export type Action =
   | { type: 'DISMISS'; id: string; reason: string }
   | { type: 'ROUTE_OPPORTUNITY'; id: string; route: RouteId; note: string }
   | { type: 'DRAFT_SET_TEXT'; clientId: string; text: string }
-  | { type: 'DRAFT_REVIEW'; clientId: string; checks: CoachCheck[] }
-  | { type: 'DRAFT_CLEAR'; clientId: string }
-  | { type: 'DRAFT_ACCEPT'; clientId: string; text: string; checks: CoachCheck[] }
-  | { type: 'DRAFT_REJECT'; clientId: string }
   | { type: 'SET_OUTREACH_CLIENT'; id: string }
-  | { type: 'SET_APPROACH'; approach: Approach }
   | { type: 'CHAT_APPEND'; clientId: string; message: ChatMessage }
   | { type: 'SET_DRAFT_SPEC'; clientId: string; spec: DraftSpec }
   | { type: 'OUTREACH_SEND'; entry: LedgerEntry }
@@ -83,28 +74,8 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, routed: { ...state.routed, [action.id]: { route: action.route, note: action.note } } };
     case 'DRAFT_SET_TEXT':
       return { ...state, draftByClient: { ...state.draftByClient, [action.clientId]: action.text } };
-    case 'DRAFT_REVIEW':
-      return { ...state, draftResultByClient: { ...state.draftResultByClient, [action.clientId]: action.checks } };
-    case 'DRAFT_CLEAR': {
-      const draftResultByClient = { ...state.draftResultByClient };
-      delete draftResultByClient[action.clientId];
-      return { ...state, draftByClient: { ...state.draftByClient, [action.clientId]: '' }, draftResultByClient };
-    }
-    case 'DRAFT_ACCEPT':
-      return {
-        ...state,
-        draftByClient: { ...state.draftByClient, [action.clientId]: action.text },
-        draftResultByClient: { ...state.draftResultByClient, [action.clientId]: action.checks },
-      };
-    case 'DRAFT_REJECT': {
-      const draftResultByClient = { ...state.draftResultByClient };
-      delete draftResultByClient[action.clientId];
-      return { ...state, draftResultByClient };
-    }
     case 'SET_OUTREACH_CLIENT':
-      return { ...state, outreachClientId: action.id, outreachApproach: null };
-    case 'SET_APPROACH':
-      return { ...state, outreachApproach: action.approach };
+      return { ...state, outreachClientId: action.id };
     case 'OUTREACH_SEND':
     case 'OUTREACH_NOSEND':
       return { ...state, ledger: [...state.ledger, action.entry] };

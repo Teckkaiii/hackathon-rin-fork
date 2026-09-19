@@ -71,11 +71,13 @@ tools/             verify.js (Playwright suite), serve.js (static server for
    compliance gate, with the full gate-by-gate reasoning. Kept out of
    Clients and Outreach until the blocking condition clears; gates always
    run before any ranking.
-4. **Outreach** — drafts a client message (approach-specific when there's an
-   active opportunity, free-form otherwise) and checks it against the
-   client's own record (fact-trace, advice-boundary, disclosure, register)
-   before it goes. Nothing sends without explicit RM approval; every
-   send/non-send writes to an outcome ledger. Blocked clients aren't
+4. **Outreach** — a conversation with RIN. RIN drafts the message from the
+   client's record and the opportunity that surfaced them; the RM shapes it
+   by chatting ("more casual", "add the figures") or with preset chips, and
+   the draft updates live. Pressing Send runs the checks (fact-trace,
+   advice-boundary, disclosure, register) as the last gate: a clean draft
+   goes, a draft with problems is refused in chat with a one-click fix.
+   Every send/non-send writes to an outcome ledger. Blocked clients aren't
    selectable here.
 5. **News** — market/desk events from the last day, read against the RM's own
    book: which clients are affected, how severely, and whether the impact is
