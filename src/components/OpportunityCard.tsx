@@ -46,25 +46,27 @@ export function OpportunityCard({
       data-testid="opportunity-card"
     >
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <button
-          type="button"
-          data-testid="client-open"
-          className="min-w-0 flex-1 text-left group"
-          onClick={() => onOpenClient(c.id)}
-        >
-          <div className="t-micro text-red">Rank {String(rank).padStart(2, '0')} · {opp.approach}</div>
-          <div className="t-h1 mt-1 break-words group-hover:underline">{c.name}</div>
-          <div className="t-meta mt-1">{c.segment}</div>
-        </button>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="t-micro text-red">Rank {String(rank).padStart(2, '0')} · {opp.approach}</span>
+            <Pill variant={WINDOW_VARIANT[signal.urgency.level]} className="text-[12px] font-semibold" data-testid="window-to-act">
+              {opp.daysToAct} days to act
+            </Pill>
+          </div>
+          <button
+            type="button"
+            data-testid="client-open"
+            className="block text-left group mt-1"
+            onClick={() => onOpenClient(c.id)}
+          >
+            <div className="t-h1 break-words group-hover:underline">{c.name}</div>
+            <div className="t-meta mt-1">{c.segment}</div>
+          </button>
+        </div>
         <div className="text-right">
           <div className="t-micro">Opportunity size</div>
           <div className="num text-[26px] font-extrabold leading-none text-ink mt-1">{fmtNumber(opp.amountAtStake)}</div>
           <div className="t-meta mt-1">SGD · rolls over {fmtRollsOver(opp.daysToAct)}</div>
-          <div className="mt-2">
-            <Pill variant={WINDOW_VARIANT[signal.urgency.level]} className="text-[13px] font-semibold px-4 py-1.5" data-testid="window-to-act">
-              {opp.daysToAct} days to act
-            </Pill>
-          </div>
         </div>
       </div>
 
