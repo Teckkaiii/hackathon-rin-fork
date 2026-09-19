@@ -218,7 +218,7 @@ function startServer() {
   await page.selectOption('#outreach-client-select', 'chen');
   check('Blocked client (Robert Teo) excluded from Outreach client selector', !(await page.locator('#outreach-client-select').innerText()).includes('Robert Teo'));
   check('Old "Review draft" button is gone', await page.locator('[data-act="outreach-review"]').count() === 0);
-  check('Approach selector chips are gone', await page.locator('button:has-text("Contextualise")').count() === 0);
+  check('Email-type chips (Notify / Contextualise / Review) live in the chat', await page.locator('[data-testid="type-chips"] button').count() === 3);
 
   await page.waitForSelector('[data-testid="chat-msg-rin"]');
   check('RIN opens the conversation with a drafted note', (await page.locator('[data-testid="chat-msg-rin"]').first().innerText()).includes("I've drafted a note to Chen"));
@@ -257,12 +257,33 @@ function startServer() {
   check('RIN replies in natural language about the change', lastRin.includes('more formal'));
   check('The RM\'s message appears in the thread', (await page.locator('[data-testid="chat-msg-rm"]').last().innerText()).includes('make it more formal please'));
 
+  // The email type (Notify / Contextualise / Review) is switchable from the chat
+  check('Email-type chips show the queue\'s approach as active', (await page.locator('[data-testid="draft-type"]').innerText()).includes('Notify'));
+  prev = await rinCount();
+  await page.click('[data-testid="chip-review"]');
+  lastRin = await waitForRin(prev);
+  draftVal = await page.inputValue('#outreach-text');
+  check('Switching to Review rewrites the body around the objective', draftVal.includes('When we last reviewed your portfolio'));
+  check('Draft header reflects the new type', (await page.locator('[data-testid="draft-type"]').innerText()).includes('Review'));
+  check('RIN explains what a review note is for', lastRin.includes('Reframed it as a review'));
+  prev = await rinCount();
+  await page.fill('#chat-input', 'explain the news to him instead');
+  await page.press('#chat-input', 'Enter');
+  lastRin = await waitForRin(prev);
+  draftVal = await page.inputValue('#outreach-text');
+  check('Free-text "explain the news" switches to Contextualise', draftVal.includes('In short: SGD rates expected to ease'));
+  prev = await rinCount();
+  await page.click('[data-testid="chip-notify"]');
+  await waitForRin(prev);
+  draftVal = await page.inputValue('#outreach-text');
+  check('Back to Notify restores the heads-up body', draftVal.includes('comes up for renewal'));
+
   // An unrecognised request gets a helpful redirect, not silence
   prev = await rinCount();
   await page.fill('#chat-input', 'what is the weather like');
   await page.press('#chat-input', 'Enter');
   lastRin = await waitForRin(prev);
-  check('Unrecognised request gets a helpful redirect', lastRin.includes('I can adjust the tone'));
+  check('Unrecognised request gets a helpful redirect', lastRin.includes('adjust the tone'));
 
   // A clean draft sends
   prev = await rinCount();

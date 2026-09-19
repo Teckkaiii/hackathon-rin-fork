@@ -6,10 +6,12 @@ import { OPPS, blockedClientIds } from '../lib/queue';
 import { runCoachChecks } from '../lib/coach';
 import {
   DEFAULT_SPEC, applyIntent, parseIntent, renderDraft, replyFor, openingMessage,
-  checkFailureMessage, sentMessage, type Intent,
+  checkFailureMessage, sentMessage, effectiveApproach, type Intent,
 } from '../lib/assistant';
+import type { Approach } from '../types';
 import { cn } from '../lib/cn';
 import { Button } from './ui/Button';
+import { Pill } from './ui/Pill';
 import { Modal } from './ui/Modal';
 
 const CHIPS: { id: string; label: string; intent: Intent }[] = [
@@ -18,6 +20,12 @@ const CHIPS: { id: string; label: string; intent: Intent }[] = [
   { id: 'shorter', label: 'Shorter', intent: 'shorter' },
   { id: 'figures', label: 'Add the figures', intent: 'figures' },
   { id: 'reset', label: 'Start over', intent: 'reset' },
+];
+
+const TYPES: { id: string; approach: Approach; intent: Intent; label: string }[] = [
+  { id: 'notify', approach: 'Notify', intent: 'notify', label: 'Make it a heads-up' },
+  { id: 'contextualise', approach: 'Contextualise', intent: 'contextualise', label: 'Explain the news' },
+  { id: 'review', approach: 'Review', intent: 'review', label: 'Make it a review' },
 ];
 
 const REPLY_DELAY_MS = 600;
@@ -130,7 +138,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
     if (!opp || busy) return;
     const checks = runCoachChecks(c, text);
     if (checks.every(k => k.status === 'pass')) {
-      commitSend(opp.approach);
+      commitSend(effectiveApproach(opp, spec));
       return;
     }
     setPending(checks);
@@ -149,6 +157,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
 
   const canSendAnyway = pending !== null && pending.every(k => k.status !== 'fail');
   const status = typing ? 'Thinking' : streaming ? 'Replying' : 'Ready';
+  const approach = opp ? effectiveApproach(opp, spec) : null;
 
   return (
     <div>
@@ -211,6 +220,21 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
           </div>
 
           <div className="px-5 pb-4 pt-2 border-t border-red/10">
+            <div className="flex items-center gap-1.5 flex-wrap mb-2" data-testid="type-chips">
+              <span className="t-micro mr-1">Email type</span>
+              {TYPES.map(t => (
+                <Button
+                  key={t.id}
+                  data-testid={`chip-${t.id}`}
+                  size="sm"
+                  variant={approach === t.approach ? 'primary' : 'default'}
+                  disabled={busy || !opp}
+                  onClick={() => ask(t.label, t.intent)}
+                >
+                  {t.approach}
+                </Button>
+              ))}
+            </div>
             <div className="flex gap-1.5 flex-wrap mb-3">
               {pending ? (
                 <>
@@ -218,7 +242,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
                     Fix it for me
                   </Button>
                   {canSendAnyway && opp && (
-                    <Button data-testid="chip-send-anyway" size="sm" disabled={busy} onClick={() => commitSend(opp.approach)}>
+                    <Button data-testid="chip-send-anyway" size="sm" disabled={busy} onClick={() => commitSend(effectiveApproach(opp, spec))}>
                       Send anyway
                     </Button>
                   )}
@@ -262,7 +286,10 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
         {/* ---- draft ---- */}
         <div className="glass p-5">
           <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="t-micro">Draft · {c.name}</div>
+            <div className="flex items-center gap-2">
+              <div className="t-micro">Draft · {c.name}</div>
+              {approach && <Pill variant="neutral" data-testid="draft-type">{approach}</Pill>}
+            </div>
             <div className="t-meta flex items-center gap-1.5">
               <span className={cn('w-1.5 h-1.5 rounded-full inline-block', busy ? 'bg-red animate-pulse' : 'bg-green')} />
               Live draft

@@ -1,4 +1,4 @@
-import type { Client, CoachCheck, Opportunity } from '../types';
+import type { Approach, Client, CoachCheck, Opportunity } from '../types';
 import { fmt } from './format';
 
 export type Tone = 'formal' | 'neutral' | 'casual';
@@ -9,11 +9,12 @@ export interface DraftSpec {
   length: Length;
   figures: boolean;
   cta: boolean;
+  approach?: Approach; // undefined = the approach the queue chose for this opportunity
 }
 
 export const DEFAULT_SPEC: DraftSpec = { tone: 'neutral', length: 'full', figures: false, cta: true };
 
-export type Intent = 'formal' | 'casual' | 'shorter' | 'longer' | 'figures' | 'cta' | 'reset' | 'fix';
+export type Intent = 'formal' | 'casual' | 'shorter' | 'longer' | 'figures' | 'cta' | 'reset' | 'fix' | 'notify' | 'contextualise' | 'review';
 
 export interface ChatMessage {
   role: 'rin' | 'rm';
@@ -26,6 +27,9 @@ const DISCLOSURE = 'This message is for information only and is not financial ad
 const INTENT_PATTERNS: [Intent, RegExp][] = [
   ['reset', /\b(start over|reset|from scratch)\b/i],
   ['fix', /\b(fix|clean it up|clean up|correct)\b/i],
+  ['notify', /\b(notify|notification|heads.?up)\b/i],
+  ['contextualise', /\b(contextuali[sz]e|context|explain the news|market news)\b/i],
+  ['review', /\b(review)\b/i],
   ['formal', /\b(formal|professional|polite)\b/i],
   ['casual', /\b(casual|friendly|relaxed|warm|informal)\b/i],
   ['shorter', /\b(short|shorter|brief|concise|trim)\b/i],
@@ -51,6 +55,9 @@ export function applyIntent(spec: DraftSpec, intent: Intent): DraftSpec {
     case 'cta': return { ...spec, cta: true };
     case 'reset': return { ...DEFAULT_SPEC };
     case 'fix': return spec;
+    case 'notify': return { ...spec, approach: 'Notify' };
+    case 'contextualise': return { ...spec, approach: 'Contextualise' };
+    case 'review': return { ...spec, approach: 'Review' };
   }
 }
 
@@ -68,21 +75,30 @@ function capitalise(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function approachLine(client: Client, opp: Opportunity): string {
+export function effectiveApproach(opp: Opportunity, spec: DraftSpec): Approach {
+  return spec.approach ?? opp.approach;
+}
+
+// The three email types differ in what the body is *about*, not just its opening:
+// Notify tells the client a fact about their own account; Contextualise explains
+// a market event and why it reaches them; Review steps back to the objective.
+function approachLine(client: Client, opp: Opportunity, approach: Approach): string {
   const h = client.holdings[0];
-  switch (opp.approach) {
+  switch (approach) {
     case 'Notify':
       return `your ${softLower(h.label)} of ${fmt(h.value)} comes up for renewal within the next ${opp.daysToAct} days, and there is a rate change expected before then that is worth knowing about.`;
-    case 'Contextualise':
-      return `something in today's market news touches a position you hold — your ${softLower(h.label)} of ${fmt(h.value)} — and I wanted you to hear it from me first.`;
+    case 'Contextualise': {
+      const news = opp.driverId ? ` In short: ${opp.signal.headline.replace(/\.$/, '')}.` : '';
+      return `something in today's market news touches a position you hold — your ${softLower(h.label)} of ${fmt(h.value)} — and I wanted you to hear it from me first.${news}`;
+    }
     case 'Review':
-      return 'when we last reviewed your portfolio we set an objective together, and the latest figures suggest it has drifted. I think it is worth a short review.';
+      return 'when we last reviewed your portfolio we set an objective together, and the latest figures suggest it has drifted. I think it is worth a short review — no product in mind, just whether the objective still holds.';
   }
 }
 
-function openingLine(client: Client, opp: Opportunity, tone: Tone): string {
-  const lead = tone === 'casual' ? 'Quick one — ' : '';
-  return capitalise(lead + approachLine(client, opp));
+function openingLine(client: Client, opp: Opportunity, spec: DraftSpec): string {
+  const lead = spec.tone === 'casual' ? 'Quick one — ' : '';
+  return capitalise(lead + approachLine(client, opp, effectiveApproach(opp, spec)));
 }
 
 export function renderDraft(client: Client, opp: Opportunity, spec: DraftSpec): string {
@@ -94,7 +110,7 @@ export function renderDraft(client: Client, opp: Opportunity, spec: DraftSpec): 
     spec.tone === 'casual' ? `Hi ${first}, hope you're well!` :
     `Hi ${first},`;
 
-  const opening = openingLine(client, opp, spec.tone);
+  const opening = openingLine(client, opp, spec);
 
   const figures = spec.figures && spec.length === 'full'
     ? `For reference: ${h.label}, ${fmt(h.value)} — ${h.note}.`
@@ -142,8 +158,14 @@ export function replyFor(intent: Intent | null, client: Client): string {
       return `Back to a fresh draft for ${first}.`;
     case 'fix':
       return `Rewritten from ${first}'s record — every figure now traces to a source and the advice language is gone.`;
+    case 'notify':
+      return `Switched it to a heads-up — short, factual, one ask. Right when ${first} just needs to know something about their own account.`;
+    case 'contextualise':
+      return `Reframed it around the news — what happened and why it reaches ${first}'s position. Right when the client will ask "why are you telling me this?"`;
+    case 'review':
+      return `Reframed it as a review — no product, just the objective you set with ${first} and whether it still holds. Right when the ask is a conversation, not a transaction.`;
     default:
-      return `I can adjust the tone (more formal or more casual), the length, or pull the figures from ${first}'s record into the note. Which would you like?`;
+      return `I can change the email type (a heads-up, a market-context note, or a review), adjust the tone or length, or pull the figures from ${first}'s record into the note. Which would you like?`;
   }
 }
 
