@@ -52,15 +52,16 @@ tools/             verify.js (Playwright suite), serve.js (static server for
 ## The modules
 
 1. **Queue** — the ranked daily opportunity list. Ranking is quantified by a
-   signal score combining momentum (is the underlying trend durable or
-   choppy this week?), relevancy (does the news actually touch this client's
-   portfolio, or just something adjacent?), urgency (window to act) and
-   conviction (how many distinct pieces of news corroborate the impact) —
-   surfaced per-opportunity as qualitative High/Medium/Low pills, never as a
-   raw number. Also: hard compliance gates, correlated-conviction
-   clusters, and an agent that routes each opportunity to its next step — draft
-   a message, refer to a specialist desk, or call the client to clarify — with
-   its reasoning shown on the card and the RM free to overrule it.
+   signal score (0–100) combining momentum (is the underlying trend durable
+   or choppy this week?), relevancy (does the news actually touch this
+   client's portfolio, or just something adjacent?), urgency (window to act)
+   and conviction (how many distinct pieces of news corroborate the impact).
+   The score is shown on the card; clicking it expands the four-dimension
+   breakdown, each also scored out of 100. Also: hard compliance gates,
+   correlated-conviction clusters, and an agent that routes each opportunity
+   to its next step — draft a message, refer to a specialist desk, or call
+   the client to clarify — with its reasoning shown on the card and the RM
+   free to overrule it.
 2. **Clients** — a position page per client, ordered by whichever constraint
    is most binding today, every figure evidence-traced to its source,
    including a client's cross-border footprint (operating countries,
@@ -79,11 +80,13 @@ tools/             verify.js (Playwright suite), serve.js (static server for
    goes, a draft with problems is refused in chat with a one-click fix.
    Every send/non-send writes to an outcome ledger. Blocked clients aren't
    selectable here.
-5. **News** — market/desk events from the last day, read against the RM's own
-   book: which clients are affected, how severely, and whether the impact is
-   confirmed (already linked to a signal on an opportunity) or inferred (a
-   holdings match RIN hasn't had reviewed). Items reaching several clients
-   severely are flagged.
+5. **News** — market/desk events from the last day, grouped by client rather
+   than by story, each client's list led by whichever item is most
+   impactful to them. Read against the RM's own book: which clients are
+   affected, how severely, and whether the impact is confirmed (already
+   linked to a signal on an opportunity) or inferred (a holdings match RIN
+   hasn't had reviewed). Items reaching several clients severely are
+   flagged.
 6. **Past Week** — seven days of daily impact reads per theme, against the
    RM's own book. A theme where every day landed the same direction of impact
    is high momentum, durable enough to build a recommendation around; a theme
@@ -91,11 +94,12 @@ tools/             verify.js (Playwright suite), serve.js (static server for
    touched only by low-momentum themes are deprioritized rather than pushed
    toward a long-term action the trend doesn't actually support.
 
-Hard constraints the build honors throughout: no composite client score
-digit shown anywhere (the signal score drives sort order but only its
-qualitative High/Medium/Low breakdown is ever rendered), no propensity/
-acceptance score, gates always run before ranking, and no invented revenue
-figures (amount-at-stake only, not predicted benefit).
+Hard constraints the build honors throughout: no propensity/acceptance
+score, gates always run before ranking, and no invented revenue figures
+(amount-at-stake only, not predicted benefit). The signal score (0–100,
+with its urgency/relevancy/momentum/conviction breakdown) is shown on the
+opportunity card by design — it drives sort order and the RM can see the
+number behind it.
 
 ## Verifying changes
 

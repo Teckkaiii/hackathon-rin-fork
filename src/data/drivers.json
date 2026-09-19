@@ -12,5 +12,40 @@
     "detail": "Foundry-segment guidance cut ~8% across peer set following a wafer-demand downgrade, published this morning.",
     "date": "2026-09-14",
     "recency": "Today"
+  },
+  "reit-rerating": {
+    "id": "reit-rerating",
+    "label": "S-REITs re-rate higher on dovish rate outlook",
+    "detail": "Desk note (2026-09-13): the S-REIT index is up ~4% over the week as falling SGD rate expectations lift distribution-yield appeal across the sector.",
+    "date": "2026-09-13",
+    "recency": "Yesterday"
+  },
+  "cross-border-fx-vol": {
+    "id": "cross-border-fx-vol",
+    "label": "Regional FX volatility spike raises hedging costs",
+    "detail": "Desk note (2026-09-14): overnight implied volatility on regional currency pairs jumped after mixed central-bank signals, raising the cost of leaving cross-border treasury exposures unhedged.",
+    "date": "2026-09-14",
+    "recency": "Today"
+  },
+  "usd-mmf-yield": {
+    "id": "usd-mmf-yield",
+    "label": "USD money-market yields compress as Fed cut bets firm",
+    "detail": "Desk note (2026-09-14): USD money-market fund yields have fallen ~20bps this week as markets price in a higher probability of a Fed rate cut this quarter.",
+    "date": "2026-09-14",
+    "recency": "Today"
+  },
+  "par-fund-bonus-trim": {
+    "id": "par-fund-bonus-trim",
+    "label": "Participating fund bonus rates trimmed across insurers",
+    "detail": "Desk note (2026-09-13): several insurers have trimmed participating-fund bonus rates for the coming policy year, affecting surrender and maturity values on universal life and endowment policies.",
+    "date": "2026-09-13",
+    "recency": "Yesterday"
+  },
+  "ig-credit-spread-widening": {
+    "id": "ig-credit-spread-widening",
+    "label": "Investment-grade credit spreads widen on risk-off tone",
+    "detail": "Desk note (2026-09-14): SGD investment-grade credit spreads widened ~8bps this week on broader risk-off positioning, pressuring mark-to-market on existing corporate bond holdings.",
+    "date": "2026-09-14",
+    "recency": "Today"
   }
 }

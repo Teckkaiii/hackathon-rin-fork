@@ -47,31 +47,29 @@ function startServer() {
   check('Header no longer shows "RM: <name>"', !(await page.locator('header').innerText()).includes('RM:'));
   check('Nav order is Queue, Clients, Blocked, News, Past Week, Outreach', (await page.locator('nav button').allInnerTexts()).join('|') === 'Queue|Clients|Blocked|News|Past Week|Outreach');
 
-  // Signal score breakdown: quantifies order via momentum / relevancy / urgency / conviction, shown qualitatively (no raw digit score)
-  check('Signal breakdown pills shown (Urgency/Relevancy/Momentum/Conviction)', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => txt.includes(s)));
-  const bodyTxtQueue = await page.locator('body').innerText();
-  check('No composite score digit shown anywhere', !/\/\s?100\b|\bscore\s*:\s*\d/i.test(bodyTxtQueue));
+  // Signal score: shown as a single 0-100 figure on the card, always expanded into its
+  // momentum / relevancy / urgency / conviction breakdown (no click needed).
+  check('Signal score shown on every card', await page.locator('[data-testid="signal-score"]').count() === await page.locator('[data-testid="opportunity-card"]').count());
+  check('Breakdown always visible on every card', await page.locator('[data-testid="signal-breakdown"]').count() === await page.locator('[data-testid="opportunity-card"]').count() && ['Urgency', 'Relevancy', 'Momentum', 'Conviction'].every(s => txt.includes(s)));
   check('Highest signal-score opportunity ranks first (Chen Wei Liang)', (await page.locator('[data-testid="opportunity-card"]').first().innerText()).includes('Chen Wei Liang'));
 
-  // ---- Task 1: card chrome stripped to name + segment + scoring pills ----
+  // ---- Card leads with rank, approach and client identity, and keeps the full scoring breakdown ----
   const chenCard0 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
   const chenTxt0 = await chenCard0.innerText();
-  check('Card leads with the client name (no rank badge, no orb initials)', chenTxt0.split('\n')[0].trim() === 'Chen Wei Liang');
-  check('Card drops the RM name', !chenTxt0.includes('Aisha Rahman'));
-  check('Card drops the client tier', !/\bPriority\b|\bSignature\b/.test(chenTxt0));
-  check('Card drops the approach pill', !/\bNotify\b/.test(chenTxt0));
-  check('Card drops the product-name pill', !chenTxt0.includes('Structured Deposit'));
-  check('Card drops the signal-recency pill', !chenTxt0.includes('Signal:'));
+  check('Card leads with rank and approach', /rank 01/i.test(chenTxt0) && /notify/i.test(chenTxt0));
+  check('Card keeps the RM name', chenTxt0.includes('Aisha Rahman'));
+  check('Card keeps the client tier', /\bPriority\b/.test(chenTxt0));
   check('Card keeps the segment', chenTxt0.includes('Premier'));
-  check('Card keeps all four scoring pills', ['Urgency:', 'Relevancy:', 'Momentum:', 'Conviction:'].every(s => chenTxt0.includes(s)));
-  check('Card keeps the opportunity size figure', chenTxt0.includes('380,000'));
-  check('Card labels the figure "Opportunity size", not "Amount at stake"', /opportunity size/i.test(chenTxt0) && !/amount at stake/i.test(chenTxt0));
+  check('Card keeps the signal headline', chenTxt0.includes('SGD rates expected to ease'));
+  check('Card keeps all four scoring dimensions, always expanded', ['Urgency', 'Relevancy', 'Momentum', 'Conviction'].every(s => chenTxt0.includes(s)));
+  check('Card keeps the amount-at-stake figure', chenTxt0.includes('380,000'));
+  check('Card labels the figure "Amount at stake"', /amount at stake/i.test(chenTxt0));
   check('Window to act is a pronounced pill on the card', await chenCard0.locator('[data-testid="window-to-act"]').count() === 1 && /12 days to act/.test(chenTxt0));
   check('Card keeps the three why-boxes', /why this client/i.test(chenTxt0) && /why now/i.test(chenTxt0) && /why this instrument/i.test(chenTxt0));
 
   // Only the name block navigates; the card body does not.
   const chenCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
-  await chenCard.locator('.t-micro', { hasText: 'Opportunity size' }).click();
+  await chenCard.locator('.t-micro', { hasText: 'Amount at stake' }).click();
   txt = await page.locator('main').innerText();
   check('Clicking the card body does NOT navigate away from the queue', txt.includes('High revenue opportunities'));
   await chenCard.locator('[data-testid="client-open"]').click();
@@ -167,7 +165,7 @@ function startServer() {
   check('No "Related opportunity" card on the client page', !txt.includes('Related opportunity'));
   check('Priya\'s impact hero names the semiconductor headline', txt.includes('Semiconductor sector correction') || txt.includes('Foundry-segment guidance cut'));
   check('Priya\'s narrative explains the concentration in plain English', txt.includes('42% of Priya\'s portfolio'));
-  check('Cross-Border Exposure kept as its own card', /cross-border exposure/i.test(txt) && /operating countries/i.test(txt));
+  check('Cross-Border Footprint kept as its own card', /cross-border footprint/i.test(txt) && /operating/i.test(txt));
   check('Portfolio card shows the concentration figures', txt.includes('42%') && txt.includes('30%'));
   check('Complaint Records shows Priya\'s open complaint', /complaint records/i.test(txt) && txt.includes('Open') && txt.includes('custody statement'));
 
@@ -179,7 +177,7 @@ function startServer() {
   check('Chen\'s name renders without an avatar icon', await page.locator('[data-testid="client-detail"] .orb').count() === 0);
   check('Chen\'s identity line shows only the segment', /Chen Wei Liang\s*\n\s*Premier\b/.test(txt) && !txt.includes('RM Aisha'));
   check('Impact hero is a single merged paragraph, not four labeled sections', !/why this client/i.test(txt) && !/what it means/i.test(txt) && txt.includes('rate-locked instrument'));
-  check('Basic Information card shows tier and RM (moved, not lost)', /basic information/i.test(txt) && txt.includes('Priority') && txt.includes('Aisha Rahman'));
+  check('Relationship card shows tier and RM (moved, not lost)', /relationship/i.test(txt) && txt.includes('Priority') && txt.includes('Aisha Rahman'));
   check('Risk Profile card renders', /risk profile/i.test(txt) && txt.includes('5–7 years'));
   check('Complaint Records shows Chen\'s closed complaint', txt.includes('Closed') && txt.includes('fixed deposit renewal'));
 
@@ -279,6 +277,16 @@ function startServer() {
     const i = txt.indexOf('SGD rates expected to ease');
     return i > -1 && txt.slice(Math.max(0, i - 300), i + 300).includes('Priority');
   })());
+  check('News tab is grouped by client, not by story', await page.locator('[data-testid="news-client-open"]').count() >= 2);
+  const firstNewsClient = await page.locator('[data-testid="news-client-open"]').first().innerText();
+  check('Client group leads with its most impactful item', (() => {
+    const i = txt.indexOf(firstNewsClient);
+    return i > -1 && txt.slice(i, i + 400).includes('High impact');
+  })());
+  await page.locator('[data-testid="news-client-open"]').first().click();
+  check('Clicking a client name in News opens that client\'s position page', await page.locator('[data-testid="client-detail"]').count() === 1);
+  await page.click('[data-testid="client-back"]');
+  await page.waitForTimeout(150);
 
   // ---- Module 6: Past Week (momentum) ----
   await page.click('nav >> text=Past Week');
@@ -300,14 +308,8 @@ function startServer() {
     const i = txt.indexOf('Vietnam manufacturing FDI trend');
     return i > -1 && txt.slice(Math.max(0, i - 100), i).includes('High momentum');
   })());
-  check('Priya deprioritized on volatile-only theme', (() => {
-    const i = txt.indexOf('Priya Ravindran');
-    return i > -1 && txt.slice(Math.max(0, i - 200), i).includes('Deprioritized');
-  })());
-  check('Chen kept active priority (touched by a high-momentum theme)', (() => {
-    const i = txt.indexOf('Chen Wei Liang');
-    return i > -1 && txt.slice(Math.max(0, i - 200), i).includes('Active priority');
-  })());
+  check('Priya deprioritized on volatile-only theme', /Deprioritized\s*\n\s*Priya Ravindran/.test(txt));
+  check('Chen kept active priority (touched by a high-momentum theme)', /Active priority\s*\n\s*Chen Wei Liang/.test(txt));
 
   // ---- Nav no longer offers the removed Cross-Border / Desk View tabs ----
   const navTxt = await page.locator('nav').innerText();

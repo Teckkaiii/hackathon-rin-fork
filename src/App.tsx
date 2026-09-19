@@ -14,14 +14,14 @@ export default function App() {
 
   return (
     <>
-      <div className="h-1 bg-gradient-to-r from-[#EE3A2E] via-red to-red-deep" />
-      <header className="bg-white/85 backdrop-blur-glass border-b border-hairline sticky top-0 z-40">
+      <div className="h-[3px] bg-red" />
+      <header className="bg-card border-b border-hairline sticky top-0 z-40">
         <div className="max-w-[1160px] mx-auto px-5 flex items-center gap-4 py-3.5 flex-wrap">
-          <div className="w-9 h-9 rounded-[11px] bg-gradient-to-br from-[#EE3A2E] via-red to-red-deep text-white flex items-center justify-center font-bold text-[15px] shadow-glass flex-none">
+          <div className="w-9 h-9 rounded-[11px] bg-graphite text-white flex items-center justify-center font-bold text-[15px] flex-none">
             RIN
           </div>
           <div>
-            <div className="font-serif text-[19px] leading-none text-ink">Revenue Intelligence Network</div>
+            <div className="font-sans font-extrabold text-[18px] leading-none text-ink">Revenue Intelligence Network</div>
             <div className="t-meta">Premier &amp; Private Banking · daily decision layer</div>
           </div>
           <Nav tab={state.tab} onChange={tab => dispatch({ type: 'SET_TAB', tab })} />
@@ -44,7 +44,7 @@ export default function App() {
         )}
         {state.tab === 'blocked' && <BlockedView />}
         {state.tab === 'outreach' && <OutreachView state={state} dispatch={dispatch} />}
-        {state.tab === 'news' && <NewsView />}
+        {state.tab === 'news' && <NewsView onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })} />}
         {state.tab === 'pastweek' && <PastWeekView />}
       </main>
 
