@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Action, AppState } from '../state';
-import { MY_CLIENTS, MY_CLIENT_IDS, CLIENTS } from '../state';
+import { MY_CLIENT_IDS, CLIENTS } from '../state';
 import type { CoachCheck } from '../types';
-import { OPPS, blockedClientIds } from '../lib/queue';
+import { OPPS, blockedClientIds, rankedOpps } from '../lib/queue';
+import { newsByClient } from '../lib/news';
 import { runCoachChecks } from '../lib/coach';
 import {
   DEFAULT_SPEC, applyIntent, parseIntent, renderDraft, replyFor, openingMessage,
@@ -48,7 +49,15 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
 
   const ledgerForClient = state.ledger.filter(l => l.clientId === clientId);
   const blocked = blockedClientIds(MY_CLIENT_IDS);
-  const selectableClients = MY_CLIENTS.filter(cc => !blocked.has(cc.id) || cc.id === clientId);
+  // Outreach is for clients there's a reason to write to today: those with a
+  // surfaced opportunity (queue order first) and those the news reaches.
+  const reachable = useMemo(() => {
+    const ids: string[] = [];
+    for (const o of rankedOpps({}, {}, MY_CLIENT_IDS)) if (!ids.includes(o.clientId)) ids.push(o.clientId);
+    for (const g of newsByClient(MY_CLIENT_IDS)) if (!ids.includes(g.client.id)) ids.push(g.client.id);
+    return ids.filter(id => !blocked.has(id));
+  }, []);
+  const selectableClients = reachable.map(id => CLIENTS[id]);
 
   const [typing, setTyping] = useState(false);
   const [input, setInput] = useState('');

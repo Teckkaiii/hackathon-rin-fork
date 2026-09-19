@@ -218,6 +218,11 @@ function startServer() {
   check('Handoff wrote an entry to the client ledger', (await page.locator('main').innerText()).includes('Booked for Thursday morning'));
   await page.selectOption('#outreach-client-select', 'chen');
   check('Blocked client (Robert Teo) excluded from Outreach client selector', !(await page.locator('#outreach-client-select').innerText()).includes('Robert Teo'));
+  const selectorNames = await page.locator('#outreach-client-select option').allInnerTexts();
+  check('Outreach offers only queue + news clients (12 of 20)', selectorNames.length === 12, 'count=' + selectorNames.length);
+  check('Queue clients come first, in the queue\'s own rank order', selectorNames.slice(0, 5).join('|') === 'Chen Wei Liang|Priya Ravindran|Marcus Wong|Lim Hui Ling|David Ong', 'got=' + selectorNames.slice(0, 5).join('|'));
+  check('A news-only client is selectable (Kevin Loh, rate-cut reaches his FD)', selectorNames.includes('Kevin Loh'));
+  check('A client with no opportunity and no news is not offered (Rajesh Menon)', !selectorNames.includes('Rajesh Menon'));
   check('Old "Review draft" button is gone', await page.locator('[data-act="outreach-review"]').count() === 0);
   check('Email-type chips (Notify / Contextualise / Review) live in the chat', await page.locator('[data-testid="type-chips"] button').count() === 3);
 
