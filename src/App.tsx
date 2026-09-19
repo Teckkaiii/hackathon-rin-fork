@@ -2,7 +2,8 @@ import { useReducer } from 'react';
 import { reducer, initialState, CURRENT_RM } from './state';
 import { Nav } from './components/Nav';
 import { QueueView } from './components/QueueView';
-import { ClientsView, ClientDetail } from './components/ClientsView';
+import { ClientsView } from './components/ClientsView';
+import { ClientDetail } from './components/ClientDetail';
 import { BlockedView } from './components/BlockedView';
 import { OutreachView } from './components/OutreachView';
 import { NewsView } from './components/NewsView';
@@ -40,7 +41,7 @@ export default function App() {
             ? <ClientDetail
                 clientId={state.selectedClientId}
                 onBack={() => dispatch({ type: 'BACK_CLIENTS' })}
-                onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
+                backLabel={state.clientOrigin === 'queue' ? 'Back to queue' : 'All clients'}
               />
             : <ClientsView onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })} />
         )}

@@ -27,12 +27,24 @@ export interface Holding {
   source: string;
 }
 
+export interface RiskProfile {
+  rating: string;
+  horizon: string;
+  lossTolerance: string;
+  lastAssessed: string;
+}
+
+export interface ComplaintRecord {
+  date: string;
+  channel: string;
+  summary: string;
+  status: 'Open' | 'Closed';
+}
+
 export interface CrossBorderProfile {
   operatingCountries: string[];
   investmentLocations: string[];
-  transactionCorridors: string[];
   treasuryExposures: string[];
-  relationshipFootprint: string[];
 }
 
 export interface Client {
@@ -50,6 +62,8 @@ export interface Client {
   idleCash: { days: number; threshold: number; source: string } | null;
   incomeObjective: { target: number; actual: number; unit: string; source: string } | null;
   crossBorder: CrossBorderProfile | null;
+  riskProfile: RiskProfile;
+  complaints: ComplaintRecord[];
 }
 
 export interface GateOverride {
@@ -69,6 +83,7 @@ export interface Opportunity {
   whyClient: string;
   whyNow: string;
   whyInstrument: string;
+  narrative: string;
   gateOverride: GateOverride | null;
 }
 
@@ -98,12 +113,6 @@ export interface LedgerEntry {
   kind: 'Sent' | 'Non-send';
   detail: string;
   ref: string | null;
-}
-
-export interface BindingConstraint {
-  kind: string;
-  label: string;
-  detail: string;
 }
 
 export type ImpactSeverity = 'high' | 'medium' | 'low';

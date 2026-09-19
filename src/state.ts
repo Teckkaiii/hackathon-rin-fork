@@ -1,7 +1,7 @@
 import clientsData from './data/clients.json';
 import driversData from './data/drivers.json';
 import type { Client, Driver, Approach, CoachCheck, LedgerEntry } from './types';
-import { DEFAULT_FILTERS, type Filters } from './lib/filters';
+import type { RouteId, RoutedMap } from './lib/routing';
 
 export const CLIENTS = clientsData as Record<string, Client>;
 export const DRIVERS = driversData as Record<string, Driver>;
@@ -18,10 +18,9 @@ export type Tab = 'queue' | 'clients' | 'blocked' | 'outreach' | 'news' | 'pastw
 export interface AppState {
   tab: Tab;
   selectedClientId: string | null;
-  filters: Filters;
-  parked: Set<string>;
-  parkDates: Record<string, string>;
+  clientOrigin: Tab;
   dismissed: Record<string, string>;
+  routed: RoutedMap;
   ledger: LedgerEntry[];
   draftByClient: Record<string, string>;
   draftResultByClient: Record<string, CoachCheck[] | undefined>;
@@ -36,10 +35,9 @@ export function initialState(): AppState {
   return {
     tab: 'queue',
     selectedClientId: null,
-    filters: { ...DEFAULT_FILTERS },
-    parked: new Set(),
-    parkDates: {},
+    clientOrigin: 'clients',
     dismissed: {},
+    routed: {},
     ledger: [],
     draftByClient: { chen: SEED_DRAFT_CHEN },
     draftResultByClient: {},
@@ -52,9 +50,8 @@ export type Action =
   | { type: 'SET_TAB'; tab: Tab }
   | { type: 'OPEN_CLIENT'; id: string }
   | { type: 'BACK_CLIENTS' }
-  | { type: 'SET_FILTER'; key: keyof Filters; value: string | number }
-  | { type: 'PARK'; id: string; resurface: string }
   | { type: 'DISMISS'; id: string; reason: string }
+  | { type: 'ROUTE_OPPORTUNITY'; id: string; route: RouteId; note: string }
   | { type: 'DRAFT_SET_TEXT'; clientId: string; text: string }
   | { type: 'DRAFT_REVIEW'; clientId: string; checks: CoachCheck[] }
   | { type: 'DRAFT_CLEAR'; clientId: string }
@@ -70,18 +67,13 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'SET_TAB':
       return { ...state, tab: action.tab, selectedClientId: action.tab === 'clients' ? state.selectedClientId : null };
     case 'OPEN_CLIENT':
-      return { ...state, tab: 'clients', selectedClientId: action.id };
+      return { ...state, tab: 'clients', selectedClientId: action.id, clientOrigin: state.tab };
     case 'BACK_CLIENTS':
-      return { ...state, selectedClientId: null };
-    case 'SET_FILTER':
-      return { ...state, filters: { ...state.filters, [action.key]: action.value } };
-    case 'PARK': {
-      const parked = new Set(state.parked);
-      parked.add(action.id);
-      return { ...state, parked, parkDates: { ...state.parkDates, [action.id]: action.resurface } };
-    }
+      return { ...state, tab: state.clientOrigin, selectedClientId: null };
     case 'DISMISS':
       return { ...state, dismissed: { ...state.dismissed, [action.id]: action.reason } };
+    case 'ROUTE_OPPORTUNITY':
+      return { ...state, routed: { ...state.routed, [action.id]: { route: action.route, note: action.note } } };
     case 'DRAFT_SET_TEXT':
       return { ...state, draftByClient: { ...state.draftByClient, [action.clientId]: action.text } };
     case 'DRAFT_REVIEW':

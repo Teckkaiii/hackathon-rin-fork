@@ -6,6 +6,7 @@
     "whyClient": "SGD 380,000 fixed deposit maturing in 12 days — currently his only rate-locked instrument.",
     "whyNow": "The desk expects SGD rates to ease before the renewal date. Left alone, the deposit rolls over automatically at whatever rate applies on 2026-09-26.",
     "whyInstrument": "A short-tenor structured deposit locks today's rate ahead of the move, without extending duration.",
+    "narrative": "The desk expects SGD short-term rates to ease by about a quarter point before quarter end. Chen's SGD 380,000 fixed deposit is his only rate-locked instrument and matures on 26 September, right in that window — left alone, it rolls over automatically at whatever lower rate applies. A short call before then locks in today's rate with a new structured deposit.",
     "gateOverride": null
   },
   {
@@ -15,6 +16,7 @@
     "whyClient": "42% of her portfolio sits in one foundry-segment name — well past the 30% concentration threshold for her mandate.",
     "whyNow": "A sector-wide guidance cut published this morning directly touches the held name; relevance to this conversation decays fast as the news ages.",
     "whyInstrument": "A discretionary-mandate rebalance conversation, not a sale recommendation — the point is to discuss the concentration, not to pitch a product.",
+    "narrative": "A guidance cut of roughly 8% was published this morning across the foundry segment. 42% of Priya's portfolio sits in a single foundry-segment holding — already well past her 30% concentration guideline — so this lands directly on her largest position and raises how much a single bad quarter could cost her. Worth a discretionary-mandate conversation about the concentration itself, not a sale recommendation.",
     "gateOverride": null
   },
   {
@@ -24,6 +26,7 @@
     "whyClient": "SGD 250,000 corporate bond maturing in 17 days.",
     "whyNow": "Same rate move as above: reinvesting after the move, rather than before, risks a lower running yield on the replacement instrument.",
     "whyInstrument": "A comparable-tenor bond, reinvested ahead of the rate move.",
+    "narrative": "The same SGD rate-easing move expected this quarter also affects Michael's SGD 250,000 corporate bond, maturing in 17 days ahead of when the move is expected to land. Reinvesting after the move, rather than before it, risks a lower running yield — worth flagging with enough lead time to reinvest into a comparable-tenor bond first.",
     "gateOverride": null
   },
   {
@@ -33,6 +36,7 @@
     "whyClient": "SGD 620,000 has sat uninvested for 56 days, past the 45-day idle-cash threshold for her segment.",
     "whyNow": "The cash arrived from a property sale in July and has not yet been reviewed against her stated objectives.",
     "whyInstrument": "An income-oriented fund conversation, sized to how much of the balance she actually wants deployed.",
+    "narrative": "No external event here — SGD 620,000 from a July property sale has now sat uninvested for 56 days, past Sarah's 45-day idle-cash threshold, without being reviewed against her stated objectives. Worth a review call to size an income-oriented fund allocation against how much of the balance she actually wants deployed.",
     "gateOverride": null
   },
   {
@@ -42,6 +46,7 @@
     "whyClient": "Trailing portfolio income of SGD 21,400/yr sits 29% below his stated objective of SGD 30,000/yr.",
     "whyNow": "The gap has held for a full quarterly review cycle without being raised.",
     "whyInstrument": "A higher-income reallocation, discussed against the objective he set — not a yield-chasing pitch.",
+    "narrative": "No external event here — David's trailing portfolio income is SGD 21,400 a year, 29% below the SGD 30,000 a year he told us he wanted, and the gap has now held for a full quarterly review cycle without being raised. Worth a review call to walk through a higher-income reallocation, framed against the objective he set rather than a yield-chasing pitch.",
     "gateOverride": null
   },
   {
@@ -51,6 +56,7 @@
     "whyClient": "SGD 890,000 held in a company that is the subject of a pending corporate action.",
     "whyNow": "The action was announced this morning.",
     "whyInstrument": "Would ordinarily be a portfolio conversation.",
+    "narrative": "A corporate action was announced this morning affecting a company Grace holds SGD 890,000 in, which would ordinarily be a timely portfolio conversation — but this conversation is currently withheld; see the Blocked tab for the information-barrier restriction in effect.",
     "gateOverride": { "gate": "mnpi", "reason": "Client's immediate family holds a board seat at the counterparty, and OCBC's advisory desk is engaged on this transaction. An information barrier is in effect (ref. IB-2026-0091) until the deal is announced publicly or terminated." }
   },
   {
@@ -60,6 +66,7 @@
     "whyClient": "SGD 410,000 fixed deposit maturing in 6 days.",
     "whyNow": "Renewal decision is due before 2026-09-20.",
     "whyInstrument": "Would ordinarily be a straightforward renewal conversation.",
+    "narrative": "No external event here — Robert's SGD 410,000 fixed deposit reaches its contractual maturity in 6 days, with a renewal decision due before 20 September, which would ordinarily be a straightforward conversation — but this conversation is currently withheld; see the Blocked tab for the suitability-review restriction in effect.",
     "gateOverride": { "gate": "suitability", "reason": "Suitability review lapsed 2026-05-02 — 4 months past the 12-month refresh policy. No product conversation may proceed until the review is refreshed." }
   },
   {
@@ -69,6 +76,7 @@
     "whyClient": "A bonus declaration on her Great Eastern policy affects its surrender value.",
     "whyNow": "The declaration was booked to the policy record this morning.",
     "whyInstrument": "Would ordinarily be a policy-review conversation.",
+    "narrative": "A bonus was declared this morning on Michelle's Great Eastern policy, affecting its surrender value — the updated figure sits on a policy record she holds outside OCBC Bank's own systems, which would ordinarily prompt a policy-review conversation — but this conversation is currently withheld; see the Blocked tab for the cross-entity permission restriction in effect.",
     "gateOverride": { "gate": "permission", "reason": "This detail originates from a Great Eastern policy record. Cross-entity data-sharing consent for this client is not on file with OCBC Bank, so the specific figure may not cross the One Group perimeter to this RM until consent is obtained." }
   }
 ]

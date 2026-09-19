@@ -5,6 +5,7 @@ import { runCoachChecks, suggestRewrite } from '../lib/coach';
 import { fmt } from '../lib/format';
 import { Pill } from './ui/Pill';
 import { Button } from './ui/Button';
+import { Modal } from './ui/Modal';
 
 const APPROACHES = ['Notify', 'Contextualise', 'Review'] as const;
 
@@ -41,6 +42,9 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
   const ledgerForClient = state.ledger.filter(l => l.clientId === clientId);
   const blocked = blockedClientIds(MY_CLIENT_IDS);
   const selectableClients = MY_CLIENTS.filter(cc => !blocked.has(cc.id) || cc.id === clientId);
+
+  const [nonSendOpen, setNonSendOpen] = useState(false);
+  const [nonSendReason, setNonSendReason] = useState('Client travelling this week');
 
   return (
     <div>
@@ -103,13 +107,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
               >
                 Send
               </Button>
-              <Button
-                variant="ghost" size="sm"
-                onClick={() => {
-                  const reason = prompt('Reason for not sending:', 'Client travelling this week');
-                  if (reason !== null) dispatch({ type: 'OUTREACH_NOSEND', entry: { ts: '14 Sep, 09:14', clientId, kind: 'Non-send', detail: reason, ref: null } });
-                }}
-              >
+              <Button variant="ghost" size="sm" onClick={() => { setNonSendReason('Client travelling this week'); setNonSendOpen(true); }}>
                 Log a non-send
               </Button>
             </>
@@ -195,6 +193,24 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
           <div className="t-meta">No entries yet.</div>
         )}
       </div>
+
+      <Modal
+        open={nonSendOpen}
+        title="Log a non-send"
+        confirmLabel="Log it"
+        onConfirm={() => {
+          dispatch({ type: 'OUTREACH_NOSEND', entry: { ts: '14 Sep, 09:14', clientId, kind: 'Non-send', detail: nonSendReason.trim() || 'No reason given', ref: null } });
+          setNonSendOpen(false);
+        }}
+        onClose={() => setNonSendOpen(false)}
+      >
+        <div className="t-meta mb-2">Recorded in the outcome ledger for {c.name}.</div>
+        <textarea
+          className="w-full border border-hairline-2 rounded-xl p-3 text-[14px] leading-relaxed min-h-[80px] font-sans"
+          value={nonSendReason}
+          onChange={e => setNonSendReason(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 }

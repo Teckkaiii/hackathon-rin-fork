@@ -1,31 +1,67 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Action, AppState } from '../state';
-import { CLIENTS, DRIVERS, MY_CLIENT_IDS } from '../state';
-import { PRODUCTS, OPPS, blockedOpps, filteredOpps, clusters } from '../lib/queue';
-import { businessDaysAdd, TODAY } from '../lib/format';
+import { CLIENTS, DRIVERS, MY_CLIENT_IDS, CURRENT_RM } from '../state';
+import { OPPS, blockedOpps, rankedOpps, clusters } from '../lib/queue';
 import { OpportunityCard } from './OpportunityCard';
 import { Pill } from './ui/Pill';
+import { Modal } from './ui/Modal';
+import { ROUTE_LABELS, type RouteId } from '../lib/routing';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
-  const { filters, parked, dismissed, parkDates } = state;
+  const { dismissed, routed } = state;
 
-  const surfaced = useMemo(
-    () => filteredOpps(parked, dismissed, filters, CLIENTS, MY_CLIENT_IDS),
-    [parked, dismissed, filters]
-  );
+  const surfaced = useMemo(() => rankedOpps(dismissed, routed, MY_CLIENT_IDS), [dismissed, routed]);
   const blocked = useMemo(() => blockedOpps(MY_CLIENT_IDS), []);
-  const cls = useMemo(() => clusters(parked, dismissed, DRIVERS, MY_CLIENT_IDS), [parked, dismissed]);
-  const families = useMemo(() => [...new Set(Object.values(PRODUCTS).map(p => p.family))], []);
-  const parkedList = OPPS.filter(o => parked.has(o.id) && MY_CLIENT_IDS.has(o.clientId));
+  const cls = useMemo(() => clusters(dismissed, routed, DRIVERS, MY_CLIENT_IDS), [dismissed, routed]);
   const dismissedList = OPPS.filter(o => o.id in dismissed && MY_CLIENT_IDS.has(o.clientId));
+  const handedOffList = OPPS.filter(o => o.id in routed && MY_CLIENT_IDS.has(o.clientId));
 
-  function setFilter(key: keyof typeof filters, value: string | number) {
-    dispatch({ type: 'SET_FILTER', key, value });
+  const [dismissTarget, setDismissTarget] = useState<string | null>(null);
+  const [dismissReason, setDismissReason] = useState('Client not reachable this week');
+
+  function openDismiss(id: string) {
+    setDismissReason('Client not reachable this week');
+    setDismissTarget(id);
+  }
+
+  function confirmDismiss() {
+    if (dismissTarget) {
+      dispatch({ type: 'DISMISS', id: dismissTarget, reason: dismissReason.trim() || 'No reason given' });
+    }
+    setDismissTarget(null);
+  }
+
+  const [handoffTarget, setHandoffTarget] = useState<{ oppId: string; route: RouteId } | null>(null);
+  const [handoffNote, setHandoffNote] = useState('');
+
+  function handoff(oppId: string, route: RouteId) {
+    setHandoffNote('');
+    setHandoffTarget({ oppId, route });
+  }
+
+  function confirmHandoff() {
+    if (handoffTarget) {
+      const { oppId, route } = handoffTarget;
+      const note = handoffNote.trim();
+      const opp = OPPS.find(o => o.id === oppId)!;
+      dispatch({ type: 'ROUTE_OPPORTUNITY', id: oppId, route, note });
+      dispatch({
+        type: 'OUTREACH_NOSEND',
+        entry: {
+          ts: '14 Sep, 09:14',
+          clientId: opp.clientId,
+          kind: 'Non-send',
+          detail: `${ROUTE_LABELS[route]}${note ? ` — ${note}` : ''}`,
+          ref: null,
+        },
+      });
+    }
+    setHandoffTarget(null);
   }
 
   return (
     <div>
-      <div className="t-display mb-1">Today's queue</div>
+      <div className="t-display mb-1">{greeting()}, {CURRENT_RM.split(' ')[0]}.</div>
       <div className="t-lead mb-5">
         Overnight signals resolved against client exposures, after compliance gates, ranked by signal score —
         momentum, news relevancy, urgency and conviction combined.
@@ -41,69 +77,41 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
         </div>
       ))}
 
-      <div className="glass-tight bg-sunk/70 flex flex-wrap gap-2.5 items-center p-3.5 mb-4">
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.segment} onChange={e => setFilter('segment', e.target.value)}>
-          <option value="all">All segments</option>
-          <option value="Premier">Premier</option>
-          <option value="Private">Private</option>
-        </select>
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.tier} onChange={e => setFilter('tier', e.target.value)}>
-          <option value="all">All tiers</option>
-          <option value="Priority">Priority</option>
-          <option value="Signature">Signature</option>
-        </select>
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.family} onChange={e => setFilter('family', e.target.value)}>
-          <option value="all">All product families</option>
-          {families.map(f => <option key={f} value={f}>{f}</option>)}
-        </select>
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.minAmount} onChange={e => setFilter('minAmount', parseInt(e.target.value, 10))}>
-          <option value={0}>Any amount at stake</option>
-          <option value={250000}>≥ SGD 250,000</option>
-          <option value={500000}>≥ SGD 500,000</option>
-          <option value={1000000}>≥ SGD 1,000,000</option>
-        </select>
-        <select className="border border-hairline-2 bg-white rounded-lg px-2.5 py-1.5 text-[13.5px]" value={filters.recency} onChange={e => setFilter('recency', e.target.value)}>
-          <option value="all">Any signal recency</option>
-          <option value="fresh">Fresh (today/yesterday)</option>
-          <option value="internal">Internal only</option>
-        </select>
-        <span className="ml-auto t-meta font-semibold">{blocked.length} withheld by gates — see the Blocked tab</span>
+      <div className="flex items-baseline justify-between gap-3 flex-wrap mb-2.5">
+        <div className="t-h1">High revenue opportunities <span className="t-meta font-semibold">· {surfaced.length} surfaced</span></div>
+        <span className="t-meta font-semibold">{blocked.length} withheld by gates — see the Blocked tab</span>
       </div>
 
-      <div className="t-h3 mb-2.5">{surfaced.length} surfaced</div>
       {surfaced.length
-        ? surfaced.map((o, i) => (
+        ? surfaced.map(o => (
             <OpportunityCard
               key={o.id}
               opp={o}
-              rank={i + 1}
-              parkedResurfaceDate={parkDates[o.id] ? new Date(parkDates[o.id]).toLocaleDateString('en-SG', { day: 'numeric', month: 'short' }) : undefined}
               onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })}
               onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
-              onPark={id => dispatch({ type: 'PARK', id, resurface: businessDaysAdd(TODAY, 5).toISOString() })}
-              onDismiss={id => {
-                const reason = prompt('Reason for dismissing this opportunity:', 'Client not reachable this week');
-                if (reason !== null) dispatch({ type: 'DISMISS', id, reason: reason || 'No reason given' });
-              }}
+              onDismiss={openDismiss}
+              onHandoff={handoff}
             />
           ))
-        : <div className="glass-tight p-4 t-meta">No opportunities match these filters.</div>}
+        : <div className="glass-tight p-4 t-meta">Nothing on your book needs attention right now.</div>}
 
-      {parkedList.length > 0 && (
+      {handedOffList.length > 0 && (
         <>
-          <div className="t-h1 mt-8 mb-1">Parked</div>
+          <div className="t-h1 mt-8 mb-1">Handed off</div>
           <div className="t-meta mb-3">
-            Parking is itself recorded as a signal. A parked item resurfaces on a governed cadence rather than vanishing or reappearing daily. Rule: review-type opportunities resurface after 5 business days, or immediately if a new signal names the same client.
+            These opportunities were routed somewhere other than a direct message. They stay out of the queue until the
+            desk or the client comes back.
           </div>
-          {parkedList.map(o => {
+          {handedOffList.map(o => {
             const c = CLIENTS[o.clientId];
+            const r = routed[o.id];
             return (
-              <div key={o.id} className="glass-tight p-4 mb-2 flex items-center justify-between">
+              <div key={o.id} className="glass-tight p-4 mb-2 flex items-center justify-between gap-3 flex-wrap">
                 <div>
                   <div className="t-h3">{c.name}</div>
-                  <div className="t-meta">{c.segment} · {c.tier}</div>
+                  <div className="t-meta">{c.segment}</div>
                 </div>
-                <Pill variant="flag">Resurfaces {new Date(parkDates[o.id]).toLocaleDateString('en-SG', { day: 'numeric', month: 'short' })}</Pill>
+                <Pill variant="flag">{ROUTE_LABELS[r.route]}{r.note ? ` — ${r.note}` : ''}</Pill>
               </div>
             );
           })}
@@ -119,7 +127,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
               <div key={o.id} className="glass-tight p-4 mb-2 flex items-center justify-between">
                 <div>
                   <div className="t-h3">{c.name}</div>
-                  <div className="t-meta">{c.segment} · {c.tier}</div>
+                  <div className="t-meta">{c.segment}</div>
                 </div>
                 <Pill variant="neutral">Reason: {dismissed[o.id]}</Pill>
               </div>
@@ -127,6 +135,45 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
           })}
         </>
       )}
+
+      <Modal
+        open={dismissTarget !== null}
+        title="Dismiss this opportunity"
+        confirmLabel="Dismiss"
+        onConfirm={confirmDismiss}
+        onClose={() => setDismissTarget(null)}
+      >
+        <div className="t-meta mb-2">The reason is recorded against this opportunity.</div>
+        <textarea
+          className="w-full border border-hairline-2 rounded-xl p-3 text-[14px] leading-relaxed min-h-[80px] font-sans"
+          value={dismissReason}
+          onChange={e => setDismissReason(e.target.value)}
+        />
+      </Modal>
+
+      <Modal
+        open={handoffTarget !== null}
+        title={handoffTarget ? ROUTE_LABELS[handoffTarget.route] : ''}
+        confirmLabel="Confirm"
+        onConfirm={confirmHandoff}
+        onClose={() => setHandoffTarget(null)}
+      >
+        <div className="t-meta mb-2">
+          This leaves the queue and is recorded in the client's outcome ledger. A note is optional.
+        </div>
+        <textarea
+          className="w-full border border-hairline-2 rounded-xl p-3 text-[14px] leading-relaxed min-h-[80px] font-sans"
+          value={handoffNote}
+          onChange={e => setHandoffNote(e.target.value)}
+        />
+      </Modal>
     </div>
   );
+}
+
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
 }

@@ -1,11 +1,19 @@
+import { useState } from 'react';
 import type { Opportunity } from '../types';
 import { CLIENTS } from '../state';
-import { PRODUCTS } from '../lib/queue';
 import { signalBreakdown, type SignalLevel } from '../lib/signal';
 import { fmt } from '../lib/format';
 import { Pill } from './ui/Pill';
 import { Button } from './ui/Button';
-import { Orb } from './ui/Orb';
+import { routeFor, ROUTE_LABELS, type RouteId } from '../lib/routing';
+
+const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
+  high: 'pass', medium: 'flag', low: 'neutral',
+};
+const LEVEL_LABEL: Record<SignalLevel, string> = { high: 'High', medium: 'Medium', low: 'Low' };
+const WINDOW_VARIANT: Record<SignalLevel, 'block' | 'flag' | 'neutral'> = {
+  high: 'block', medium: 'flag', low: 'neutral',
+};
 
 const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
   high: 'pass', medium: 'flag', low: 'neutral',
@@ -13,49 +21,49 @@ const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
 const LEVEL_LABEL: Record<SignalLevel, string> = { high: 'High', medium: 'Medium', low: 'Low' };
 
 export function OpportunityCard({
-  opp, rank, parkedResurfaceDate, onOpenClient, onOpenOutreach, onPark, onDismiss,
+  opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff,
 }: {
   opp: Opportunity;
-  rank?: number;
-  parkedResurfaceDate?: string;
   onOpenClient: (id: string) => void;
   onOpenOutreach: (id: string) => void;
-  onPark?: (id: string) => void;
   onDismiss?: (id: string) => void;
+  onHandoff: (oppId: string, route: RouteId) => void;
 }) {
   const c = CLIENTS[opp.clientId];
-  const prod = PRODUCTS[opp.productId];
   const signal = signalBreakdown(opp);
+  const route = routeFor(opp, c);
+  const [showAlts, setShowAlts] = useState(false);
+  const alternates = (Object.keys(ROUTE_LABELS) as RouteId[]).filter(id => id !== route.id);
+
+  function runRoute(id: RouteId) {
+    if (id === 'draft') onOpenOutreach(c.id);
+    else onHandoff(opp.id, id);
+  }
 
   return (
     <div
-      className="glass-tight border p-5 mb-3 cursor-pointer hover:border-ink-3 transition-colors"
+      className="glass-tight border p-5 mb-3"
       data-oppid={opp.id}
       data-testid="opportunity-card"
-      onClick={() => onOpenClient(c.id)}
     >
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex gap-3 items-start min-w-0 flex-1">
-          {rank && (
-            <div className="w-8 h-8 rounded-lg bg-slate text-white font-bold text-[14px] flex items-center justify-center flex-none">
-              {rank}
-            </div>
-          )}
-          <Orb name={c.name} size={38} />
-          <div className="min-w-0 flex-1">
-            <div className="t-h2 break-words">{c.name}</div>
-            <div className="t-meta">{c.segment} · {c.tier} · RM {c.rm}</div>
-            <div className="flex gap-1.5 flex-wrap mt-2">
-              <Pill variant="neutral">{opp.approach}</Pill>
-              <Pill variant="neutral">{prod.name}</Pill>
-              <Pill variant="neutral">Signal: {opp.signal.recency}</Pill>
-            </div>
-          </div>
-        </div>
+        <button
+          type="button"
+          data-testid="client-open"
+          className="min-w-0 flex-1 text-left group"
+          onClick={() => onOpenClient(c.id)}
+        >
+          <div className="t-h2 break-words group-hover:underline">{c.name}</div>
+          <div className="t-meta">{c.segment}</div>
+        </button>
         <div className="text-right">
-          <div className="t-micro">Amount at stake</div>
+          <div className="t-micro">Opportunity size</div>
           <div className="t-h2 font-serif text-[24px]">{fmt(opp.amountAtStake)}</div>
-          <div className="t-meta">Window to act: {opp.daysToAct} days</div>
+          <div className="mt-1.5">
+            <Pill variant={WINDOW_VARIANT[signal.urgency.level]} dot className="text-[13px] font-semibold" data-testid="window-to-act">
+              {opp.daysToAct} days to act
+            </Pill>
+          </div>
         </div>
       </div>
 
@@ -69,29 +77,46 @@ export function OpportunityCard({
       </div>
 
       <div className="grid md:grid-cols-3 gap-3 mt-4">
-        <WhyBox label="Why this client" value={opp.whyClient} />
-        <WhyBox label="Why now" value={opp.whyNow} />
-        <WhyBox label="Why this instrument" value={opp.whyInstrument} />
+        <WhyBox label="Why this client" value={opp.whyClient} onClick={() => onOpenClient(c.id)} />
+        <WhyBox label="Why now" value={opp.whyNow} onClick={() => onOpenClient(c.id)} />
+        <WhyBox label="Why this instrument" value={opp.whyInstrument} onClick={() => onOpenClient(c.id)} />
       </div>
 
-      <div className="flex gap-2 flex-wrap mt-4" onClick={e => e.stopPropagation()}>
-        <Button size="sm" onClick={() => onOpenOutreach(c.id)}>Draft outreach</Button>
-        {parkedResurfaceDate ? (
-          <Pill variant="flag">Parked — resurfaces {parkedResurfaceDate}</Pill>
-        ) : (
-          onPark && <Button variant="ghost" size="sm" onClick={() => onPark(opp.id)}>Park</Button>
+      <div className="mt-4">
+        <div className="flex gap-2 flex-wrap items-center">
+          <Button data-testid="route-primary" variant="primary" size="sm" onClick={() => runRoute(route.id)}>
+            {route.label}
+          </Button>
+          <Button data-testid="route-toggle" variant="ghost" size="sm" onClick={() => setShowAlts(v => !v)}>
+            Other actions {showAlts ? '▴' : '▾'}
+          </Button>
+          {onDismiss && <Button variant="ghost" size="sm" onClick={() => onDismiss(opp.id)}>Dismiss</Button>}
+        </div>
+        <div data-testid="route-rationale" className="t-meta mt-2">{route.rationale}</div>
+        {showAlts && (
+          <div className="flex gap-2 flex-wrap mt-2.5">
+            {alternates.map(id => (
+              <Button key={id} data-testid="route-alt" variant="ghost" size="sm" onClick={() => runRoute(id)}>
+                {ROUTE_LABELS[id]}
+              </Button>
+            ))}
+          </div>
         )}
-        {onDismiss && <Button variant="ghost" size="sm" onClick={() => onDismiss(opp.id)}>Dismiss</Button>}
       </div>
     </div>
   );
 }
 
-function WhyBox({ label, value }: { label: string; value: string }) {
+function WhyBox({ label, value, onClick }: { label: string; value: string; onClick: () => void }) {
   return (
-    <div className="bg-sunk rounded-xl p-3">
+    <button
+      type="button"
+      data-testid="why-box"
+      onClick={onClick}
+      className="bg-sunk rounded-xl p-3 text-left hover:bg-hairline-2/40 transition-colors"
+    >
       <div className="t-micro mb-1">{label}</div>
       <div className="text-[13.5px] leading-relaxed text-ink-2">{value}</div>
-    </div>
+    </button>
   );
 }
