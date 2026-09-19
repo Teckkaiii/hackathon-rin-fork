@@ -92,8 +92,6 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
         </div>
       ))}
 
-      <div className="t-h1 mb-2.5">High revenue opportunities</div>
-
       {surfaced.length
         ? surfaced.map((o, i) => (
             <OpportunityCard

@@ -30,6 +30,7 @@ function startServer() {
 
   const results = [];
   const check = (label, ok, extra) => results.push(`${ok ? 'OK ' : 'FAIL'} ${label}${extra ? ' -- ' + extra : ''}`);
+  const ON_QUEUE = /Good (morning|afternoon|evening), Aisha\./;
 
   // ---- Module 1: Queue (scoped to the signed-in RM's own book — Aisha Rahman) ----
   let txt = await page.locator('main').innerText();
@@ -43,7 +44,7 @@ function startServer() {
 
   // ---- Greeting, heading, no filters, no RM name in the header ----
   check('Queue greets the RM by first name, chatbot-style', /Good (morning|afternoon|evening), Aisha\./.test(txt));
-  check('Queue heading is "High revenue opportunities"', txt.includes('High revenue opportunities'));
+  check('No "High revenue opportunities" heading — the summary carries the page', !txt.includes('High revenue opportunities'));
   check('"Today\'s queue" heading is gone', !txt.includes("Today's queue"));
   check('No filter dropdowns on the queue', await page.locator('main select').count() === 0);
   check('Header no longer shows "RM: <name>"', !(await page.locator('header').innerText()).includes('RM:'));
@@ -73,7 +74,7 @@ function startServer() {
   const chenCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'Chen Wei Liang' });
   await chenCard.locator('.t-micro', { hasText: 'Opportunity size' }).click();
   txt = await page.locator('main').innerText();
-  check('Clicking the card body does NOT navigate away from the queue', txt.includes('High revenue opportunities'));
+  check('Clicking the card body does NOT navigate away from the queue', ON_QUEUE.test(txt));
   await chenCard.locator('[data-testid="client-open"]').click();
   txt = await page.locator('main').innerText();
   check('Clicking the client name opens that client\'s position page', txt.includes('Chen Wei Liang') && txt.includes('rate-locked instrument'));
@@ -88,7 +89,7 @@ function startServer() {
   check('Back button says where it goes when opened from the queue', (await page.locator('[data-testid="client-back"]').innerText()).includes('Back to queue'));
   await page.click('[data-testid="client-back"]');
   txt = await page.locator('main').innerText();
-  check('Back from a queue-opened client returns to the queue, not the client list', txt.includes('High revenue opportunities'));
+  check('Back from a queue-opened client returns to the queue, not the client list', ON_QUEUE.test(txt));
 
   // Park is gone.
   txt = await page.locator('main').innerText();
@@ -106,8 +107,7 @@ function startServer() {
   check('The three routes differ', new Set([chenRoute, priyaRoute, davidRoute]).size === 3);
 
   const davidCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'David Ong' });
-  check('Route shows a rationale', (await davidCard.locator('[data-testid="route-rationale"]').innerText()).length > 20);
-  check('Priya rationale cites the concentration breach', (await page.locator('[data-testid="opportunity-card"]', { hasText: 'Priya Ravindran' }).locator('[data-testid="route-rationale"]').innerText()).includes('42%'));
+  check('No rationale line under the route button', await davidCard.locator('[data-testid="route-rationale"]').count() === 0);
 
   // Executing a non-draft route hands the item off and drops it from the queue
   await davidCard.locator('[data-testid="route-primary"]').click();
@@ -118,7 +118,7 @@ function startServer() {
   check('Handed-off item leaves the surfaced list', (await page.locator('[data-testid="queue-stat-strip"]').innerText()).includes('02'));
   check('Handoff note is recorded', txt.includes('Booked for Thursday morning'));
   check('Handed-off section names the route taken', txt.includes('Handed off') && txt.includes('Call to clarify'));
-  check('Handing off kept us on the Queue tab', txt.includes('High revenue opportunities'));
+  check('Handing off kept us on the Queue tab', ON_QUEUE.test(txt));
 
   // The RM can overrule the agent's pick
   const priyaCard2 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Priya Ravindran' });

@@ -99,7 +99,6 @@ export function OpportunityCard({
           </Button>
           {onDismiss && <Button variant="ghost" size="sm" onClick={() => onDismiss(opp.id)}>Dismiss</Button>}
         </div>
-        <div data-testid="route-rationale" className="t-meta mt-2">{route.rationale}</div>
         {showAlts && (
           <div className="flex gap-2 flex-wrap mt-2.5">
             {alternates.map(id => (

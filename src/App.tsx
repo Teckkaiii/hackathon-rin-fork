@@ -21,8 +21,8 @@ export default function App() {
             RIN
           </div>
           <div>
-            <div className="font-sans font-extrabold text-[20px] leading-none tracking-tight text-ink">RIN</div>
-            <div className="t-meta">Revenue Intelligence Network · daily decision layer</div>
+            <div className="font-sans font-extrabold text-[18px] leading-none tracking-tight text-ink">Revenue Intelligence Network</div>
+            <div className="t-meta mt-0.5">Daily decision layer</div>
           </div>
           <Nav tab={state.tab} onChange={tab => dispatch({ type: 'SET_TAB', tab })} />
         </div>
