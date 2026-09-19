@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import { reducer, initialState } from './state';
+import { reducer, initialState, CURRENT_RM } from './state';
 import { Nav } from './components/Nav';
 import { QueueView } from './components/QueueView';
 import { ClientsView } from './components/ClientsView';
@@ -25,6 +25,9 @@ export default function App() {
             <div className="t-meta">Premier &amp; Private Banking · daily decision layer</div>
           </div>
           <Nav tab={state.tab} onChange={tab => dispatch({ type: 'SET_TAB', tab })} />
+          <span className="t-meta font-semibold flex-none">
+            RM: {CURRENT_RM}
+          </span>
           <span className="text-[11.5px] font-semibold text-red-deep bg-red-wash px-2.5 py-1 rounded-full flex-none">
             Synthetic prototype
           </span>

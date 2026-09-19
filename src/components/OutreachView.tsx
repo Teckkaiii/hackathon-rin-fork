@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { Action, AppState } from '../state';
 import { MY_CLIENTS, MY_CLIENT_IDS, CLIENTS } from '../state';
 import { OPPS, blockedClientIds } from '../lib/queue';

@@ -15,6 +15,11 @@ const WINDOW_VARIANT: Record<SignalLevel, 'block' | 'flag' | 'neutral'> = {
   high: 'block', medium: 'flag', low: 'neutral',
 };
 
+const LEVEL_VARIANT: Record<SignalLevel, 'pass' | 'flag' | 'neutral'> = {
+  high: 'pass', medium: 'flag', low: 'neutral',
+};
+const LEVEL_LABEL: Record<SignalLevel, string> = { high: 'High', medium: 'Medium', low: 'Low' };
+
 export function OpportunityCard({
   opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff,
 }: {
