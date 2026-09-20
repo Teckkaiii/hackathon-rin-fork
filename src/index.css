@@ -91,7 +91,7 @@ body {
 
   .bubble-in { animation: bubble-in .22s ease-out both; }
 
-  .typing-dot { @apply w-1.5 h-1.5 rounded-full bg-red inline-block; animation: dot-bounce 1.1s ease-in-out infinite; }
+  .typing-dot { @apply w-1.5 h-1.5 rounded-full bg-red inline-block; animation: dot-rise 1.1s ease-in-out infinite; }
   .typing-dot:nth-child(2) { animation-delay: .15s; }
   .typing-dot:nth-child(3) { animation-delay: .3s; }
 
@@ -111,7 +111,7 @@ body {
   from { opacity: 0; transform: translateY(6px) scale(.985); }
   to   { opacity: 1; transform: none; }
 }
-@keyframes dot-bounce {
+@keyframes dot-rise {
   0%, 80%, 100% { transform: translateY(0); opacity: .35; }
   40%           { transform: translateY(-4px); opacity: 1; }
 }
@@ -119,4 +119,14 @@ body {
 @keyframes flash-red {
   0%   { box-shadow: 0 0 0 2px rgba(227,6,19,.40), 0 0 30px 8px rgba(227,6,19,.24); }
   100% { box-shadow: 0 0 0 1px rgba(23,23,23,.09), 0 0 0 0 rgba(227,6,19,0); }
+}
+
+/* Presence motion is for people who can watch it. Reduced-motion users get the same
+   states without the loop: the orb holds a steady glow, dots hold, the caret holds. */
+@media (prefers-reduced-motion: reduce) {
+  .rin-orb, .rin-orb[data-state="thinking"]::after, .typing-dot, .stream-caret::after, .bubble-in, .flash-red {
+    animation: none !important;
+  }
+  .rin-orb { box-shadow: 0 0 0 1px rgba(227,6,19,.30), 0 0 22px 3px rgba(227,6,19,.18); }
+  .typing-dot { opacity: 1; }
 }

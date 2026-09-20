@@ -17,19 +17,20 @@ export function ClientsView({ onOpenClient }: { onOpenClient: (id: string) => vo
         const months = monthsBetween(new Date(c.suitability.lastReview + 'T00:00:00'), TODAY);
         const lapsed = months > 12;
         return (
-          <div
+          <button
+            type="button"
             key={c.id}
             onClick={() => onOpenClient(c.id)}
             data-testid="client-row"
             data-client-id={c.id}
-            className="glass-tight p-4 mb-2 flex items-center gap-3.5 cursor-pointer hover:border-ink-3 transition-colors"
+            className="w-full text-left glass-tight p-4 mb-2 flex items-center gap-3.5 cursor-pointer hover:border-ink-3 transition-colors"
           >
             <div className="flex-1">
               <div className="t-h3">{c.name}</div>
               <div className="t-meta">{c.segment}</div>
             </div>
             <Pill variant={lapsed ? 'block' : 'pass'}>{lapsed ? 'Review lapsed' : 'Docs current'}</Pill>
-          </div>
+          </button>
         );
       })}
     </div>
