@@ -61,34 +61,40 @@ function flagFor(impacts: NewsImpact[]): NewsFlag {
   return 'standard';
 }
 
+// Everyone in the book this driver lands on: clients whose opportunity is
+// linked to it (confirmed) and clients whose holdings look like the same
+// instrument or sector (inferred). Exported so the News tab and the
+// bring-your-own-news intake can never disagree about who is exposed.
+export function impactsForDriver(driverId: string, clientIds?: Set<string>): NewsImpact[] {
+  const pool = clientIds ? CLIENT_LIST.filter(c => clientIds.has(c.id)) : CLIENT_LIST;
+  const linkedOpps = OPPS.filter(o => o.driverId === driverId && (!clientIds || clientIds.has(o.clientId)));
+  const confirmedIds = new Set(linkedOpps.map(o => o.clientId));
+
+  const confirmed: NewsImpact[] = linkedOpps.map(o => ({
+    clientId: o.clientId,
+    severity: severityFromOpp(o),
+    basis: 'confirmed',
+    reason: o.whyNow,
+  }));
+
+  const match = INFERRED_MATCH[driverId];
+  const inferred: NewsImpact[] = match
+    ? pool.filter(c => !confirmedIds.has(c.id) && match.test(c)).map(c => ({
+        clientId: c.id,
+        severity: 'medium' as const,
+        basis: 'inferred' as const,
+        reason: match.reason(c),
+      }))
+    : [];
+
+  return [...confirmed, ...inferred].sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
+}
+
 // clientIds, when passed, scopes results to a single RM's book — same
 // convention as lib/queue.ts. Omit it for book-wide views.
 export function newsItems(clientIds?: Set<string>): NewsItem[] {
-  const pool = clientIds ? CLIENT_LIST.filter(c => clientIds.has(c.id)) : CLIENT_LIST;
-
   const items = Object.values(DRIVERS).map(driver => {
-    const linkedOpps = OPPS.filter(o => o.driverId === driver.id && (!clientIds || clientIds.has(o.clientId)));
-    const confirmedIds = new Set(linkedOpps.map(o => o.clientId));
-
-    const confirmed: NewsImpact[] = linkedOpps.map(o => ({
-      clientId: o.clientId,
-      severity: severityFromOpp(o),
-      basis: 'confirmed',
-      reason: o.whyNow,
-    }));
-
-    const match = INFERRED_MATCH[driver.id];
-    const inferred: NewsImpact[] = match
-      ? pool.filter(c => !confirmedIds.has(c.id) && match.test(c)).map(c => ({
-          clientId: c.id,
-          severity: 'medium' as const,
-          basis: 'inferred' as const,
-          reason: match.reason(c),
-        }))
-      : [];
-
-    const impacts = [...confirmed, ...inferred].sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
-
+    const impacts = impactsForDriver(driver.id, clientIds);
     const item: NewsItem = {
       id: driver.id,
       headline: driver.label,
