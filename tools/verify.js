@@ -255,6 +255,25 @@ function startServer() {
   txt = await page.locator('main').innerText();
   check('Robert Teo withheld (suitability) surfaced in Blocked tab', txt.includes('Robert Teo') && txt.includes('Suitability & mandate fit'));
 
+  const robertCard = page.locator('[data-testid="blocked-card"]', { hasText: 'Robert Teo' });
+  check('Suitability gate offers a request action', await robertCard.locator('[data-testid="unblock-request"]').count() === 1);
+  await robertCard.locator('[data-testid="unblock-request"]').click();
+  check('Request opens a modal with an editable, pre-filled message', await page.locator('[data-testid="modal"] textarea').count() === 1);
+  const prefill = await page.locator('[data-testid="modal"] textarea').inputValue();
+  check('The message is grounded in the client record', prefill.includes('Robert Teo') && prefill.includes('410,000'));
+  await page.click('[data-act="modal-confirm"]');
+  check('Modal closes after confirming', await page.locator('[data-testid="modal"]').count() === 0);
+  const robertTxt = await robertCard.innerText();
+  check('Card shows Requested once sent', robertTxt.includes('Requested'));
+  check('Request button is gone after requesting', await robertCard.locator('[data-testid="unblock-request"]').count() === 0);
+
+  const boonkiatCard = page.locator('[data-testid="blocked-card"]', { hasText: 'Tan Boon Kiat' });
+  check('An MNPI firewall offers no request action', await boonkiatCard.locator('[data-testid="unblock-request"]').count() === 0);
+  check('MNPI card explains why there is nothing to request', (await boonkiatCard.innerText()).includes('clears on its own'));
+
+  const nadiaCard = page.locator('[data-testid="blocked-card"]', { hasText: 'Nadia Sulaiman' });
+  check('A missing-consent gate also offers a request action', await nadiaCard.locator('[data-testid="unblock-request"]').count() === 1);
+
   // ---- Module 4: Outreach (chat-driven drafting + sending) ----
   const rinCount = () => page.locator('[data-testid="chat-msg-rin"]').count();
   // A reply first appears, then streams in word by word; wait for both before reading it.
