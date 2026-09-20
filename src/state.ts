@@ -29,6 +29,7 @@ export interface AppState {
   chatByClient: Record<string, ChatMessage[]>;
   specByClient: Record<string, DraftSpec>;
   specialistReplies: Record<string, { verdict: string; nextStep: string }>;
+  callOutcomes: Record<string, { verdict: string; nextStep: string }>;
 }
 
 const SEED_DRAFT_CHEN =
@@ -47,6 +48,7 @@ export function initialState(): AppState {
     chatByClient: {},
     specByClient: {},
     specialistReplies: {},
+    callOutcomes: {},
   };
 }
 
@@ -62,7 +64,8 @@ export type Action =
   | { type: 'SET_DRAFT_SPEC'; clientId: string; spec: DraftSpec }
   | { type: 'OUTREACH_SEND'; entry: LedgerEntry }
   | { type: 'OUTREACH_NOSEND'; entry: LedgerEntry }
-  | { type: 'SPECIALIST_REPLY'; id: string; clientId: string; verdict: string; nextStep: string };
+  | { type: 'SPECIALIST_REPLY'; id: string; clientId: string; verdict: string; nextStep: string }
+  | { type: 'CALL_OUTCOME_LOGGED'; id: string; clientId: string; verdict: string; nextStep: string };
 
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -102,6 +105,17 @@ export function reducer(state: AppState, action: Action): AppState {
         routed: routedRest,
         specialistReplies: { ...state.specialistReplies, [action.id]: { verdict: action.verdict, nextStep: action.nextStep } },
         ledger: [...state.ledger, { ts: NOW_TS, clientId: action.clientId, kind: 'Specialist reply', detail: action.verdict, ref: null }],
+      };
+    }
+    case 'CALL_OUTCOME_LOGGED': {
+      // Same shape as SPECIALIST_REPLY: closing the loop drops it off "Handed
+      // off" and re-enters the ranked queue, now carrying what was learned.
+      const { [action.id]: _clarified, ...routedRest } = state.routed;
+      return {
+        ...state,
+        routed: routedRest,
+        callOutcomes: { ...state.callOutcomes, [action.id]: { verdict: action.verdict, nextStep: action.nextStep } },
+        ledger: [...state.ledger, { ts: NOW_TS, clientId: action.clientId, kind: 'Call outcome logged', detail: action.verdict, ref: null }],
       };
     }
     default:
