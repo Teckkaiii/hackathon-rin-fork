@@ -9,7 +9,7 @@ export function BlockedCard({ opp, gates }: { opp: Opportunity; gates: GateResul
   const blockedRow = gates.rows.find(r => r.status === 'block')!;
 
   return (
-    <div className="glass-tight border-t-2 border-t-red p-0 mb-4 overflow-hidden" data-oppid={opp.id} data-testid="blocked-card">
+    <div className="glass border-t-2 border-t-red p-0 mb-4 overflow-hidden" data-oppid={opp.id} data-testid="blocked-card">
       <div className="flex items-start justify-between gap-4 flex-wrap p-5 pb-4">
         <div>
           <div className="t-h2">{c.name}</div>

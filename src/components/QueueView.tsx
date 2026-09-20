@@ -83,7 +83,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
       </div>
 
       {cls.map(cl => (
-        <div key={cl.driver.id} className="glass-tight border-[#C9DDE2] bg-[#EFF6F7]/80 p-4 mb-4 flex gap-3 items-start">
+        <div key={cl.driver.id} className="glass-tight bg-sunk p-4 mb-4 flex gap-3 items-start">
           <Pill variant="flag">Cluster</Pill>
           <div className="t-body">
             <b>Correlated conviction cluster</b> — {cl.opps.length} opportunities rest on the same driver:{' '}

@@ -41,7 +41,7 @@ export function OpportunityCard({
 
   return (
     <div
-      className="glass-tight border p-5 mb-3"
+      className="glass p-5 mb-3"
       data-oppid={opp.id}
       data-testid="opportunity-card"
     >
