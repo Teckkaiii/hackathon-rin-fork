@@ -181,6 +181,7 @@ function startServer() {
   txt = await page.locator('main').innerText();
   check('Chen\'s name renders without an avatar icon', await page.locator('[data-testid="client-detail"] .orb').count() === 0);
   check('Chen\'s identity line shows only the segment', /Chen Wei Liang\s*\n\s*Premier\b/.test(txt) && !txt.includes('RM Aisha'));
+  check('Client header does not repeat tier/mandate/KYC that the Relationship card shows', !/Premier · Priority · Advisory mandate/.test(txt));
   check('Impact hero is a single merged paragraph, not four labeled sections', !/why this client/i.test(txt) && !/what it means/i.test(txt) && txt.includes('rate-locked instrument'));
   check('Relationship card shows tier and RM (moved, not lost)', /relationship/i.test(txt) && txt.includes('Priority') && txt.includes('Aisha Rahman'));
   check('Risk Profile card renders', /risk profile/i.test(txt) && txt.includes('5–7 years'));

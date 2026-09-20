@@ -18,7 +18,7 @@ export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string
       <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
         <div>
           <div className="font-sans text-[30px] font-extrabold leading-tight tracking-tight text-ink">{c.name}</div>
-          <div className="t-meta mt-0.5">{c.segment} · {c.tier} · {c.mandate} mandate · KYC current to {fmtDate(c.kyc.expiry)}</div>
+          <div className="t-meta mt-0.5">{c.segment}</div>
         </div>
         <div className="flex gap-2 flex-none">
           <Pill variant={lapsed ? 'block' : 'pass'}>{lapsed ? 'Suitability lapsed' : `Suitability current · ${monthsSince} months ago`}</Pill>
@@ -43,7 +43,7 @@ export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string
           <KV label="Tier" value={c.tier} />
           <KV label="RM" value={c.rm} />
           <KV label="Mandate" value={c.mandate} />
-          <KV label="KYC" value={c.kyc.status} />
+          <KV label="KYC" value={`${c.kyc.status} · to ${fmtDate(c.kyc.expiry)}`} />
           <KV label="Suitability review" value={`${fmtDate(c.suitability.lastReview)} · ${monthsSince} mo ago`} />
         </InfoCard>
 
@@ -116,8 +116,8 @@ function InfoCard({ eyebrow, children }: { eyebrow: string; children: ReactNode 
 function KV({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex justify-between gap-3 text-[13.5px]">
-      <span className="text-ink-3">{label}</span>
-      <span className="font-semibold text-ink text-right">{value}</span>
+      <span className="text-ink-3 flex-none w-[128px]">{label}</span>
+      <span className="font-semibold text-ink text-right min-w-0">{value}</span>
     </div>
   );
 }
