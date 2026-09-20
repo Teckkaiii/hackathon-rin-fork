@@ -61,7 +61,11 @@ tools/             verify.js (Playwright suite), serve.js (static server for
    correlated-conviction clusters, and an agent that routes each opportunity
    to its next step — draft a message, refer to a specialist desk, or call
    the client to clarify — with its reasoning shown on the card and the RM
-   free to overrule it.
+   free to overrule it. Referring to a specialist or logging a clarifying
+   call closes the loop: RIN's canned, grounded reply returns the
+   opportunity to the queue with a verdict and switches its next step to
+   Draft outreach. A "Needs a follow-up" section flags a sent message with
+   no reply.
 2. **Clients** — a position page per client, ordered by whichever constraint
    is most binding today, every figure evidence-traced to its source,
    including a client's cross-border footprint (operating countries,
@@ -71,7 +75,10 @@ tools/             verify.js (Playwright suite), serve.js (static server for
 3. **Blocked** — every client withheld from the Queue entirely by a hard
    compliance gate, with the full gate-by-gate reasoning. Kept out of
    Clients and Outreach until the blocking condition clears; gates always
-   run before any ranking.
+   run before any ranking. Where a gate is something an RM can chase (a
+   lapsed suitability review, missing cross-entity consent), a button
+   opens an editable, record-grounded request; an MNPI firewall says
+   plainly that nothing can be requested.
 4. **Outreach** — a conversation with RIN. RIN drafts the message from the
    client's record and the opportunity that surfaced them; the RM shapes it
    by chatting ("more casual", "add the figures") or with preset chips, and

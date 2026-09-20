@@ -211,6 +211,12 @@ Unchanged — already working well and not brand-specific:
   the white bubble with `rounded-bl-sm`, on a `.mesh-red` surface. If
   RIN ever answers on a third screen, reuse these — don't invent a new
   bubble.
+- The Queue's "closed loop" pattern — a canned, grounded verdict in a
+  `bg-green-wash` box (`data-testid="specialist-verdict"` /
+  `"clarify-verdict"`), a "Reviewed"-style `Pill`, and a primary action
+  that switches to Draft outreach — is now used twice (specialist reply,
+  clarify call outcome). If a third referral type needs the same
+  treatment, follow this shape rather than inventing a new one.
 
 ## Do / Don't
 
@@ -267,6 +273,15 @@ page (RM vocabulary stays, RIN's internal words don't). Plan:
 **2026-09-20 — bring-your-own-news.** Intake input on the News tab;
 RIN's reply reuses the chat bubble language. No new tokens or classes.
 Plan: `docs/superpowers/plans/2026-09-20-news-intake.md`.
+
+**2026-09-20 — three more agent loops.** The clarify route (David) now
+closes the same way the specialist route does: a canned call outcome,
+a verdict, Draft outreach. The Blocked tab offers an editable, record-
+grounded request for suitability/permission gates, and says honestly
+that MNPI/eligibility gates have no RM-side action. A follow-up agent
+flags a stale send with no reply (seeded: Marcus, 3 days) and resolves
+itself the moment a fresh note actually sends. Plan:
+`docs/superpowers/plans/2026-09-20-three-agent-loops.md`.
 
 When you add a surface that needs weight, the check is: is it `red`,
 `slate`, or `.mesh-red`? If it's none of those, stop.
