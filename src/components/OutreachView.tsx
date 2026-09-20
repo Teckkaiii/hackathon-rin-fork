@@ -5,6 +5,7 @@ import type { CoachCheck } from '../types';
 import { OPPS, blockedClientIds, rankedOpps } from '../lib/queue';
 import { newsByClient } from '../lib/news';
 import { runCoachChecks } from '../lib/coach';
+import { NOW_TS } from '../lib/format';
 import {
   DEFAULT_SPEC, applyIntent, parseIntent, renderDraft, replyFor, openingMessage,
   specialistOpeningMessage, checkFailureMessage, sentMessage, effectiveApproach, type Intent,
@@ -139,7 +140,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
     const ref = 'ARC-' + Math.random().toString(36).slice(2, 8).toUpperCase();
     dispatch({
       type: 'OUTREACH_SEND',
-      entry: { ts: '14 Sep, 09:14', clientId, kind: 'Sent', detail: `${approach} message sent`, ref: 'Archived Client Comms · ' + ref },
+      entry: { ts: NOW_TS, clientId, kind: 'Sent', detail: `${approach} message sent`, ref: 'Archived Client Comms · ' + ref },
     });
     setPending(null);
     rinReplies(chat.length, sentMessage(c, ref));
@@ -363,7 +364,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
         title="Log a non-send"
         confirmLabel="Log it"
         onConfirm={() => {
-          dispatch({ type: 'OUTREACH_NOSEND', entry: { ts: '14 Sep, 09:14', clientId, kind: 'Non-send', detail: nonSendReason.trim() || 'No reason given', ref: null } });
+          dispatch({ type: 'OUTREACH_NOSEND', entry: { ts: NOW_TS, clientId, kind: 'Non-send', detail: nonSendReason.trim() || 'No reason given', ref: null } });
           setNonSendOpen(false);
         }}
         onClose={() => setNonSendOpen(false)}

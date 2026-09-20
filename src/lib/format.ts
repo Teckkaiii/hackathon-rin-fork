@@ -1,5 +1,11 @@
 export const TODAY = new Date('2026-09-14T09:00:00');
 
+// The one "now" every live-written ledger entry uses. A shared constant (not
+// a fresh Date().toLocaleString() each time) keeps every entry's timestamp
+// byte-identical, which the follow-up agent relies on to tell "sent today"
+// from "sent on a stale, seeded date" by exact string equality.
+export const NOW_TS = '14 Sep, 09:14';
+
 export function fmt(n: number): string {
   return 'SGD ' + Math.round(n).toLocaleString('en-SG');
 }

@@ -3,6 +3,7 @@ import driversData from './data/drivers.json';
 import type { Client, Driver, LedgerEntry } from './types';
 import type { RouteId, RoutedMap } from './lib/routing';
 import type { ChatMessage, DraftSpec } from './lib/assistant';
+import { NOW_TS } from './lib/format';
 
 export const CLIENTS = clientsData as Record<string, Client>;
 export const DRIVERS = driversData as Record<string, Driver>;
@@ -100,7 +101,7 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         routed: routedRest,
         specialistReplies: { ...state.specialistReplies, [action.id]: { verdict: action.verdict, nextStep: action.nextStep } },
-        ledger: [...state.ledger, { ts: '14 Sep, 09:14', clientId: action.clientId, kind: 'Specialist reply', detail: action.verdict, ref: null }],
+        ledger: [...state.ledger, { ts: NOW_TS, clientId: action.clientId, kind: 'Specialist reply', detail: action.verdict, ref: null }],
       };
     }
     default:

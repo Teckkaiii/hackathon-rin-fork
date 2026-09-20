@@ -10,6 +10,7 @@ import { Modal } from './ui/Modal';
 import { StatStrip } from './ui/StatStrip';
 import { ROUTE_LABELS, type RouteId } from '../lib/routing';
 import { specialistReply } from '../lib/specialist';
+import { NOW_TS } from '../lib/format';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
   const { dismissed, routed, specialistReplies } = state;
@@ -56,7 +57,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
       dispatch({
         type: 'OUTREACH_NOSEND',
         entry: {
-          ts: '14 Sep, 09:14',
+          ts: NOW_TS,
           clientId: opp.clientId,
           kind: 'Non-send',
           detail: `${ROUTE_LABELS[route]}${note ? ` — ${note}` : ''}`,
