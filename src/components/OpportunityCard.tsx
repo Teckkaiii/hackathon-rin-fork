@@ -12,9 +12,9 @@ const WINDOW_VARIANT: Record<SignalLevel, 'block' | 'flag' | 'neutral'> = {
   high: 'block', medium: 'flag', low: 'neutral',
 };
 const BAR_COLOR = {
-  urgency: 'bg-gold',
-  relevancy: 'bg-green',
-  momentum: 'bg-green',
+  urgency: 'bg-slate',
+  relevancy: 'bg-slate',
+  momentum: 'bg-slate',
   conviction: 'bg-slate',
 } as const;
 
@@ -48,7 +48,7 @@ export function OpportunityCard({
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="t-micro text-red">Rank {String(rank).padStart(2, '0')} · {opp.approach}</span>
+            <span className="t-micro">Rank {String(rank).padStart(2, '0')} · {opp.approach}</span>
             <Pill variant={WINDOW_VARIANT[signal.urgency.level]} className="text-[12px] font-semibold" data-testid="window-to-act">
               {opp.daysToAct} days to act
             </Pill>
@@ -66,7 +66,7 @@ export function OpportunityCard({
         <div className="text-right">
           <div className="t-micro">Opportunity size</div>
           <div className="num text-[26px] font-extrabold leading-none text-ink mt-1">{fmtNumber(opp.amountAtStake)}</div>
-          <div className="t-meta mt-1">SGD · rolls over {fmtRollsOver(opp.daysToAct)}</div>
+          <div className="t-meta mt-1">SGD · {opp.approach === 'Notify' ? 'rolls over' : 'act by'} {fmtRollsOver(opp.daysToAct)}</div>
         </div>
       </div>
 
@@ -136,7 +136,7 @@ function WhyBox({ label, value, onClick }: { label: string; value: string; onCli
       type="button"
       data-testid="why-box"
       onClick={onClick}
-      className="bg-sunk rounded-xl p-3 text-left hover:bg-hairline-2/40 transition-colors"
+      className="bg-sunk rounded-xl p-3 text-left hover:bg-red-wash transition-colors"
     >
       <div className="t-micro mb-1">{label}</div>
       <div className="text-[13.5px] leading-relaxed text-ink-2">{value}</div>
