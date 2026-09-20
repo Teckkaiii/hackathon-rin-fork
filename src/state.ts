@@ -36,6 +36,21 @@ export interface AppState {
 const SEED_DRAFT_CHEN =
   "Hi Mr Chen,\n\nJust a heads up that your SGD 500,000 fixed deposit is coming due soon. Rates are looking great right now so I'd recommend locking in a new structured deposit today — don't miss this window!\n\nBest,\nAisha";
 
+export interface FollowUpSeed {
+  clientId: string;
+  sentTs: string;   // when the original note went out — deliberately not NOW_TS
+  daysAgo: number;
+  about: string;    // plain-English: what the note was about
+}
+
+// A stale send with no reply, seeded so the follow-up agent has something
+// real to point at. Marcus already has a live opportunity today (his bond
+// matures in 8 days) — the earlier note and today's opportunity are the
+// same live matter, which is exactly why a follow-up is still worth it.
+export const FOLLOW_UPS: FollowUpSeed[] = [
+  { clientId: 'marcus', sentTs: '11 Sep, 10:20', daysAgo: 3, about: 'his corporate bond maturing soon' },
+];
+
 export function initialState(): AppState {
   return {
     tab: 'queue',
@@ -43,7 +58,9 @@ export function initialState(): AppState {
     clientOrigin: 'clients',
     dismissed: {},
     routed: {},
-    ledger: [],
+    ledger: [
+      { ts: '11 Sep, 10:20', clientId: 'marcus', kind: 'Sent', detail: 'Notify message sent', ref: 'Archived Client Comms · ARC-M3RC5Q' },
+    ],
     draftByClient: { chen: SEED_DRAFT_CHEN },
     outreachClientId: 'chen',
     chatByClient: {},
