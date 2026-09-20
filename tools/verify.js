@@ -160,6 +160,8 @@ function startServer() {
   check('Client directory lists 20 clients (Aisha\'s book, minus the 3 blocked)', await page.locator('[data-testid="client-row"]').count() === 20, 'count=' + await page.locator('[data-testid="client-row"]').count());
   check('Client list rows show no avatar icon', await page.locator('[data-testid="client-row"] .orb').count() === 0);
   check('Client list row shows only name and segment, not tier or RM', !(await page.locator('[data-testid="client-row"]').first().innerText()).includes('RM '));
+  const clientRows = await page.locator('[data-testid="client-row"]').allInnerTexts();
+  check('Client rows flag queued clients, not "Docs current" on every row', clientRows.filter(t => /In queue/i.test(t)).length === 5 && !clientRows.some(t => t.includes('Docs current')));
   check('Blocked client (Robert Teo) not listed among Clients', !(await page.locator('main').innerText()).includes('Robert Teo'));
 
   await page.locator('[data-client-id="priya"]').click();

@@ -1,11 +1,13 @@
 import { MY_CLIENTS, MY_CLIENT_IDS } from '../state';
 import { TODAY, monthsBetween } from '../lib/format';
-import { blockedClientIds } from '../lib/queue';
+import { blockedClientIds, rankedOpps } from '../lib/queue';
 import { Pill } from './ui/Pill';
 
 export function ClientsView({ onOpenClient }: { onOpenClient: (id: string) => void }) {
   const blocked = blockedClientIds(MY_CLIENT_IDS);
   const clients = MY_CLIENTS.filter(c => !blocked.has(c.id));
+  const queued = new Map<string, number>();
+  rankedOpps({}, {}, MY_CLIENT_IDS).forEach((o, i) => { if (!queued.has(o.clientId)) queued.set(o.clientId, i + 1); });
   return (
     <div>
       <div className="t-display mb-1">Clients</div>
@@ -29,7 +31,10 @@ export function ClientsView({ onOpenClient }: { onOpenClient: (id: string) => vo
               <div className="t-h3">{c.name}</div>
               <div className="t-meta">{c.segment}</div>
             </div>
-            <Pill variant={lapsed ? 'block' : 'pass'}>{lapsed ? 'Review lapsed' : 'Docs current'}</Pill>
+            <div className="flex items-center gap-2 flex-none">
+              {queued.has(c.id) && <span className="t-meta num">In queue · #{String(queued.get(c.id)).padStart(2, '0')}</span>}
+              {lapsed && <Pill variant="block">Review lapsed</Pill>}
+            </div>
           </button>
         );
       })}
