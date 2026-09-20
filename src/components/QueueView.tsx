@@ -10,10 +10,11 @@ import { Modal } from './ui/Modal';
 import { StatStrip } from './ui/StatStrip';
 import { ROUTE_LABELS, type RouteId } from '../lib/routing';
 import { specialistReply } from '../lib/specialist';
+import { callOutcome } from '../lib/clarify';
 import { NOW_TS } from '../lib/format';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
-  const { dismissed, routed, specialistReplies } = state;
+  const { dismissed, routed, specialistReplies, callOutcomes } = state;
 
   const surfaced = useMemo(() => rankedOpps(dismissed, routed, MY_CLIENT_IDS), [dismissed, routed]);
   const blocked = useMemo(() => blockedOpps(MY_CLIENT_IDS), []);
@@ -74,6 +75,12 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
     dispatch({ type: 'SPECIALIST_REPLY', id: opp.id, clientId: opp.clientId, verdict: reply.verdict, nextStep: reply.nextStep });
   }
 
+  function logCallOutcome(opp: Opportunity) {
+    const client = CLIENTS[opp.clientId];
+    const outcome = callOutcome(opp, client);
+    dispatch({ type: 'CALL_OUTCOME_LOGGED', id: opp.id, clientId: opp.clientId, verdict: outcome.verdict, nextStep: outcome.nextStep });
+  }
+
   return (
     <div>
       <div className="t-display mb-3">{greeting()}, {CURRENT_RM.split(' ')[0]}.</div>
@@ -112,6 +119,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
               onDismiss={openDismiss}
               onHandoff={handoff}
               specialistReply={specialistReplies[o.id]}
+              callOutcome={callOutcomes[o.id]}
             />
           ))
         : <div className="glass-tight p-4 t-meta">Nothing on your book needs attention right now.</div>}
@@ -136,6 +144,11 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
                   {r.route === 'specialist' && (
                     <Button size="sm" variant="ghost" data-testid="simulate-specialist-reply" onClick={() => simulateSpecialistReply(o)}>
                       Simulate specialist reply
+                    </Button>
+                  )}
+                  {r.route === 'clarify' && (
+                    <Button size="sm" variant="ghost" data-testid="log-call-outcome" onClick={() => logCallOutcome(o)}>
+                      Log the call outcome
                     </Button>
                   )}
                 </div>

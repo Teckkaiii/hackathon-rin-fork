@@ -145,6 +145,14 @@ export function specialistOpeningMessage(client: Client, reply: { verdict: strin
   return `The specialist desk got back on ${first}: ${reply.verdict} ${reply.nextStep} Want me to draft that note now?`;
 }
 
+// Opens the chat differently when the RM arrives here straight off a
+// clarifying call — RIN leads with what was learned, not the usual
+// "I've drafted a note".
+export function clarifyOpeningMessage(client: Client, outcome: { verdict: string; nextStep: string }): string {
+  const first = firstName(client);
+  return `From the call with ${first}: ${outcome.verdict} ${outcome.nextStep} Want me to draft that note now?`;
+}
+
 export function replyFor(intent: Intent | null, client: Client): string {
   const first = firstName(client);
   const h = client.holdings[0];

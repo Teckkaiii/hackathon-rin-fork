@@ -8,6 +8,7 @@ import { Pill } from './ui/Pill';
 import { Button } from './ui/Button';
 import { routeFor, ROUTE_LABELS, type RouteId } from '../lib/routing';
 import type { SpecialistReply } from '../lib/specialist';
+import type { CallOutcome } from '../lib/clarify';
 
 const WINDOW_VARIANT: Record<SignalLevel, 'block' | 'flag' | 'neutral'> = {
   high: 'block', medium: 'flag', low: 'neutral',
@@ -20,7 +21,7 @@ const BAR_COLOR = {
 } as const;
 
 export function OpportunityCard({
-  rank, opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff, specialistReply,
+  rank, opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff, specialistReply, callOutcome,
 }: {
   rank: number;
   opp: Opportunity;
@@ -29,15 +30,18 @@ export function OpportunityCard({
   onDismiss?: (id: string) => void;
   onHandoff: (oppId: string, route: RouteId) => void;
   specialistReply?: SpecialistReply;
+  callOutcome?: CallOutcome;
 }) {
   const c = CLIENTS[opp.clientId];
   const signal = signalBreakdown(opp);
   const route = routeFor(opp, c);
   const [showAlts, setShowAlts] = useState(false);
-  // Once the specialist has replied, the referral is closed — the next step is to
-  // draft, whatever the original routing rule said.
-  const primaryId: RouteId = specialistReply ? 'draft' : route.id;
-  const primaryLabel = specialistReply ? ROUTE_LABELS.draft : route.label;
+  // Once the specialist has replied (or the clarifying call is logged), the
+  // referral is closed — the next step is to draft, whatever the original
+  // routing rule said.
+  const resolved = specialistReply ?? callOutcome;
+  const primaryId: RouteId = resolved ? 'draft' : route.id;
+  const primaryLabel = resolved ? ROUTE_LABELS.draft : route.label;
   const alternates = (Object.keys(ROUTE_LABELS) as RouteId[]).filter(id => id !== primaryId);
 
   function runRoute(id: RouteId) {
@@ -59,6 +63,7 @@ export function OpportunityCard({
               {opp.daysToAct} days to act
             </Pill>
             {specialistReply && <Pill variant="pass" dot>Specialist reviewed</Pill>}
+            {callOutcome && <Pill variant="pass" dot>Call captured</Pill>}
           </div>
           <button
             type="button"
@@ -102,6 +107,13 @@ export function OpportunityCard({
         <div className="bg-green-wash rounded-xl p-3 mt-3" data-testid="specialist-verdict">
           <div className="t-micro mb-1">Specialist verdict</div>
           <div className="text-[13.5px] leading-relaxed text-ink-2">{specialistReply.verdict} {specialistReply.nextStep}</div>
+        </div>
+      )}
+
+      {callOutcome && (
+        <div className="bg-green-wash rounded-xl p-3 mt-3" data-testid="clarify-verdict">
+          <div className="t-micro mb-1">What {c.name.split(' ')[0]} said</div>
+          <div className="text-[13.5px] leading-relaxed text-ink-2">{callOutcome.verdict} {callOutcome.nextStep}</div>
         </div>
       )}
 
