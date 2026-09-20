@@ -86,7 +86,8 @@ tools/             verify.js (Playwright suite), serve.js (static server for
    affected, how severely, and whether the impact is confirmed (already
    linked to a signal on an opportunity) or inferred (a holdings match RIN
    hasn't had reviewed). Items reaching several clients severely are
-   flagged.
+   flagged. Paste a headline or a link at the top and RIN says what it is,
+   which of your clients it touches, and offers a draft for each.
 6. **Past Week** — seven days of daily impact reads per theme, against the
    RM's own book. A theme where every day landed the same direction of impact
    is high momentum, durable enough to build a recommendation around; a theme

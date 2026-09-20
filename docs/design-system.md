@@ -205,6 +205,12 @@ Unchanged — already working well and not brand-specific:
 - A pill is a label, not a sentence. If the text needs a clause, put the
   clause in `title` (a tooltip) or in `t-meta` beside it, not inside the
   pill.
+- The News tab's intake panel (`src/components/NewsIntake.tsx`) is RIN
+  speaking outside the Outreach chat, so it borrows the chat's grammar
+  exactly: `.rin-orb` with `data-state`, `.typing-dot` while thinking,
+  the white bubble with `rounded-bl-sm`, on a `.mesh-red` surface. If
+  RIN ever answers on a third screen, reuse these — don't invent a new
+  bubble.
 
 ## Do / Don't
 
@@ -257,6 +263,10 @@ extracted and shared by Queue and Past week; Outreach's client `<select>`
 restyled to match the pill family; a plain-English copy pass across every
 page (RM vocabulary stays, RIN's internal words don't). Plan:
 `docs/superpowers/plans/2026-09-20-design-polish.md`.
+
+**2026-09-20 — bring-your-own-news.** Intake input on the News tab;
+RIN's reply reuses the chat bubble language. No new tokens or classes.
+Plan: `docs/superpowers/plans/2026-09-20-news-intake.md`.
 
 When you add a surface that needs weight, the check is: is it `red`,
 `slate`, or `.mesh-red`? If it's none of those, stop.
