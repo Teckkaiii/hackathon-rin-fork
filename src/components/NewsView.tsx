@@ -3,6 +3,7 @@ import { newsByClient } from '../lib/news';
 import { fmtDate } from '../lib/format';
 import type { NewsFlag, ImpactSeverity } from '../types';
 import { Pill } from './ui/Pill';
+import { NewsIntake } from './NewsIntake';
 
 const FLAG_LABEL: Record<NewsFlag, string> = { priority: 'Priority', elevated: 'Watch', standard: 'Standard' };
 const FLAG_TITLE: Record<NewsFlag, string> = {
@@ -23,7 +24,7 @@ const SEVERITY_VARIANT: Record<ImpactSeverity, 'block' | 'flag' | 'neutral'> = {
 };
 const SEVERITY_LABEL: Record<ImpactSeverity, string> = { high: 'High', medium: 'Medium', low: 'Low' };
 
-export function NewsView({ onOpenClient }: { onOpenClient: (id: string) => void }) {
+export function NewsView({ onOpenClient, onDraftOutreach }: { onOpenClient: (id: string) => void; onDraftOutreach: (id: string) => void }) {
   const groups = newsByClient(MY_CLIENT_IDS);
 
   return (
@@ -33,6 +34,8 @@ export function NewsView({ onOpenClient }: { onOpenClient: (id: string) => void 
         What happened in the last day, sorted by who it touches most. Confirmed means it is already behind an item
         in your queue. Inferred means RIN thinks it fits what the client holds, and you have not checked it yet.
       </div>
+
+      <NewsIntake onOpenClient={onOpenClient} onDraftOutreach={onDraftOutreach} />
 
       {groups.map(({ client, items }) => {
         const groupFlag = items.map(i => i.flag).sort((a, b) => FLAG_RANK[a] - FLAG_RANK[b])[0];
