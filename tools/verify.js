@@ -150,6 +150,28 @@ function startServer() {
   await page.click('nav >> text=Queue');
   await page.waitForTimeout(150);
 
+  // ---- Close the clarify loop: log the call, then draft from what was learned ----
+  const davidRow = page.locator('[data-testid="handed-off-row"]', { hasText: 'David Ong' });
+  check('Handed off row offers a way to log the call outcome', await davidRow.locator('[data-testid="log-call-outcome"]').count() === 1);
+  await davidRow.locator('[data-testid="log-call-outcome"]').click();
+  check('Logging the call closes the referral and returns it to the surfaced queue', /05\s+surfaced/i.test(await page.locator('[data-testid="queue-stat-strip"]').innerText()));
+  check('No longer listed under Handed off', await page.locator('[data-testid="handed-off-row"]', { hasText: 'David Ong' }).count() === 0);
+
+  const davidCard2 = page.locator('[data-testid="opportunity-card"]', { hasText: 'David Ong' });
+  const davidCardTxt = await davidCard2.innerText();
+  check('Card shows the call-captured pill', /call captured/i.test(davidCardTxt));
+  const clarifyTxt = await davidCard2.locator('[data-testid="clarify-verdict"]').innerText();
+  check("Card shows what David said, grounded in his income objective", clarifyTxt.includes('21,400') && clarifyTxt.includes('30,000'));
+  check('Primary action switches to Draft outreach once captured', (await davidCard2.locator('[data-testid="route-primary"]').innerText()).includes('Draft outreach'));
+
+  await davidCard2.locator('[data-testid="route-primary"]').click();
+  check('Draft outreach after a captured call opens Outreach for that client', await page.inputValue('#outreach-client-select') === 'david');
+  await page.waitForSelector('[data-testid="chat-msg-rin"]');
+  const davidOpening = await page.locator('[data-testid="chat-msg-rin"]').first().innerText();
+  check("RIN's opening message leads with the call, not the usual draft line", davidOpening.includes('From the call with David') && davidOpening.includes('21,400'));
+  await page.click('nav >> text=Queue');
+  await page.waitForTimeout(150);
+
   // The RM can overrule the agent's pick
   const priyaCard2 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Priya Ravindran' });
   check('Alternate routes are hidden by default', await priyaCard2.locator('[data-testid="route-alt"]').count() === 0);
