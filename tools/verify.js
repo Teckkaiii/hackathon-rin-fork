@@ -348,6 +348,46 @@ function startServer() {
     const i = txt.indexOf(firstNewsClient);
     return i > -1 && txt.slice(i, i + 400).includes('High impact');
   })());
+
+  // ---- Bring-your-own-news: paste a link or headline, RIN names the exposed clients ----
+  // ask() clears the old brief synchronously and shows the thinking dots, so waiting
+  // for a brief to (re)appear is enough to know this submit's answer has landed.
+  const intakeAnswer = async () => {
+    await page.waitForFunction(() => document.querySelector('[data-testid="news-intake-brief"]') !== null, null, { timeout: 5000 });
+    return page.locator('[data-testid="news-intake-brief"]').innerText();
+  };
+  check('News tab offers a place to paste a headline or link', await page.locator('#news-intake-input').count() === 1);
+  check('The intake is an input, not a select (Queue must stay select-free)', await page.locator('main select').count() === 0);
+
+  await page.fill('#news-intake-input', 'https://www.straitstimes.com/business/mas-signals-easing-as-core-inflation-cools');
+  await page.press('#news-intake-input', 'Enter');
+  check('RIN shows it is thinking before it answers', await page.locator('[data-testid="news-intake-thinking"], [data-testid="news-intake-brief"]').count() >= 1);
+  let brief = await intakeAnswer();
+  check('A pasted link is read from its headline and tied to the rates story', brief.includes('Reads as: SGD rates expected to ease'));
+  check('The brief counts confirmed and inferred exposure', /1 confirmed against an open opportunity/.test(brief) && /\d+ inferred from what they hold/.test(brief));
+  check('The panel names the source it read from', (await page.locator('[data-testid="news-intake-panel"]').innerText()).includes('straitstimes.com'));
+  const intakeRows = await page.locator('[data-testid="news-intake-client"]').allInnerTexts();
+  check('Chen is listed first as a confirmed exposure', intakeRows.length >= 2 && intakeRows[0].includes('Chen Wei Liang') && intakeRows[0].includes('Confirmed'));
+  check('A news-only client is listed as inferred', intakeRows.some(r => r.includes('Kevin Loh') && r.includes('Inferred')));
+  const robertIntake = page.locator('[data-testid="news-intake-client"]', { hasText: 'Robert Teo' });
+  check('A withheld client shows Withheld instead of a draft button', (await robertIntake.innerText()).includes('Withheld') && await robertIntake.locator('[data-testid="news-intake-draft"]').count() === 0);
+
+  await page.fill('#news-intake-input', 'Weather warning for the east coast');
+  await page.press('#news-intake-input', 'Enter');
+  brief = await intakeAnswer();
+  check('An unrelated story gets an honest "couldn\'t tie that" reply', brief.includes("I couldn't tie that") && await page.locator('[data-testid="news-intake-client"]').count() === 0);
+
+  await page.fill('#news-intake-input', 'Chip stocks slide as foundry guidance is cut');
+  await page.press('#news-intake-input', 'Enter');
+  brief = await intakeAnswer();
+  check('A plain headline is classified too (semiconductors -> Priya, confirmed)', brief.includes('Reads as: Semiconductor sector correction') && (await page.locator('[data-testid="news-intake-client"]').first().innerText()).includes('Priya Ravindran'));
+
+  await page.locator('[data-testid="news-intake-client"]', { hasText: 'Priya Ravindran' }).locator('[data-testid="news-intake-draft"]').click();
+  check('Draft outreach from the intake opens Outreach for that client', await page.inputValue('#outreach-client-select') === 'priya');
+  await page.click('nav >> text=News');
+  await page.waitForTimeout(150);
+  txt = await page.locator('main').innerText();
+
   await page.locator('[data-testid="news-client-open"]').first().click();
   check('Clicking a client name in News opens that client\'s position page', await page.locator('[data-testid="client-detail"]').count() === 1);
   await page.click('[data-testid="client-back"]');
