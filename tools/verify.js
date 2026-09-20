@@ -205,6 +205,28 @@ function startServer() {
   txt = await page.locator('main').innerText();
   check('Priya dismissed with reason recorded', txt.includes('Dismissed') && txt.includes('Client travelling'));
 
+  // ---- Follow-up agent: a stale send with no reply ----
+  const marcusFollowUp = page.locator('[data-testid="needs-followup-row"]', { hasText: 'Marcus Wong' });
+  check('Queue surfaces a stale send as needing a follow-up', await marcusFollowUp.count() === 1);
+  check('The row says when it was sent and how long ago', (await marcusFollowUp.innerText()).includes('11 Sep, 10:20') && (await marcusFollowUp.innerText()).includes('3 days ago'));
+  await marcusFollowUp.locator('[data-testid="draft-followup"]').click();
+  check('Draft follow-up opens Outreach for that client', await page.inputValue('#outreach-client-select') === 'marcus');
+  await page.waitForSelector('[data-testid="chat-msg-rin"]');
+  const marcusOpening = await page.locator('[data-testid="chat-msg-rin"]').first().innerText();
+  check("RIN's opening message leads with the earlier send, not the usual draft line", marcusOpening.includes('3 days ago') && marcusOpening.includes('corporate bond'));
+
+  const marcusSendPrev = await page.locator('[data-testid="chat-msg-rin"]').count();
+  await page.click('[data-act="outreach-send"]');
+  await page.waitForFunction(
+    n => document.querySelectorAll('[data-testid="chat-msg-rin"]').length > n && !document.querySelector('[data-streaming]'),
+    marcusSendPrev, { timeout: 8000 }
+  );
+  check('The default follow-up draft sends cleanly', (await page.locator('main').innerText()).includes('Archived Client Comms'));
+
+  await page.click('nav >> text=Queue');
+  await page.waitForTimeout(150);
+  check('Resolved follow-up disappears from the Queue on its own', await page.locator('[data-testid="needs-followup-row"]').count() === 0);
+
   // ---- Module 2: Clients ----
   await page.click('nav >> text=Clients');
   await page.waitForSelector('[data-testid="client-row"]');
