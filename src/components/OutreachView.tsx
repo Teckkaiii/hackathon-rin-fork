@@ -172,13 +172,13 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
     <div>
       <div className="t-display mb-1">Outreach</div>
       <div className="t-lead mb-5">
-        Talk to RIN to shape the message. RIN checks it against {c.name}'s own record before anything goes —
-        nothing sends without your say-so, and every send or non-send is written to the outcome ledger.
+        Tell RIN how you want the note to sound. RIN checks it against {c.name}'s records before you send, and
+        keeps a record of what you decided.
       </div>
 
       <select
         id="outreach-client-select"
-        className="border border-hairline-2 rounded-lg px-2.5 py-2 text-[14px] mb-4 bg-white"
+        className="appearance-none rounded-full border border-hairline-2 bg-white pl-4 pr-9 py-2 text-[14px] font-semibold text-ink mb-4 bg-no-repeat bg-[right_0.9rem_center] bg-[length:12px_12px] bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%234A5560%22><path d=%22M5.5 7.5l4.5 4.5 4.5-4.5%22 stroke=%22%234A5560%22 stroke-width=%222%22 fill=%22none%22 stroke-linecap=%22round%22/></svg>')] hover:border-ink-3 transition-colors"
         value={clientId}
         onChange={e => switchClient(e.target.value)}
       >
@@ -229,8 +229,8 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
           </div>
 
           <div className="px-5 pb-4 pt-2 border-t border-red/10">
-            <div className="flex items-center gap-1.5 flex-wrap mb-2" data-testid="type-chips">
-              <span className="t-micro mr-1">Email type</span>
+            <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible mb-2" data-testid="type-chips">
+              <span className="t-micro mr-1 flex-none">Email type</span>
               {TYPES.map(t => (
                 <Button
                   key={t.id}
@@ -239,26 +239,27 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
                   variant={approach === t.approach ? 'primary' : 'default'}
                   disabled={busy || !opp}
                   onClick={() => ask(t.label, t.intent)}
+                  className="flex-none"
                 >
                   {t.approach}
                 </Button>
               ))}
             </div>
-            <div className="flex gap-1.5 flex-wrap mb-3">
+            <div className="flex gap-1.5 flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible mb-3">
               {pending ? (
                 <>
-                  <Button data-testid="chip-fix" size="sm" variant="primary" disabled={busy} onClick={() => ask('Fix it for me', 'fix')}>
+                  <Button data-testid="chip-fix" size="sm" variant="primary" disabled={busy} onClick={() => ask('Fix it for me', 'fix')} className="flex-none">
                     Fix it for me
                   </Button>
                   {canSendAnyway && opp && (
-                    <Button data-testid="chip-send-anyway" size="sm" disabled={busy} onClick={() => commitSend(effectiveApproach(opp, spec))}>
+                    <Button data-testid="chip-send-anyway" size="sm" disabled={busy} onClick={() => commitSend(effectiveApproach(opp, spec))} className="flex-none">
                       Send anyway
                     </Button>
                   )}
                 </>
               ) : (
                 CHIPS.map(ch => (
-                  <Button key={ch.id} data-testid={`chip-${ch.id}`} size="sm" disabled={busy || !opp} onClick={() => ask(ch.label, ch.intent)}>
+                  <Button key={ch.id} data-testid={`chip-${ch.id}`} size="sm" disabled={busy || !opp} onClick={() => ask(ch.label, ch.intent)} className="flex-none">
                     {ch.label}
                   </Button>
                 ))
@@ -317,7 +318,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
               Send to {first}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => { setNonSendReason('Client travelling this week'); setNonSendOpen(true); }}>
-              Log a non-send
+              Skip, and say why
             </Button>
           </div>
           {!opp && (
@@ -329,7 +330,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
       </div>
 
       <div className="glass p-5">
-        <div className="t-h3 mb-2">Outcome ledger — {c.name}</div>
+        <div className="t-h3 mb-2">What you decided — {c.name}</div>
         {ledgerForClient.length ? (
           <table className="w-full text-[13.5px] border-collapse">
             <thead>
@@ -351,7 +352,7 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
             </tbody>
           </table>
         ) : (
-          <div className="t-meta">No entries yet.</div>
+          <div className="t-meta">Nothing here yet. Once you send or skip a note to {first}, it shows up here.</div>
         )}
       </div>
 
