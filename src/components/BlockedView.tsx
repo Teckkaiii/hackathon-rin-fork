@@ -1,8 +1,9 @@
+import type { Action, AppState } from '../state';
 import { MY_CLIENT_IDS } from '../state';
 import { blockedOpps } from '../lib/queue';
 import { BlockedCard } from './BlockedCard';
 
-export function BlockedView() {
+export function BlockedView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
   const blocked = blockedOpps(MY_CLIENT_IDS);
 
   return (
@@ -14,7 +15,15 @@ export function BlockedView() {
       </div>
 
       {blocked.length
-        ? blocked.map(x => <BlockedCard key={x.opp.id} opp={x.opp} gates={x.gates} />)
+        ? blocked.map(x => (
+            <BlockedCard
+              key={x.opp.id}
+              opp={x.opp}
+              gates={x.gates}
+              requested={!!state.unblockRequests[x.opp.id]}
+              onRequest={message => dispatch({ type: 'REQUEST_UNBLOCK', id: x.opp.id, clientId: x.opp.clientId, message })}
+            />
+          ))
         : <div className="glass-tight p-4 t-meta">Nothing is currently withheld in your book.</div>}
     </div>
   );

@@ -39,7 +39,7 @@ export default function App() {
               />
             : <ClientsView onOpenClient={id => dispatch({ type: 'OPEN_CLIENT', id })} />
         )}
-        {state.tab === 'blocked' && <BlockedView />}
+        {state.tab === 'blocked' && <BlockedView state={state} dispatch={dispatch} />}
         {state.tab === 'outreach' && <OutreachView state={state} dispatch={dispatch} />}
         {state.tab === 'news' && (
           <NewsView
