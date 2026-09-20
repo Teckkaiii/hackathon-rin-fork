@@ -155,6 +155,9 @@ Motion, in two registers:
   length so a long reply never drags. These live in `src/index.css` under
   "RIN, the assistant" and are what makes the chat read as a *someone*
   rather than a form. Don't add ambient motion to anything that isn't RIN.
+- Both registers stop under `prefers-reduced-motion: reduce` — the orb
+  holds its idle glow, the dots hold, the caret holds. That block lives at
+  the bottom of `src/index.css`, right after the keyframes.
 
 RIN is a decision tool an RM uses dozens of times a day — anything the RM
 has to wait on that runs past ~250ms reads as friction, not as "future."
@@ -188,6 +191,20 @@ Unchanged — already working well and not brand-specific:
 - The RIN avatar in Outreach chat is a red gradient — RIN is the brand, so
   it wears the brand color. The RM's own bubbles stay `slate`.
 - The modal scrim is `slate/30` with a backdrop blur, not a black overlay.
+- `StatStrip` (`src/components/ui/StatStrip.tsx`) — the only place a
+  summary number renders in `red` at display size. Queue and Past week
+  both use it. Don't hand-roll a third version of this.
+- Cards are `.glass` (shadow) when they are the page's content and
+  `.glass-tight` (no shadow) when they are rows inside something else.
+  Queue cards, blocked cards, news groups and past-week themes are
+  content; handed-off rows, dismissed rows, client-list rows and info
+  cards inside the client page are rows.
+- Metric bars (urgency/relevancy/momentum/conviction on a queue card) are
+  one colour (`slate`). They're measurements, not statuses — don't recolor
+  one to imply "this one's a warning."
+- A pill is a label, not a sentence. If the text needs a clause, put the
+  clause in `title` (a tooltip) or in `t-meta` beside it, not inside the
+  pill.
 
 ## Do / Don't
 
@@ -200,6 +217,11 @@ Unchanged — already working well and not brand-specific:
 - Sample real reference material when you have it, and record what you
   sampled and from where (see the Grounding section) so the next person
   can trust the numbers without re-deriving them.
+- Write copy in the RM's own vocabulary. Banking terms they use daily
+  (suitability, KYC, mandate, concentration, fixed deposit) stay; words
+  that describe RIN's own machinery (gate, driver, ranking, correlated
+  conviction cluster) don't belong on screen — say what happened instead
+  of naming the mechanism that decided it.
 
 **Don't:**
 - Don't add a second accent color competing with red for attention — the
@@ -209,6 +231,9 @@ Unchanged — already working well and not brand-specific:
   for `.glow-red` or `.mesh-red` instead.
 - Don't introduce beige/cream tones — the canvas is pink-white, sampled
   directly from OCBC's own app, not a warm neutral chosen for taste.
+- Don't repeat a fact the page already shows one card away (tier, mandate,
+  KYC under a client's name *and* again in the Relationship card, for
+  example). Say it once, in the place it belongs.
 
 ## Migration log
 
@@ -219,6 +244,19 @@ tab, the queue stat strip, the client-page hero, the Outreach RIN avatar,
 the modal scrim, and the signal-score numeral all now follow this
 document. A `grep -rn "graphite\|panel-dark\|bg-black" src` returns
 nothing — if it ever does again, that's a regression against this file.
+
+**2026-09-20 — polish pass.** `prefers-reduced-motion` support for RIN's
+ambient animation; single-row phone nav; `glass` standardised on content
+cards; red demoted off the queue card's rank eyebrow and the metric bars
+(now one colour); Clients tab shows exceptions only (review lapsed,
+in-queue) instead of an identical pill on every row; Blocked gate rows
+stack on phone instead of squeezing the reason text; News pills shortened
+to a single word with the detail in a tooltip, and `Inferred` moved off
+the heaviest (`slate`) fill since it's the less certain state; `StatStrip`
+extracted and shared by Queue and Past week; Outreach's client `<select>`
+restyled to match the pill family; a plain-English copy pass across every
+page (RM vocabulary stays, RIN's internal words don't). Plan:
+`docs/superpowers/plans/2026-09-20-design-polish.md`.
 
 When you add a surface that needs weight, the check is: is it `red`,
 `slate`, or `.mesh-red`? If it's none of those, stop.
