@@ -30,6 +30,7 @@ export interface AppState {
   specByClient: Record<string, DraftSpec>;
   specialistReplies: Record<string, { verdict: string; nextStep: string }>;
   callOutcomes: Record<string, { verdict: string; nextStep: string }>;
+  unblockRequests: Record<string, boolean>;
 }
 
 const SEED_DRAFT_CHEN =
@@ -49,6 +50,7 @@ export function initialState(): AppState {
     specByClient: {},
     specialistReplies: {},
     callOutcomes: {},
+    unblockRequests: {},
   };
 }
 
@@ -65,7 +67,8 @@ export type Action =
   | { type: 'OUTREACH_SEND'; entry: LedgerEntry }
   | { type: 'OUTREACH_NOSEND'; entry: LedgerEntry }
   | { type: 'SPECIALIST_REPLY'; id: string; clientId: string; verdict: string; nextStep: string }
-  | { type: 'CALL_OUTCOME_LOGGED'; id: string; clientId: string; verdict: string; nextStep: string };
+  | { type: 'CALL_OUTCOME_LOGGED'; id: string; clientId: string; verdict: string; nextStep: string }
+  | { type: 'REQUEST_UNBLOCK'; id: string; clientId: string; message: string };
 
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -118,6 +121,12 @@ export function reducer(state: AppState, action: Action): AppState {
         ledger: [...state.ledger, { ts: NOW_TS, clientId: action.clientId, kind: 'Call outcome logged', detail: action.verdict, ref: null }],
       };
     }
+    case 'REQUEST_UNBLOCK':
+      return {
+        ...state,
+        unblockRequests: { ...state.unblockRequests, [action.id]: true },
+        ledger: [...state.ledger, { ts: NOW_TS, clientId: action.clientId, kind: 'Unblock requested', detail: action.message, ref: null }],
+      };
     default:
       return state;
   }
