@@ -4,10 +4,11 @@ import { fmtDate } from '../lib/format';
 import type { NewsFlag, ImpactSeverity } from '../types';
 import { Pill } from './ui/Pill';
 
-const FLAG_LABEL: Record<NewsFlag, string> = {
-  priority: 'Priority — reaches multiple clients, at least one severely',
-  elevated: 'Elevated — at least one client severely affected',
-  standard: 'Standard',
+const FLAG_LABEL: Record<NewsFlag, string> = { priority: 'Priority', elevated: 'Watch', standard: 'Standard' };
+const FLAG_TITLE: Record<NewsFlag, string> = {
+  priority: 'Touches several of your clients, at least one hard',
+  elevated: 'Hits one of your clients hard',
+  standard: '',
 };
 const FLAG_VARIANT: Record<NewsFlag, 'block' | 'flag' | 'neutral'> = {
   priority: 'block',
@@ -49,12 +50,12 @@ export function NewsView({ onOpenClient }: { onOpenClient: (id: string) => void 
                 <span className="t-meta ml-2">{client.segment}</span>
               </button>
               {groupFlag !== 'standard' && (
-                <Pill variant={FLAG_VARIANT[groupFlag]}>{FLAG_LABEL[groupFlag]}</Pill>
+                <Pill variant={FLAG_VARIANT[groupFlag]} title={FLAG_TITLE[groupFlag]}>{FLAG_LABEL[groupFlag]}</Pill>
               )}
             </div>
 
             {items.map(item => (
-              <div key={item.id} className="flex items-start gap-4 py-3 border-t border-hairline first:border-t-0 first:pt-0">
+              <div key={item.id} className="flex items-start gap-4 py-3 border-t border-hairline first:border-t-0 first:pt-0 flex-wrap">
                 <div className="w-16 flex-none">
                   <div className="t-meta font-semibold text-ink-2">{fmtDate(item.date).slice(0, 6)}</div>
                   <div className="t-meta">{item.recency}</div>
@@ -63,9 +64,9 @@ export function NewsView({ onOpenClient }: { onOpenClient: (id: string) => void 
                   <div className="t-h3 mb-1">{item.headline}</div>
                   <div className="text-[13.5px] text-ink-2 leading-relaxed">{item.impact.reason}</div>
                 </div>
-                <div className="flex flex-col items-end gap-1.5 flex-none">
+                <div className="flex flex-row flex-wrap items-start gap-1.5 flex-none sm:flex-col sm:items-end">
                   <Pill variant={SEVERITY_VARIANT[item.impact.severity]}>{SEVERITY_LABEL[item.impact.severity]} impact</Pill>
-                  <Pill variant={item.impact.basis === 'confirmed' ? 'pass' : 'slate'}>
+                  <Pill variant={item.impact.basis === 'confirmed' ? 'pass' : 'neutral'}>
                     {item.impact.basis === 'confirmed' ? 'Confirmed' : 'Inferred'}
                   </Pill>
                 </div>
