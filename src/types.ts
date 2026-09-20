@@ -110,7 +110,7 @@ export interface CoachCheck {
 export interface LedgerEntry {
   ts: string;
   clientId: string;
-  kind: 'Sent' | 'Non-send';
+  kind: 'Sent' | 'Non-send' | 'Specialist reply';
   detail: string;
   ref: string | null;
 }

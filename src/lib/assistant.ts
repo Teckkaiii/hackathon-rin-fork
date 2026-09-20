@@ -138,6 +138,13 @@ export function openingMessage(client: Client, opp: Opportunity | undefined): st
   return `I've drafted a note to ${first} — ${softLower(opp.signal.headline)}. Want it more formal, more casual, shorter, or with the figures from the record?`;
 }
 
+// Opens the chat differently when the RM arrives here straight off a specialist's
+// callback — RIN leads with what the desk said, not the usual "I've drafted a note".
+export function specialistOpeningMessage(client: Client, reply: { verdict: string; nextStep: string }): string {
+  const first = firstName(client);
+  return `The specialist desk got back on ${first}: ${reply.verdict} ${reply.nextStep} Want me to draft that note now?`;
+}
+
 export function replyFor(intent: Intent | null, client: Client): string {
   const first = firstName(client);
   const h = client.holdings[0];

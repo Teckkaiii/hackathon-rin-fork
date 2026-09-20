@@ -7,7 +7,7 @@ import { newsByClient } from '../lib/news';
 import { runCoachChecks } from '../lib/coach';
 import {
   DEFAULT_SPEC, applyIntent, parseIntent, renderDraft, replyFor, openingMessage,
-  checkFailureMessage, sentMessage, effectiveApproach, type Intent,
+  specialistOpeningMessage, checkFailureMessage, sentMessage, effectiveApproach, type Intent,
 } from '../lib/assistant';
 import type { Approach } from '../types';
 import { cn } from '../lib/cn';
@@ -76,7 +76,9 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
 
   useEffect(() => {
     if (chat.length === 0) {
-      dispatch({ type: 'CHAT_APPEND', clientId, message: { role: 'rin', text: openingMessage(c, opp) } });
+      const specialistReply = opp ? state.specialistReplies[opp.id] : undefined;
+      const opening = specialistReply ? specialistOpeningMessage(c, specialistReply) : openingMessage(c, opp);
+      dispatch({ type: 'CHAT_APPEND', clientId, message: { role: 'rin', text: opening } });
     }
   }, [clientId]);
 

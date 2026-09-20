@@ -27,6 +27,7 @@ export interface AppState {
   outreachClientId: string;
   chatByClient: Record<string, ChatMessage[]>;
   specByClient: Record<string, DraftSpec>;
+  specialistReplies: Record<string, { verdict: string; nextStep: string }>;
 }
 
 const SEED_DRAFT_CHEN =
@@ -44,6 +45,7 @@ export function initialState(): AppState {
     outreachClientId: 'chen',
     chatByClient: {},
     specByClient: {},
+    specialistReplies: {},
   };
 }
 
@@ -58,7 +60,8 @@ export type Action =
   | { type: 'CHAT_APPEND'; clientId: string; message: ChatMessage }
   | { type: 'SET_DRAFT_SPEC'; clientId: string; spec: DraftSpec }
   | { type: 'OUTREACH_SEND'; entry: LedgerEntry }
-  | { type: 'OUTREACH_NOSEND'; entry: LedgerEntry };
+  | { type: 'OUTREACH_NOSEND'; entry: LedgerEntry }
+  | { type: 'SPECIALIST_REPLY'; id: string; clientId: string; verdict: string; nextStep: string };
 
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -89,6 +92,17 @@ export function reducer(state: AppState, action: Action): AppState {
       };
     case 'SET_DRAFT_SPEC':
       return { ...state, specByClient: { ...state.specByClient, [action.clientId]: action.spec } };
+    case 'SPECIALIST_REPLY': {
+      // The specialist calling back closes the referral: it drops off "Handed off"
+      // and re-enters the ranked queue, now carrying the desk's verdict.
+      const { [action.id]: _referred, ...routedRest } = state.routed;
+      return {
+        ...state,
+        routed: routedRest,
+        specialistReplies: { ...state.specialistReplies, [action.id]: { verdict: action.verdict, nextStep: action.nextStep } },
+        ledger: [...state.ledger, { ts: '14 Sep, 09:14', clientId: action.clientId, kind: 'Specialist reply', detail: action.verdict, ref: null }],
+      };
+    }
     default:
       return state;
   }

@@ -1,15 +1,18 @@
 import { useMemo, useState } from 'react';
 import type { Action, AppState } from '../state';
+import type { Opportunity } from '../types';
 import { CLIENTS, DRIVERS, MY_CLIENT_IDS, CURRENT_RM } from '../state';
 import { OPPS, blockedOpps, rankedOpps, clusters } from '../lib/queue';
 import { OpportunityCard } from './OpportunityCard';
 import { Pill } from './ui/Pill';
+import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
 import { StatStrip } from './ui/StatStrip';
 import { ROUTE_LABELS, type RouteId } from '../lib/routing';
+import { specialistReply } from '../lib/specialist';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
-  const { dismissed, routed } = state;
+  const { dismissed, routed, specialistReplies } = state;
 
   const surfaced = useMemo(() => rankedOpps(dismissed, routed, MY_CLIENT_IDS), [dismissed, routed]);
   const blocked = useMemo(() => blockedOpps(MY_CLIENT_IDS), []);
@@ -64,6 +67,12 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
     setHandoffTarget(null);
   }
 
+  function simulateSpecialistReply(opp: Opportunity) {
+    const client = CLIENTS[opp.clientId];
+    const reply = specialistReply(opp, client);
+    dispatch({ type: 'SPECIALIST_REPLY', id: opp.id, clientId: opp.clientId, verdict: reply.verdict, nextStep: reply.nextStep });
+  }
+
   return (
     <div>
       <div className="t-display mb-3">{greeting()}, {CURRENT_RM.split(' ')[0]}.</div>
@@ -101,6 +110,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
               onOpenOutreach={id => { dispatch({ type: 'SET_OUTREACH_CLIENT', id }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
               onDismiss={openDismiss}
               onHandoff={handoff}
+              specialistReply={specialistReplies[o.id]}
             />
           ))
         : <div className="glass-tight p-4 t-meta">Nothing on your book needs attention right now.</div>}
@@ -115,12 +125,19 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
             const c = CLIENTS[o.clientId];
             const r = routed[o.id];
             return (
-              <div key={o.id} className="glass-tight p-4 mb-2 flex items-center justify-between gap-3 flex-wrap">
+              <div key={o.id} data-testid="handed-off-row" className="glass-tight p-4 mb-2 flex items-center justify-between gap-3 flex-wrap">
                 <div>
                   <div className="t-h3">{c.name}</div>
                   <div className="t-meta">{c.segment}</div>
                 </div>
-                <Pill variant="flag">{ROUTE_LABELS[r.route]}{r.note ? ` — ${r.note}` : ''}</Pill>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Pill variant="flag">{ROUTE_LABELS[r.route]}{r.note ? ` — ${r.note}` : ''}</Pill>
+                  {r.route === 'specialist' && (
+                    <Button size="sm" variant="ghost" data-testid="simulate-specialist-reply" onClick={() => simulateSpecialistReply(o)}>
+                      Simulate specialist reply
+                    </Button>
+                  )}
+                </div>
               </div>
             );
           })}

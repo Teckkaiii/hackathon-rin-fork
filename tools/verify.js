@@ -121,6 +121,35 @@ function startServer() {
   check('Handed-off section names the route taken', txt.includes('Handed off') && txt.includes('Call to clarify'));
   check('Handing off kept us on the Queue tab', ON_QUEUE.test(txt));
 
+  // ---- The full specialist-referral pipeline: refer, simulate the callback, act on it ----
+  const huilingCard = page.locator('[data-testid="opportunity-card"]', { hasText: 'Lim Hui Ling' });
+  check('Huiling routed to a specialist', (await huilingCard.locator('[data-testid="route-primary"]').innerText()).includes('Refer to specialist'));
+  await huilingCard.locator('[data-testid="route-primary"]').click();
+  check('Referring to a specialist opens the note modal', await page.locator('[data-testid="modal"]').count() === 1);
+  await page.click('[data-act="modal-confirm"]');
+  check('Referred opportunity leaves the surfaced list', /03\s+surfaced/i.test(await page.locator('[data-testid="queue-stat-strip"]').innerText()));
+  const huilingRow = page.locator('[data-testid="handed-off-row"]', { hasText: 'Lim Hui Ling' });
+  check('Handed off row offers a way to simulate the specialist calling back', await huilingRow.locator('[data-testid="simulate-specialist-reply"]').count() === 1);
+
+  await huilingRow.locator('[data-testid="simulate-specialist-reply"]').click();
+  check('The reply closes the referral and returns it to the surfaced queue', /04\s+surfaced/i.test(await page.locator('[data-testid="queue-stat-strip"]').innerText()));
+  check('No longer listed under Handed off', await page.locator('[data-testid="handed-off-row"]', { hasText: 'Lim Hui Ling' }).count() === 0);
+
+  const huilingCard2 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Lim Hui Ling' });
+  const huilingTxt = await huilingCard2.innerText();
+  check('Card shows the specialist-reviewed pill', /specialist reviewed/i.test(huilingTxt));
+  const verdictTxt = await huilingCard2.locator('[data-testid="specialist-verdict"]').innerText();
+  check("Card shows the specialist's verdict, grounded in the same concentration figures", verdictTxt.includes('35%') && verdictTxt.includes('30%'));
+  check('Primary action switches to Draft outreach once reviewed', (await huilingCard2.locator('[data-testid="route-primary"]').innerText()).includes('Draft outreach'));
+
+  await huilingCard2.locator('[data-testid="route-primary"]').click();
+  check('Draft outreach after a reply opens Outreach for that client', await page.inputValue('#outreach-client-select') === 'huiling');
+  await page.waitForSelector('[data-testid="chat-msg-rin"]');
+  const huilingOpening = await page.locator('[data-testid="chat-msg-rin"]').first().innerText();
+  check("RIN's opening message leads with the specialist's callback, not the usual draft line", huilingOpening.includes('specialist desk') && huilingOpening.includes('35%'));
+  await page.click('nav >> text=Queue');
+  await page.waitForTimeout(150);
+
   // The RM can overrule the agent's pick
   const priyaCard2 = page.locator('[data-testid="opportunity-card"]', { hasText: 'Priya Ravindran' });
   check('Alternate routes are hidden by default', await priyaCard2.locator('[data-testid="route-alt"]').count() === 0);

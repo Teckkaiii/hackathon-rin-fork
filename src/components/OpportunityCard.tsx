@@ -7,6 +7,7 @@ import { cn } from '../lib/cn';
 import { Pill } from './ui/Pill';
 import { Button } from './ui/Button';
 import { routeFor, ROUTE_LABELS, type RouteId } from '../lib/routing';
+import type { SpecialistReply } from '../lib/specialist';
 
 const WINDOW_VARIANT: Record<SignalLevel, 'block' | 'flag' | 'neutral'> = {
   high: 'block', medium: 'flag', low: 'neutral',
@@ -19,7 +20,7 @@ const BAR_COLOR = {
 } as const;
 
 export function OpportunityCard({
-  rank, opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff,
+  rank, opp, onOpenClient, onOpenOutreach, onDismiss, onHandoff, specialistReply,
 }: {
   rank: number;
   opp: Opportunity;
@@ -27,12 +28,17 @@ export function OpportunityCard({
   onOpenOutreach: (id: string) => void;
   onDismiss?: (id: string) => void;
   onHandoff: (oppId: string, route: RouteId) => void;
+  specialistReply?: SpecialistReply;
 }) {
   const c = CLIENTS[opp.clientId];
   const signal = signalBreakdown(opp);
   const route = routeFor(opp, c);
   const [showAlts, setShowAlts] = useState(false);
-  const alternates = (Object.keys(ROUTE_LABELS) as RouteId[]).filter(id => id !== route.id);
+  // Once the specialist has replied, the referral is closed — the next step is to
+  // draft, whatever the original routing rule said.
+  const primaryId: RouteId = specialistReply ? 'draft' : route.id;
+  const primaryLabel = specialistReply ? ROUTE_LABELS.draft : route.label;
+  const alternates = (Object.keys(ROUTE_LABELS) as RouteId[]).filter(id => id !== primaryId);
 
   function runRoute(id: RouteId) {
     if (id === 'draft') onOpenOutreach(c.id);
@@ -52,6 +58,7 @@ export function OpportunityCard({
             <Pill variant={WINDOW_VARIANT[signal.urgency.level]} className="text-[12px] font-semibold" data-testid="window-to-act">
               {opp.daysToAct} days to act
             </Pill>
+            {specialistReply && <Pill variant="pass" dot>Specialist reviewed</Pill>}
           </div>
           <button
             type="button"
@@ -91,10 +98,17 @@ export function OpportunityCard({
         <WhyBox label="Why this instrument" value={opp.whyInstrument} onClick={() => onOpenClient(c.id)} />
       </div>
 
+      {specialistReply && (
+        <div className="bg-green-wash rounded-xl p-3 mt-3" data-testid="specialist-verdict">
+          <div className="t-micro mb-1">Specialist verdict</div>
+          <div className="text-[13.5px] leading-relaxed text-ink-2">{specialistReply.verdict} {specialistReply.nextStep}</div>
+        </div>
+      )}
+
       <div className="mt-4">
         <div className="flex gap-2 flex-wrap items-center">
-          <Button data-testid="route-primary" variant="primary" size="sm" onClick={() => runRoute(route.id)}>
-            {route.label}
+          <Button data-testid="route-primary" variant="primary" size="sm" onClick={() => runRoute(primaryId)}>
+            {primaryLabel}
           </Button>
           <Button data-testid="route-toggle" variant="ghost" size="sm" onClick={() => setShowAlts(v => !v)}>
             Other actions {showAlts ? '▴' : '▾'}
