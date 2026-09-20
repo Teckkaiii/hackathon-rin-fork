@@ -330,7 +330,7 @@ function startServer() {
   txt = await page.locator('main').innerText();
   check('Past Week tracks 3 themes', (() => {
     const i = txt.toLowerCase().indexOf('themes tracked');
-    return i > -1 && txt.slice(i, i + 20).includes('3');
+    return i > -1 && txt.slice(Math.max(0, i - 20), i + 20).includes('3');
   })());
   check('Rate-cut theme flagged High momentum', (() => {
     const i = txt.indexOf('SGD rates expected to ease');

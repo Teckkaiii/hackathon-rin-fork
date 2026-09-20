@@ -5,6 +5,7 @@ import { OPPS, blockedOpps, rankedOpps, clusters } from '../lib/queue';
 import { OpportunityCard } from './OpportunityCard';
 import { Pill } from './ui/Pill';
 import { Modal } from './ui/Modal';
+import { StatStrip } from './ui/StatStrip';
 import { ROUTE_LABELS, type RouteId } from '../lib/routing';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
@@ -67,16 +68,14 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
     <div>
       <div className="t-display mb-3">{greeting()}, {CURRENT_RM.split(' ')[0]}.</div>
 
-      <div
+      <StatStrip
         data-testid="queue-stat-strip"
-        className="mesh-red flex items-stretch gap-0 !p-0 overflow-hidden mb-4"
-      >
-        <StatBlock value={surfaced.length} label="Surfaced" />
-        <div className="w-px bg-red/15 my-4" />
-        <StatBlock value={blocked.length} label="Withheld" />
-        <div className="w-px bg-red/15 my-4" />
-        <StatBlock value={overnightDrivers.length} label="Signals overnight" />
-      </div>
+        stats={[
+          { value: surfaced.length, label: 'Surfaced' },
+          { value: blocked.length, label: 'Withheld' },
+          { value: overnightDrivers.length, label: 'Signals overnight' },
+        ]}
+      />
 
       <div className="t-lead mb-5" data-testid="queue-summary">
         {overnightSummary(overnightDrivers, surfaced.length, blocked.length)}
@@ -187,15 +186,6 @@ function greeting(): string {
   if (h < 12) return 'Good morning';
   if (h < 18) return 'Good afternoon';
   return 'Good evening';
-}
-
-function StatBlock({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="flex-1 px-5 py-4 min-w-[110px]">
-      <div className="num text-[32px] font-extrabold leading-none tracking-tight text-red">{String(value).padStart(2, '0')}</div>
-      <div className="t-micro mt-1.5">{label}</div>
-    </div>
-  );
 }
 
 function overnightSummary(driverLabels: string[], surfacedCount: number, blockedCount: number): string {
