@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Action, AppState } from '../state';
-import { MY_CLIENT_IDS, CLIENTS } from '../state';
+import { MY_CLIENT_IDS, CLIENTS, FOLLOW_UPS } from '../state';
 import type { CoachCheck } from '../types';
 import { OPPS, blockedClientIds, rankedOpps } from '../lib/queue';
 import { newsByClient } from '../lib/news';
@@ -8,7 +8,7 @@ import { runCoachChecks } from '../lib/coach';
 import { NOW_TS } from '../lib/format';
 import {
   DEFAULT_SPEC, applyIntent, parseIntent, renderDraft, replyFor, openingMessage,
-  specialistOpeningMessage, clarifyOpeningMessage, checkFailureMessage, sentMessage, effectiveApproach, type Intent,
+  specialistOpeningMessage, clarifyOpeningMessage, followUpOpeningMessage, checkFailureMessage, sentMessage, effectiveApproach, type Intent,
 } from '../lib/assistant';
 import type { Approach } from '../types';
 import { cn } from '../lib/cn';
@@ -79,10 +79,15 @@ export function OutreachView({ state, dispatch }: { state: AppState; dispatch: (
     if (chat.length === 0) {
       const specialistReply = opp ? state.specialistReplies[opp.id] : undefined;
       const callOutcome = opp ? state.callOutcomes[opp.id] : undefined;
+      const followUp = FOLLOW_UPS.find(f =>
+        f.clientId === clientId && !state.ledger.some(l => l.clientId === clientId && l.kind === 'Sent' && l.ts === NOW_TS)
+      );
       const opening = specialistReply
         ? specialistOpeningMessage(c, specialistReply)
         : callOutcome
         ? clarifyOpeningMessage(c, callOutcome)
+        : followUp
+        ? followUpOpeningMessage(c, followUp.daysAgo, followUp.about)
         : openingMessage(c, opp);
       dispatch({ type: 'CHAT_APPEND', clientId, message: { role: 'rin', text: opening } });
     }

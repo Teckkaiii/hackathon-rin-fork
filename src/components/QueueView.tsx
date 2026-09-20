@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { Action, AppState } from '../state';
 import type { Opportunity } from '../types';
-import { CLIENTS, DRIVERS, MY_CLIENT_IDS, CURRENT_RM } from '../state';
+import { CLIENTS, DRIVERS, MY_CLIENT_IDS, CURRENT_RM, FOLLOW_UPS } from '../state';
 import { OPPS, blockedOpps, rankedOpps, clusters } from '../lib/queue';
 import { OpportunityCard } from './OpportunityCard';
 import { Pill } from './ui/Pill';
@@ -14,7 +14,7 @@ import { callOutcome } from '../lib/clarify';
 import { NOW_TS } from '../lib/format';
 
 export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
-  const { dismissed, routed, specialistReplies, callOutcomes } = state;
+  const { dismissed, routed, specialistReplies, callOutcomes, ledger } = state;
 
   const surfaced = useMemo(() => rankedOpps(dismissed, routed, MY_CLIENT_IDS), [dismissed, routed]);
   const blocked = useMemo(() => blockedOpps(MY_CLIENT_IDS), []);
@@ -25,6 +25,13 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
   }, []);
   const dismissedList = OPPS.filter(o => o.id in dismissed && MY_CLIENT_IDS.has(o.clientId));
   const handedOffList = OPPS.filter(o => o.id in routed && MY_CLIENT_IDS.has(o.clientId));
+  // A follow-up is still open as long as no *live* Sent entry exists for that
+  // client — the moment the RM actually sends a fresh note, this list drops
+  // them on its own, no separate "resolve" action needed.
+  const needsFollowUp = FOLLOW_UPS.filter(f =>
+    MY_CLIENT_IDS.has(f.clientId) &&
+    !ledger.some(l => l.clientId === f.clientId && l.kind === 'Sent' && l.ts === NOW_TS)
+  );
 
   const [dismissTarget, setDismissTarget] = useState<string | null>(null);
   const [dismissReason, setDismissReason] = useState('Client not reachable this week');
@@ -152,6 +159,34 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
                     </Button>
                   )}
                 </div>
+              </div>
+            );
+          })}
+        </>
+      )}
+
+      {needsFollowUp.length > 0 && (
+        <>
+          <div className="t-h1 mt-8 mb-1">Needs a follow-up</div>
+          <div className="t-meta mb-3">
+            Sent, with nothing back yet.
+          </div>
+          {needsFollowUp.map(f => {
+            const c = CLIENTS[f.clientId];
+            return (
+              <div key={f.clientId} data-testid="needs-followup-row" className="glass-tight p-4 mb-2 flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <div className="t-h3">{c.name}</div>
+                  <div className="t-meta">Sent {f.sentTs} · {f.daysAgo} days ago — no reply since.</div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  data-testid="draft-followup"
+                  onClick={() => { dispatch({ type: 'SET_OUTREACH_CLIENT', id: f.clientId }); dispatch({ type: 'SET_TAB', tab: 'outreach' }); }}
+                >
+                  Draft follow-up
+                </Button>
               </div>
             );
           })}

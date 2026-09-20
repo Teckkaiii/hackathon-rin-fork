@@ -153,6 +153,13 @@ export function clarifyOpeningMessage(client: Client, outcome: { verdict: string
   return `From the call with ${first}: ${outcome.verdict} ${outcome.nextStep} Want me to draft that note now?`;
 }
 
+// Opens the chat differently when a note already went out and nothing came
+// back — RIN leads with that instead of the usual "I've drafted a note".
+export function followUpOpeningMessage(client: Client, daysAgo: number, about: string): string {
+  const first = firstName(client);
+  return `You sent ${first} a note ${daysAgo} days ago about ${about} — no reply yet. Want me to draft a follow-up?`;
+}
+
 export function replyFor(intent: Intent | null, client: Client): string {
   const first = firstName(client);
   const h = client.holdings[0];
