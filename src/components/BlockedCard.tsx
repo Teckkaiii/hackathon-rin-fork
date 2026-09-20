@@ -13,7 +13,7 @@ export function BlockedCard({ opp, gates }: { opp: Opportunity; gates: GateResul
       <div className="flex items-start justify-between gap-4 flex-wrap p-5 pb-4">
         <div>
           <div className="t-h2">{c.name}</div>
-          <div className="t-meta mt-0.5">{c.segment} · {c.tier} · RM {c.rm}</div>
+          <div className="t-meta mt-0.5">{c.segment}</div>
         </div>
         <Pill variant="block" dot>Withheld from queue</Pill>
       </div>
@@ -23,13 +23,13 @@ export function BlockedCard({ opp, gates }: { opp: Opportunity; gates: GateResul
           <div
             key={r.gate}
             className={cn(
-              'flex items-center gap-3 text-[13.5px] py-3 px-5 border-t border-hairline',
+              'grid grid-cols-[7px_1fr] sm:grid-cols-[7px_170px_1fr] items-baseline gap-x-3 gap-y-1 text-[13.5px] py-3 px-5 border-t border-hairline',
               r.status === 'block' && 'bg-red-wash'
             )}
           >
             <span className={`dot dot-${r.status === 'pass' ? 'pass' : 'block'}`} />
-            <span className={cn('font-semibold min-w-[170px]', r.status === 'block' ? 'text-red-deep' : 'text-ink')}>{r.label}</span>
-            <span className="text-ink-2 text-[13px]">{r.reason}</span>
+            <span className={cn('font-semibold', r.status === 'block' ? 'text-red-deep' : 'text-ink')}>{r.label}</span>
+            <span className="text-ink-2 text-[13px] col-start-2 sm:col-start-3">{r.reason}</span>
           </div>
         ))}
       </div>
