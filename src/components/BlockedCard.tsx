@@ -35,8 +35,8 @@ export function BlockedCard({ opp, gates }: { opp: Opportunity; gates: GateResul
       </div>
 
       <div className="t-meta px-5 py-3 border-t border-hairline bg-sunk">
-        Would otherwise rank on <span className="num font-semibold text-ink-2">{fmt(opp.amountAtStake)}</span> at stake,{' '}
-        {opp.daysToAct}-day window. Blocked at <b className="text-ink-2">{blockedRow.label}</b>.
+        Worth <span className="num font-semibold text-ink-2">{fmt(opp.amountAtStake)}</span> with {opp.daysToAct} days
+        to act — held at <b className="text-ink-2">{blockedRow.label}</b>.
       </div>
     </div>
   );

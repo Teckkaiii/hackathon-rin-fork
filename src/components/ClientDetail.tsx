@@ -21,8 +21,8 @@ export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string
           <div className="t-meta mt-0.5">{c.segment}</div>
         </div>
         <div className="flex gap-2 flex-none">
-          <Pill variant={lapsed ? 'block' : 'pass'}>{lapsed ? 'Suitability lapsed' : `Suitability current · ${monthsSince} months ago`}</Pill>
-          <Pill variant="neutral">{oppCount} open {oppCount === 1 ? 'opportunity' : 'opportunities'}</Pill>
+          <Pill variant={lapsed ? 'block' : 'pass'}>{lapsed ? 'Suitability review overdue' : `Suitability reviewed ${monthsSince} months ago`}</Pill>
+          {oppCount > 0 && <Pill variant="neutral">{oppCount === 1 ? 'In your queue' : `${oppCount} in your queue`}</Pill>}
         </div>
       </div>
 
@@ -54,7 +54,7 @@ export function ClientDetail({ clientId, onBack, backLabel }: { clientId: string
           <KV label="Last assessed" value={fmtDate(c.riskProfile.lastAssessed)} />
         </InfoCard>
 
-        <InfoCard eyebrow="Portfolio · evidence-traced">
+        <InfoCard eyebrow="Portfolio">
           {c.holdings.map((h, i) => (
             <div key={i} className={i > 0 ? 'pt-3 mt-3 border-t border-hairline' : ''}>
               <div className="flex justify-between items-baseline gap-3">

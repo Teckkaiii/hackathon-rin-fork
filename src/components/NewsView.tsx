@@ -30,9 +30,8 @@ export function NewsView({ onOpenClient }: { onOpenClient: (id: string) => void 
     <div>
       <div className="t-display mb-1">News</div>
       <div className="t-lead mb-5 max-w-[820px]">
-        Market and desk events from the last day, grouped by client and led by whichever is most impactful to them.
-        Confirmed impacts are already linked to a signal on an opportunity; inferred ones are RIN's own match against
-        holdings, unreviewed.
+        What happened in the last day, sorted by who it touches most. Confirmed means it is already behind an item
+        in your queue. Inferred means RIN thinks it fits what the client holds, and you have not checked it yet.
       </div>
 
       {groups.map(({ client, items }) => {

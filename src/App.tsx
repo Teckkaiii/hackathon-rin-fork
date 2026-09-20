@@ -22,7 +22,7 @@ export default function App() {
           </div>
           <div>
             <div className="font-sans font-extrabold text-[18px] leading-none tracking-tight text-ink">Revenue Intelligence Network</div>
-            <div className="t-meta mt-0.5">Daily decision layer</div>
+            <div className="t-meta mt-0.5">Your morning, sorted.</div>
           </div>
           <Nav tab={state.tab} onChange={tab => dispatch({ type: 'SET_TAB', tab })} />
         </div>
@@ -46,7 +46,7 @@ export default function App() {
       </main>
 
       <div className="max-w-[1160px] mx-auto px-5 py-4 border-t border-hairline-2 text-center t-meta">
-        Synthetic data throughout. RIN surfaces and explains; it does not price, advise, or send without RM approval.
+        Demo data. RIN suggests and explains — it never prices, advises, or sends anything without you.
       </div>
     </>
   );

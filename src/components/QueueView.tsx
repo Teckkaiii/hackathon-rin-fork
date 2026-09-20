@@ -83,10 +83,10 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
 
       {cls.map(cl => (
         <div key={cl.driver.id} className="glass-tight bg-sunk p-4 mb-4 flex gap-3 items-start">
-          <Pill variant="flag">Cluster</Pill>
+          <Pill variant="flag">Linked</Pill>
           <div className="t-body">
-            <b>Correlated conviction cluster</b> — {cl.opps.length} opportunities rest on the same driver:{' '}
-            <b>{cl.driver.label}</b> ({cl.opps.map(o => CLIENTS[o.clientId].name).join(', ')}). Read as one conviction, not {cl.opps.length} independent ones.
+            <b>Same story, {cl.opps.length} clients</b> — {cl.opps.map(o => CLIENTS[o.clientId].name).join(', ')} are all
+            here because of <b>{cl.driver.label}</b>. Treat them as one call, not {cl.opps.length}.
           </div>
         </div>
       ))}
@@ -109,8 +109,7 @@ export function QueueView({ state, dispatch }: { state: AppState; dispatch: (a: 
         <>
           <div className="t-h1 mt-8 mb-1">Handed off</div>
           <div className="t-meta mb-3">
-            These opportunities were routed somewhere other than a direct message. They stay out of the queue until the
-            desk or the client comes back.
+            You passed these to a specialist or to a call. They stay off your queue until you hear back.
           </div>
           {handedOffList.map(o => {
             const c = CLIENTS[o.clientId];

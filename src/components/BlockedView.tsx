@@ -9,8 +9,8 @@ export function BlockedView() {
     <div>
       <div className="t-display mb-1">Blocked</div>
       <div className="t-lead mb-5 max-w-[760px]">
-        Withheld from the queue entirely by a hard compliance gate. Gates always run before ranking, so no filter
-        setting can surface these.
+        Held back by a compliance check. These never reach your queue until the check clears — there is no way to
+        force them through.
       </div>
 
       {blocked.length

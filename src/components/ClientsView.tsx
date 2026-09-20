@@ -12,8 +12,7 @@ export function ClientsView({ onOpenClient }: { onOpenClient: (id: string) => vo
     <div>
       <div className="t-display mb-1">Clients</div>
       <div className="t-lead mb-5">
-        One reviewable position page per Premier or Private client. Clients withheld by a compliance gate live in
-        the Blocked tab instead.
+        Everyone in your book. Anyone held back by a compliance check is in the Blocked tab instead.
       </div>
       {clients.map(c => {
         const months = monthsBetween(new Date(c.suitability.lastReview + 'T00:00:00'), TODAY);

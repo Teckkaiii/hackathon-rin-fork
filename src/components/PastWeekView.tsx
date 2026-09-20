@@ -18,16 +18,16 @@ export function PastWeekView() {
     <div>
       <div className="t-display mb-1">Past week</div>
       <div className="t-lead mb-5 max-w-[820px]">
-        Seven days of daily impact reads per theme, against this book. A theme that landed the same direction every
-        day is durable enough to build a recommendation around; one that flips is not.
+        How each story moved over the last seven days. A story that pointed the same way every day is safe to act
+        on. One that kept flipping is not.
       </div>
 
       <StatStrip
         data-testid="pastweek-stat-strip"
         stats={[
           { value: rows.length, label: 'Themes tracked', hint: 'over the last 7 days' },
-          { value: highCount, label: 'High momentum', hint: 'consistent direction all week' },
-          { value: deprioritized.size, label: 'Clients deprioritized', hint: 'touched only by volatile themes' },
+          { value: highCount, label: 'High momentum', hint: 'pointed one way all week' },
+          { value: deprioritized.size, label: 'Clients deprioritized', hint: 'only touched by flipping stories' },
         ]}
       />
 
@@ -76,8 +76,8 @@ export function PastWeekView() {
                         <div className="t-h3">{c.name}</div>
                         <div className="text-[13.5px] text-ink-2">
                           {isDeprioritized
-                            ? 'Every theme touching this client this week was volatile — no durable long-term action to recommend yet. Watch, don’t act.'
-                            : 'Touched by at least one high-momentum theme this week — keeps its normal priority in the Queue.'}
+                            ? 'Every story touching this client kept flipping this week. Watch, don’t act yet.'
+                            : 'At least one steady story touches this client — stays where it is in your queue.'}
                         </div>
                       </div>
                     </div>
